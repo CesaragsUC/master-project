@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Hosting;
-using Produtos.Consumer;
+using Produtos.Consumer.Configurations;
 using Serilog;
 
 

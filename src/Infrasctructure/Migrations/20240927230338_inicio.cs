@@ -8,6 +8,8 @@ public class Inicio : Migration
 {
     public override void Up()
     {
+        Console.WriteLine("Criando tabela Produtos.");
+
         if (!Schema.Table("Produtos").Exists())
         {
             Create.Table("Produtos")
@@ -17,7 +19,7 @@ public class Inicio : Migration
             .WithColumn("Active").AsBoolean().NotNullable()
             .WithColumn("CreatAt").AsDateTimeOffset().Nullable(); // Utilizando DateTimeOffset para equivaler ao "timestamp with time zone"
         }
-
+        Console.WriteLine("Tabela Produtos criada.");
     }
 
     public override void Down()

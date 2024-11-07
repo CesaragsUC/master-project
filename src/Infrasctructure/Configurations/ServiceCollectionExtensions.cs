@@ -47,24 +47,6 @@ public static class ServiceCollectionExtensions
          runner.MigrateUp();
     }
 
-    private static void RollbackMigration(IMigrationRunner runner, long targetVersion)
-    {
-        // Reverte para a versão especificada
-        runner.MigrateDown(targetVersion);
-    }
-
-    private static void RollbackAllMigrations(IMigrationRunner runner)
-    {
-        // Reverte todas as migrações
-        runner.MigrateDown(0);
-    }
-
-    private static void RollbackLastMigrations(IMigrationRunner runner, int steps)
-    {
-        // Reverte as últimas 'steps' migrações
-        runner.Rollback(steps);
-    }
-
     private static void EnsureDatabaseExists(IConfiguration configuration)
     {
         var defaultConnectionString = configuration.GetConnectionString("DefaultConnection");
@@ -90,11 +72,28 @@ public static class ServiceCollectionExtensions
             }
         }
     }
-
     private static string RemoveDatabaseFromConnectionString(string connectionString)
     {
         var builder = new NpgsqlConnectionStringBuilder(connectionString);
         builder.Database = string.Empty; // Remove o nome do banco de dados
         return builder.ToString();
+    }
+
+    private static void RollbackMigration(IMigrationRunner runner, long targetVersion)
+    {
+        // Reverte para a versão especificada
+        runner.MigrateDown(targetVersion);
+    }
+
+    private static void RollbackAllMigrations(IMigrationRunner runner)
+    {
+        // Reverte todas as migrações
+        runner.MigrateDown(0);
+    }
+
+    private static void RollbackLastMigrations(IMigrationRunner runner, int steps)
+    {
+        // Reverte as últimas 'steps' migrações
+        runner.Rollback(steps);
     }
 }

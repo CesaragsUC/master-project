@@ -5,10 +5,10 @@ namespace Infrasctructure
 {
     public static class ProdutoFactory
     {
-        public static Produto CreateProduto()
+        public static Produtos CreateProduto()
         {
             Faker bogus = new Faker();
-            return new Produto
+            return new Produtos
             {
                 Id = bogus.Random.Guid(),
                 Nome = bogus.Commerce.ProductName(),
@@ -19,21 +19,21 @@ namespace Infrasctructure
 
         }
 
-        public static Produto CreateNullProduto()
+        public static Produtos CreateNullProduto()
         {
             return null;
         }
 
-        public static List<Produto> CreateProdutoList(int total)
+        public static List<Produtos> CreateProdutoList(int total)
         {
-            var produtos = new List<Produto>();
+            var produtos = new List<Produtos>();
             for (int i = 0; i < total; i++)
             {
                 produtos.Add(CreateProduto());
             }
 
             Faker bogus = new Faker();
-            var produto = new Produto
+            var produto = new Produtos
             {
                 Id = Guid.Parse("dfa9057b-9d9e-427f-9e94-4fbd0d3d02a2"),
                 Nome = bogus.Commerce.ProductName(),

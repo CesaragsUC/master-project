@@ -1,11 +1,12 @@
-﻿using Microsoft.Extensions.Options;
-using MongoDB.Bson.Serialization.Serializers;
-using MongoDB.Bson.Serialization;
+﻿using Configurations;
+using Domain.Interfaces;
+using Microsoft.Extensions.Options;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
-using Api.Catalogo.Abstractions;
 
-namespace Api.Catalogo.DbContext;
+namespace InfraStructure;
 
 public class MongoDbContext : IMongoDbContext
 {

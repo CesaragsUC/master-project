@@ -1,4 +1,4 @@
-﻿namespace Api.Produto.Tests;
+﻿namespace Api.Produtos.Tests;
 
 public class RepositoryTest
 {
@@ -8,7 +8,7 @@ public class RepositoryTest
     }
 
     [Fact(DisplayName = "Teste 01 - Deve se conectar ao banco Postgres com sucesso.")]
-    [Trait("ProdutoService", "Repository")]
+    [Trait("Produtoservice", "Repository")]
     public async Task Test1()
     {
 

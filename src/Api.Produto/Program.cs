@@ -1,10 +1,14 @@
-using Domain;
+using Azure.Storage.Blobs;
+using Domain.Configurations;
 using Domain.Interfaces;
 using Infrasctructure;
-using Infrastructure;
 using Infrastructure.Configurations;
+using Infrastructure.Repository;
+using Infrastructure.Services;
+using InfraStructure;
 using MassTransit;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -37,8 +41,18 @@ try
 
     builder.Services.AddMediatrService();
     builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+    builder.Services.AddScoped<IBobStorageService, BobStorageService>();
 
     builder.Services.PostgresDbService(builder.Configuration);
+
+
+    builder.Services.Configure<BlobContainers>(builder.Configuration.GetSection("BlobContainers"));
+
+    builder.Services.AddSingleton(provider =>
+    {
+        var blobContainers = provider.GetRequiredService<IOptions<BlobContainers>>().Value;
+        return new BlobServiceClient(blobContainers.ConnectionStrings);
+    });
 
     ////opção 1 com classe de configuração
     //builder.Services.AddScoped<IMigratorService, MigratorService>();

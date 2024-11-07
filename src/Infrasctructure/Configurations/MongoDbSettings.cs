@@ -1,4 +1,4 @@
-﻿namespace Produtos.Consumer;
+﻿namespace Configurations;
 
 public class MongoDbSettings
 {

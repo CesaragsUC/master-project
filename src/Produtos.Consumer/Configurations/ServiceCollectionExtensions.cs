@@ -1,10 +1,15 @@
-﻿using MassTransit;
+﻿using Configurations;
+using Domain.Interfaces;
+using Infrastructure.Repository;
+using InfraStructure;
+using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Produtos.Consumer.Jobs;
 using Quartz;
 using System.Reflection;
 
-namespace Produtos.Consumer;
+namespace Produtos.Consumer.Configurations;
 
 public static class ServiceCollectionExtensions
 {
@@ -13,6 +18,7 @@ public static class ServiceCollectionExtensions
         services.QuartzJobServices(configuration);
         services.MassTransitServices(configuration);
         services.MongoDbService(configuration);
+        services.AddMediatrService();
         return services;
     }
 
@@ -103,8 +109,17 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection MongoDbService(this IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<MongoDbSettings>(configuration.GetSection(nameof(MongoDbSettings)));
-        services.AddSingleton<MongoDbContext>();
+        services.AddScoped(typeof(IMongoRepository<>), typeof(MongoRepository<>));
+        services.AddSingleton<IMongoDbContext,MongoDbContext>();
 
         return services;
+    }
+
+    public static void AddMediatrService(this IServiceCollection services)
+    {
+        //Registra todos os handlers do MediatR
+        services.AddMediatR(cfg => {
+            cfg.RegisterServicesFromAssemblies(Assembly.GetExecutingAssembly());
+        });
     }
 }

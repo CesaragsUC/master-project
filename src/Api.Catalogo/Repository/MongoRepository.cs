@@ -84,9 +84,9 @@ public class MongoRepository<TEntity> : IMongoRepository<TEntity> where TEntity 
 
 
 
-    public async Task UpdateAsync(string field, TEntity obj)
+    public async Task UpdateAsync(string id, TEntity obj)
     {
-        var filter = Builders<TEntity>.Filter.Eq(field, GetEntityId(field,obj));
+        var filter = Builders<TEntity>.Filter.Eq(id, GetEntityId(id, obj));
 
         // Define as atualizações necessárias para cada <field,value>.
         var update = GetObjectProperties(obj);

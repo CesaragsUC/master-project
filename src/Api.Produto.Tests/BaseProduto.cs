@@ -3,15 +3,15 @@ using Domain.Models;
 
 namespace Tests;
 
-public static class BaseProduto
+public static class BaseProdutos
 {
-    public static List<Produto> CriarteProdutoLista(int total = 10)
+    public static List<Produtos> CriarteProdutosLista(int total = 10)
     {
-        var produtos = new List<Produto>();
+        var Produtos = new List<Produtos>();
         for (int i = 0; i < total; i++)
         {
             Faker faker = new Faker("pt_BR");
-            produtos.Add(new Produto
+            Produtos.Add(new Produtos
             {
                 Id = Guid.NewGuid(),
                 Nome = faker.Commerce.ProductName(),
@@ -21,14 +21,14 @@ public static class BaseProduto
             });
         }
 
-        return produtos;
+        return Produtos;
     }
 
-    public static Produto CriarteProduto()
+    public static Produtos CriarteProdutos()
     {
         Faker faker = new Faker("pt_BR");
 
-        var produto = new Produto
+        var Produtos = new Produtos
         {
             Id = Guid.NewGuid(),
             Nome = faker.Commerce.ProductName(),
@@ -38,6 +38,6 @@ public static class BaseProduto
         };
 
 
-        return produto;
+        return Produtos;
     }
 }

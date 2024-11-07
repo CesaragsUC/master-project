@@ -29,6 +29,6 @@ public class ProdutoPgDbContext : DbContext
         base.OnModelCreating(modelBuilder);
     }
 
-    public DbSet<Produto> Produtos { get; set; }
+    public DbSet<Produtos> Produtos { get; set; }
 
 }

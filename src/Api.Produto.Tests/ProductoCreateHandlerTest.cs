@@ -12,29 +12,29 @@ namespace Tests
 {
     public class ProductoCreateHandlerTest : BaseConfig
     {
-        private readonly Mock<IRepository<Produto>> _repository;
+        private readonly Mock<IRepository<Produtos>> _repository;
         private readonly Mock<IPublishEndpoint> _massTransient;
-        private readonly Mock<IMediator> _mediator;
-        private ProdutoCreateHandler _handler;
+        private readonly Mock<IBobStorageService> _bobStorageService;
+        private readonly ProdutoCreateHandler _handler;
         public ProductoCreateHandlerTest()
         {
             InitializeMediatrService();
 
-            _repository = new Mock<IRepository<Produto>>();
-            _mediator = new Mock<IMediator>();
+            _repository = new Mock<IRepository<Produtos>>();
             _massTransient = new Mock<IPublishEndpoint>();
-            _handler = new ProdutoCreateHandler(_repository.Object, _massTransient.Object);
+            _bobStorageService = new Mock<IBobStorageService>();
+            _handler = new ProdutoCreateHandler(_repository.Object, _massTransient.Object, _bobStorageService.Object);
         }
 
         [Fact(DisplayName = "Teste 01 - Com sucesso")]
-        [Trait("ProdutoService", "ProductoCreateHandler")]
+        [Trait("Produtoservice", "ProductoCreateHandler")]
         public async Task Test1()
         {
             // Arrange
 
             var command = new CreateProdutoCommand
             {
-                Nome = "Produto 01",
+                Nome = "Produtos 01",
                 Preco = 10.5m,
                 Active = true
             };
@@ -44,11 +44,11 @@ namespace Tests
             // Act
             Assert.True(result);
 
-            _repository.Verify(r => r.Add(It.IsAny<Produto>()), Times.Once);
+            _repository.Verify(r => r.Add(It.IsAny<Produtos>()), Times.Once);
         }
 
         [Fact(DisplayName = "Teste 02 - Com Falha")]
-        [Trait("ProdutoService", "ProductoCreateHandler")]
+        [Trait("Produtoservice", "ProductoCreateHandler")]
         public async Task Test2()
         {
             // Arrange
@@ -59,7 +59,7 @@ namespace Tests
 
             // Act
             Assert.False(result);
-            _repository.Verify(r => r.Add(It.IsAny<Produto>()), Times.Never);
+            _repository.Verify(r => r.Add(It.IsAny<Produtos>()), Times.Never);
         }
     }
 }

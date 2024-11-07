@@ -7,9 +7,9 @@ namespace Domain.Handlers
 {
     public class ProdutoDeleteHandler : IRequestHandler<DeleteProdutoCommand, bool>
     {
-        private readonly IRepository<Produto> _repository;
+        private readonly IRepository<Produtos> _repository;
 
-        public ProdutoDeleteHandler(IRepository<Produto> repository)
+        public ProdutoDeleteHandler(IRepository<Produtos> repository)
         {
             _repository = repository;
         }

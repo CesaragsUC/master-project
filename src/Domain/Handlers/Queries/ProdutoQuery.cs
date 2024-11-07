@@ -3,12 +3,12 @@ using Domain.Models;
 
 namespace Domain.Handlers.Queries
 {
-    public class ProdutoByIdQuery : IRequest<Produto>
+    public class ProdutoByIdQuery : IRequest<Produtos>
     {
         public Guid Id { get; set; }
     }
 
-    public class ProdutoQuery : IRequest<List<Produto>>
+    public class ProdutoQuery : IRequest<List<Produtos>>
     {
     }
 }

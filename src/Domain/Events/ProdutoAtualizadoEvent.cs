@@ -1,9 +1,11 @@
-﻿using MongoDB.Bson;
+﻿using MediatR;
 using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Bson;
+using Domain.Models;
 
-namespace Domain.Models;
+namespace Domain.Events;
 
-public class ProdutoMessage
+public class ProdutoAtualizadoEvent : IRequest<bool>
 {
     [BsonElement("ProdutoId")]
     public string? ProdutoId { get; set; }
@@ -18,7 +20,7 @@ public class ProdutoMessage
     [BsonElement("Active")]
     public bool Active { get; set; }
 
-    [BsonElement("CreatAt")]
-    [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
-    public DateTime? CreatAt { get; set; }
+    [BsonElement("ImageUri")]
+    public string? ImageUri { get; set; }
+
 }

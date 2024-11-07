@@ -20,7 +20,7 @@ public interface IMongoRepository<TEntity> where TEntity : class
     /// <param name="whereCondition"></param>
     /// <param name="updates"></param>
     /// <returns></returns>
-    Task UpdateAsync(string field, TEntity obj);
+    Task UpdateAsync(string id, TEntity obj);
 
     /// <summary>
     ///  Atualiza um campo
