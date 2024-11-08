@@ -8,22 +8,22 @@ public class Inicio : Migration
 {
     public override void Up()
     {
-        Console.WriteLine("Criando tabela Produtos.");
+        Console.WriteLine("Creating table Products.");
 
-        if (!Schema.Table("Produtos").Exists())
+        if (!Schema.Table("Products").Exists())
         {
-            Create.Table("Produtos")
+            Create.Table("Products")
             .WithColumn("Id").AsGuid().PrimaryKey().NotNullable()
-            .WithColumn("Nome").AsString().NotNullable()
-            .WithColumn("Preco").AsDecimal().NotNullable()
+            .WithColumn("Name").AsString().NotNullable()
+            .WithColumn("Price").AsDecimal().NotNullable()
             .WithColumn("Active").AsBoolean().NotNullable()
             .WithColumn("CreatAt").AsDateTimeOffset().Nullable(); // Utilizando DateTimeOffset para equivaler ao "timestamp with time zone"
         }
-        Console.WriteLine("Tabela Produtos criada.");
+        Console.WriteLine("Table Products created.");
     }
 
     public override void Down()
     {
-        Delete.Table("Produtos");
+        Delete.Table("Products");
     }
 }

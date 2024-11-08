@@ -8,9 +8,9 @@ namespace Api.Catalogo.Mapping
     {
         public MapperConfig()
         {
-            CreateMap<ProdutoAddDto, Produtos>().ReverseMap();
-            CreateMap<ProdutoUpdateDto, Produtos>().ReverseMap();
-            CreateMap<Produtos, ProdutoDto>().ReverseMap();
+            CreateMap<ProductCreateDto, Product>().ReverseMap();
+            CreateMap<ProductUpdateDto, Product>().ReverseMap();
+            CreateMap<Product, ProductDto>().ReverseMap();
         }
     }
 }

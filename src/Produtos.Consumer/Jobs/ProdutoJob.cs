@@ -1,5 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using MassTransit;
+using Microsoft.Extensions.DependencyInjection;
 using Quartz;
+using Serilog;
 
 namespace Produtos.Consumer.Jobs;
 
@@ -13,22 +15,27 @@ internal sealed class ProdutoJob : IJob
     }
 
 
-    // somente uma demo de como criar um job. Isso não faz nada.
+    // Just simple demo.
     public async Task Execute(IJobExecutionContext context)
     {
-        // Log.Information($"Job executado em {DateTime.Now}");
+        Log.Information($"Job exectuted at {DateTime.Now}");
 
-        // await using var scope = _scopeFactory.CreateAsyncScope();
+        await using var scope = _scopeFactory.CreateAsyncScope();
 
-        // var pub01 = scope.ServiceProvider.GetRequiredService<IMessageScheduler>();
+        var pub01 = scope.ServiceProvider.GetRequiredService<IMessageScheduler>();
 
-        //await pub01.SchedulePublish(TimeSpan.FromSeconds(15),
-        //     new DemoMessage { Value = "Hello, World", CreatAt = DateTime.Now });
+        await pub01.SchedulePublish(TimeSpan.FromSeconds(15),
+             new DemoMessage { Price = 200, CreatAt = DateTime.Now });
 
-        // var pub02 = scope.ServiceProvider.GetRequiredService<IPublishEndpoint>();
+        var pub02 = scope.ServiceProvider.GetRequiredService<IPublishEndpoint>();
 
-        //envia a msg na fila
-        // await pub02.Publish(new ProductMessage { Id = Guid.NewGuid(),Nome= "Mochila" , Preco = 100, Active= true, CreatAt = DateTime.Now });
+        // send a msg to queue
+        await pub02.Publish(new DemoMessage {
+            Id = Guid.NewGuid(),
+            Name = "Mochila", 
+            Price = 100,
+            CreatAt = DateTime.Now 
+        });
 
 
         await Task.CompletedTask;
@@ -38,7 +45,9 @@ internal sealed class ProdutoJob : IJob
 public class DemoMessage
 {
     public Guid Id { get; set; }
-    public string Value { get; set; }
+    public decimal Price { get; set; }
+
+    public string Name { get; set; }
     public DateTime CreatAt { get; set; }
 
     public DemoMessage()

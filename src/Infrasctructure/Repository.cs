@@ -7,8 +7,8 @@ namespace Infrasctructure;
 
 public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
 {
-    private readonly ProdutoPgDbContext _context;
-    public Repository(ProdutoPgDbContext context)
+    private readonly ProductPgDbContext _context;
+    public Repository(ProductPgDbContext context)
     {
         _context = context;
     }

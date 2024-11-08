@@ -9,7 +9,7 @@ public abstract class BaseConfig
     {
         var services = new ServiceCollection();
         var serviceProvider = services
-            .AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(typeof(ProdutoCreateHandler).Assembly))
+            .AddMediatR(cfg => cfg.RegisterServicesFromAssemblies(typeof(CreateProductHandler).Assembly))
             .BuildServiceProvider();
 
     }

@@ -3,10 +3,14 @@ using FluentValidation;
 
 namespace Domain.Validation
 {
-    public class CreateProductCommandValidator : AbstractValidator<CreateProductCommand>
+    public class UpdateProductCommandValidator : AbstractValidator<UpdateProductCommand>
     {
-        public CreateProductCommandValidator()
+        public UpdateProductCommandValidator()
         {
+            RuleFor(x => x.Id)
+                .NotEmpty()
+                .WithMessage("Id do produto não pode ser vazio");
+
             RuleFor(x => x.Name)
                 .NotEmpty()
                 .WithMessage("Nome do produto não pode ser vazio");

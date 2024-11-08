@@ -11,6 +11,9 @@ using System.Reflection;
 
 namespace Produtos.Consumer.Configurations;
 
+
+//https://github.com/quartznet/quartznet/tree/main/database/tables
+
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration configuration)

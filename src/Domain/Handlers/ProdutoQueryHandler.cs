@@ -6,23 +6,23 @@ using MediatR;
 namespace Domain.Handlers
 {
     public class ProdutoQueryHandler : 
-        IRequestHandler<ProdutoQuery, List<Produtos>>,
-        IRequestHandler<ProdutoByIdQuery,Produtos>
+        IRequestHandler<ProductQuery, List<Product>>,
+        IRequestHandler<ProductByIdQuery, Product>
     {
 
-        private readonly IRepository<Produtos> _repository;
+        private readonly IRepository<Product> _repository;
 
-        public ProdutoQueryHandler(IRepository<Produtos> repository)
+        public ProdutoQueryHandler(IRepository<Product> repository)
         {
             _repository = repository;
         }
 
-        public async Task<List<Produtos?>> Handle(ProdutoQuery request, CancellationToken cancellationToken)
+        public async Task<List<Product?>> Handle(ProductQuery request, CancellationToken cancellationToken)
         {
             return _repository.GetAll().ToList()!;
         }
 
-        public async Task<Produtos?> Handle(ProdutoByIdQuery request, CancellationToken cancellationToken)
+        public async Task<Product?> Handle(ProductByIdQuery request, CancellationToken cancellationToken)
         {
             var produto = _repository.FindOne(x => x.Id == request.Id);
 

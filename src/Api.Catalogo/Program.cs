@@ -28,12 +28,12 @@ try
     });
 
     builder.Services.AddScoped(typeof(IMongoRepository<>), typeof(MongoRepository<>));
-    builder.Services.AddScoped<IProdutoRepository, ProdutoRepository>();
-    builder.Services.AddScoped<IProdutoService, ProdutoService>();
+    builder.Services.AddScoped<IProductRepository, ProductRepository>();
+    builder.Services.AddScoped<IProductService, ProductService>();
     builder.Services.AddScoped<IMongoDbContext, MongoDbContext>();
     
    
-    builder.Services.AddScoped<IQueryFilter, ProdutoFilter>();
+    builder.Services.AddScoped<IQueryFilter, ProductFilter>();
 
     builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 

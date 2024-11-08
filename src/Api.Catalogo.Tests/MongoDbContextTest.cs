@@ -1,19 +1,14 @@
 ﻿using Api.Catalogo.Abstractions;
 using Api.Catalogo.DbContext;
-using Api.Catalogo.Models;
-using Api.Catalogo.Repository;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
-using MongoDB.Driver.Core.Configuration;
-using Moq;
 
 namespace Api.Catalogo.Tests;
 
 public class MongoDbContextTest
 {
 
-    private MongoRepository<Produtos> _mongoRepository;
-    private IMongoDbContext _mongoDbContext;
+    private readonly IMongoDbContext _mongoDbContext;
 
     public MongoDbContextTest()
     {
@@ -24,7 +19,6 @@ public class MongoDbContextTest
         });
 
         _mongoDbContext = new MongoDbContext(settings);
-        _mongoRepository = new MongoRepository<Produtos>(_mongoDbContext);
     }
 
 

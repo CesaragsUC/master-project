@@ -1,5 +1,4 @@
 ﻿using Api.Catalogo.Abstractions;
-using Api.Catalogo.Filters;
 using Api.Catalogo.Models;
 using Api.Catalogo.Repository;
 using MongoDB.Bson;
@@ -12,22 +11,22 @@ public class MongoRepositoryTest
 {
 
     private readonly Mock<IMongoDbContext> _mockContext;
-    private readonly Mock<IMongoCollection<Produtos>> _mockCollection;
-    private readonly MongoRepository<Produtos> _mongoRepository;
+    private readonly Mock<IMongoCollection<Product>> _mockCollection;
+    private readonly MongoRepository<Product> _mongoRepository;
     public MongoRepositoryTest()
     {
-        _mockCollection = new Mock<IMongoCollection<Produtos>>();
+        _mockCollection = new Mock<IMongoCollection<Product>>();
 
         _mockContext = new Mock<IMongoDbContext>();
 
         _mockContext
-            .Setup(c => c.GetCollection<Produtos>(It.IsAny<string>()))
+            .Setup(c => c.GetCollection<Product>(It.IsAny<string>()))
             .Returns(_mockCollection.Object);
 
         
-        _mongoRepository = new MongoRepository<Produtos>(_mockContext.Object);
+        _mongoRepository = new MongoRepository<Product>(_mockContext.Object);
 
-        // Descomentar caso queira usar o método InitializeMongoRepository
+        //// Descomentar caso queira usar o método InitializeMongoRepository
         //var (repository, collection) = BaseConfig.InitializeMongoRepository<Produtos>();
         //_mongoRepository = repository;
         //_mockCollection = collection;
@@ -39,13 +38,13 @@ public class MongoRepositoryTest
     public async Task Teste01()
     {
         // Arrange
-        var produto = ProdutosFactoryTests.CriarProduto();
+        var produto = ProductFactoryTests.CriarProduto();
 
         // Act
         await _mongoRepository.Insert(produto);
 
         // Assert
-        _mockCollection.Verify(c => c.InsertOneAsync(It.IsAny<Produtos>(), null, default), Times.Once);
+        _mockCollection.Verify(c => c.InsertOneAsync(It.IsAny<Product>(), null, default), Times.Once);
     }
 
     [Fact(DisplayName = "Teste 02 - Deve inserir lista produto com sucesso.")]
@@ -53,13 +52,13 @@ public class MongoRepositoryTest
     public async Task Teste02()
     {
         // Arrange
-        var produtos = ProdutosFactoryTests.CriarProdutoLista();
+        var produtos = ProductFactoryTests.CriarProdutoLista();
 
         // Act
         await _mongoRepository.InsertMany(produtos);
 
         // Assert
-        _mockCollection.Verify(c => c.InsertManyAsync(It.IsAny<List<Produtos>>(), null, default), Times.Once);
+        _mockCollection.Verify(c => c.InsertManyAsync(It.IsAny<List<Product>>(), null, default), Times.Once);
     }
 
     [Fact(DisplayName = "Teste 04 - Deve obter produto pelo ID com sucesso.")]
@@ -67,15 +66,15 @@ public class MongoRepositoryTest
     public async Task Teste03()
     {
         // Arrange
-        var produto = ProdutosFactoryTests.CriarProduto();
+        var produto = ProductFactoryTests.CriarProduto();
 
         // Opcao alternativa ao invez de usar os dados do construtor
-        var (repository, collection) = BaseConfig.InitializeMongoRepository<Produtos>();
+        var (repository, collection) = BaseConfig.InitializeMongoRepository<Product>();
 
         // Mock do retorno do Find para retornar um cursor mockado
-        var mockCursor = new Mock<IAsyncCursor<Produtos>>();
+        var mockCursor = new Mock<IAsyncCursor<Product>>();
 
-        mockCursor.Setup(c => c.Current).Returns(new List<Produtos> { produto });
+        mockCursor.Setup(c => c.Current).Returns(new List<Product> { produto });
 
         mockCursor
             .SetupSequence(c => c.MoveNext(It.IsAny<CancellationToken>())).Returns(true);
@@ -84,21 +83,21 @@ public class MongoRepositoryTest
             .SetupSequence(c => c.MoveNextAsync(It.IsAny<CancellationToken>())).ReturnsAsync(true);
 
 
-        collection.Setup(c => c.FindAsync(It.IsAny<FilterDefinition<Produtos>>(),
-                                    It.IsAny<FindOptions<Produtos>>(),
+        collection.Setup(c => c.FindAsync(It.IsAny<FilterDefinition<Product>>(),
+                                    It.IsAny<FindOptions<Product>>(),
                                     It.IsAny<CancellationToken>()))
                                     .ReturnsAsync(mockCursor.Object); // Retorna o cursor mockado
 
 
         // Act
 
-        var result = await repository.GetById(nameof(produto.ProdutoId), Guid.Parse(produto.ProdutoId!));
+        var result = await repository.GetById(nameof(produto.ProductId), Guid.Parse(produto.ProductId!));
 
 
         // Assert
 
-        collection.Verify(c => c.FindAsync(It.IsAny<FilterDefinition<Produtos>>(),
-                                       It.IsAny<FindOptions<Produtos>>(),
+        collection.Verify(c => c.FindAsync(It.IsAny<FilterDefinition<Product>>(),
+                                       It.IsAny<FindOptions<Product>>(),
                                        It.IsAny<CancellationToken>()),
                                        Times.Once);
 
@@ -110,17 +109,17 @@ public class MongoRepositoryTest
     public async Task Teste04()
     {
         // Arrange
-        var produtos = ProdutosFactoryTests.CriarProdutoLista();
+        var produtos = ProductFactoryTests.CriarProdutoLista();
 
         var produto = produtos.FirstOrDefault();
 
         // Opcao alternativa ao invez de usar os dados do construtor
-        var (repository, collection) = BaseConfig.InitializeMongoRepository<Produtos>();
+        var (repository, collection) = BaseConfig.InitializeMongoRepository<Product>();
 
-        var filter = Builders<Produtos>.Filter.Regex(nameof(produto.Nome), new BsonRegularExpression(produto?.Nome!, "i"));
+        var filter = Builders<Product>.Filter.Regex(nameof(produto.Name), new BsonRegularExpression(produto?.Name!, "i"));
 
         // Mock do retorno do Find para retornar um cursor mockado
-        var mockCursor = new Mock<IAsyncCursor<Produtos>>();
+        var mockCursor = new Mock<IAsyncCursor<Product>>();
 
         mockCursor.Setup(c => c.Current).Returns(produtos);
 
@@ -134,23 +133,23 @@ public class MongoRepositoryTest
             .ReturnsAsync(true)  // Primeira chamada para MoveNextAsync retorna true
             .ReturnsAsync(false); // Segunda chamada para MoveNextAsync retorna false
 
-        collection.Setup(c => c.FindAsync(It.IsAny<FilterDefinition<Produtos>>(),
-                                    It.IsAny<FindOptions<Produtos>>(),
+        collection.Setup(c => c.FindAsync(It.IsAny<FilterDefinition<Product>>(),
+                                    It.IsAny<FindOptions<Product>>(),
                                     It.IsAny<CancellationToken>()))
                                     .ReturnsAsync(mockCursor.Object); // Retorna o cursor mockado
 
 
         // Act
 
-        var result = await repository.GetByName(nameof(produto.Nome), produto?.Nome!);
+        var result = await repository.GetByName(nameof(produto.Name), produto?.Name!);
         // Assert
 
-        collection.Verify(c => c.FindAsync(It.IsAny<FilterDefinition<Produtos>>(),
-                                       It.IsAny<FindOptions<Produtos>>(),
+        collection.Verify(c => c.FindAsync(It.IsAny<FilterDefinition<Product>>(),
+                                       It.IsAny<FindOptions<Product>>(),
                                        It.IsAny<CancellationToken>()),
                                        Times.Once);
 
-        Assert.Equal(produto!.Nome, result!.Items.FirstOrDefault()!.Nome);
+        Assert.Equal(produto!.Name, result!.Items.FirstOrDefault()!.Name);
         Assert.True(result!.Items.Count > 0);
     }
 
@@ -159,16 +158,16 @@ public class MongoRepositoryTest
     public async Task Teste05()
     {
         // Arrange
-        var produtos = ProdutosFactoryTests.CriarProdutoLista();
+        var produtos = ProductFactoryTests.CriarProdutoLista();
 
         var produto = produtos.FirstOrDefault();
 
         // Opcao alternativa ao invez de usar os dados do construtor
-        var (repository, collection) = BaseConfig.InitializeMongoRepository<Produtos>();
+        var (repository, collection) = BaseConfig.InitializeMongoRepository<Product>();
 
 
         // Mock do retorno do Find para retornar um cursor mockado
-        var mockCursor = new Mock<IAsyncCursor<Produtos>>();
+        var mockCursor = new Mock<IAsyncCursor<Product>>();
 
         mockCursor.Setup(c => c.Current).Returns(produtos);
 
@@ -183,8 +182,8 @@ public class MongoRepositoryTest
             .ReturnsAsync(false); // Segunda chamada para MoveNextAsync retorna false
 
 
-        collection.Setup(c => c.FindAsync(It.IsAny<FilterDefinition<Produtos>>(),
-                                    It.IsAny<FindOptions<Produtos>>(),
+        collection.Setup(c => c.FindAsync(It.IsAny<FilterDefinition<Product>>(),
+                                    It.IsAny<FindOptions<Product>>(),
                                     It.IsAny<CancellationToken>()))
                                     .ReturnsAsync(mockCursor.Object); // Retorna o cursor mockado
 

@@ -7,33 +7,20 @@ public class RemoverColunaTeste : Migration
 {
     public override void Up()
     {
-        if (Schema.Table("Produtos").Exists())
+        if (Schema.Table("Products").Exists())
         {
-            Console.WriteLine("Tabela 'Produtos' existe.");
-            if (Schema.Table("Produtos").Column("ColunaTeste").Exists())
+            if (Schema.Table("Products").Column("Quantity").Exists())
             {
-                Console.WriteLine("Removendo coluna 'ColunaTeste'...");
-                Delete.Column("ColunaTeste").FromTable("Produtos");
-                Console.WriteLine("Coluna 'ColunaTeste' removida.");
+                Delete.Column("Quantity").FromTable("Products");
             }
-            else
-            {
-                Console.WriteLine("Coluna 'ColunaTeste' não existe.");
-            }
-        }
-        else
-        {
-            Console.WriteLine("Tabela 'Produtos' não existe.");
         }
     }
 
     public override void Down()
     {
-        if (Schema.Table("Produtos").Exists())
+        if (Schema.Table("Products").Exists())
         {
-            Console.WriteLine("Adicionando coluna 'ColunaTeste'...");
-            Alter.Table("Produtos").AddColumn("ColunaTeste").AsString().Nullable();
-            Console.WriteLine("Coluna 'ColunaTeste' adicionada.");
+            Alter.Table("Products").AddColumn("Quantity").AsString().Nullable();
         }
     }
 }
