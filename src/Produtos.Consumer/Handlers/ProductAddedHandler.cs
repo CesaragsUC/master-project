@@ -1,6 +1,6 @@
-﻿using Domain.Events;
-using Domain.Interfaces;
+﻿using Domain.Interfaces;
 using MediatR;
+using Messaging.Contracts.Events.Product;
 using Serilog;
 
 namespace Produtos.Consumer.Handlers;

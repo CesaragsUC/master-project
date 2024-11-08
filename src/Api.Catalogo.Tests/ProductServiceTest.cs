@@ -1,11 +1,12 @@
-using Api.Catalogo.Abstractions;
-using Api.Catalogo.Dtos;
-using Api.Catalogo.Filters;
 using Api.Catalogo.Mapping;
-using Api.Catalogo.Models;
-using Api.Catalogo.Repository;
-using Api.Catalogo.Services;
+using Application.Dtos.Dtos.Produtos;
 using AutoMapper;
+using Catalog.Domain.Abstractions;
+using Catalog.Domain.Models;
+using Catalog.Service.Abstractions;
+using Catalog.Service.Services;
+using Catalog.Services.Filters;
+using Catalogo.Api.Tests;
 using FluentAssertions;
 using MongoDB.Driver;
 using Moq;
@@ -16,34 +17,33 @@ namespace Api.Catalogo.Tests
     {
 
         private readonly Mock<IMongoDbContext> _mockContext;
-        private readonly Mock<IMongoCollection<Product>> _mockCollection;
-        private readonly Mock<IMongoRepository<Product>> _mongoRepository;
+        private readonly Mock<IMongoCollection<Products>> _mockCollection;
+        private readonly Mock<IMongoRepository<Products>> _mongoRepository;
         private readonly Mock<IProductRepository> _produtoRepository;
         private readonly ProductService _service;
         private readonly IMapper _mapper;
         public ProdutoServiceTest()
         {
-            _mockCollection = new Mock<IMongoCollection<Product>>();
+            _mockCollection = new Mock<IMongoCollection<Products>>();
 
-            _mongoRepository = new Mock<IMongoRepository<Product>>();
+            _mongoRepository = new Mock<IMongoRepository<Products>>();
 
             _produtoRepository = new Mock<IProductRepository>();
 
             _mockContext = new Mock<IMongoDbContext>();
 
             _mockContext
-                .Setup(c => c.GetCollection<Product>(It.IsAny<string>()))
+                .Setup(c => c.GetCollection<Products>(It.IsAny<string>()))
                 .Returns(_mockCollection.Object);
 
-            _service = new ProductService(_mongoRepository.Object, _produtoRepository.Object);
-
-         
             var config = new MapperConfiguration(cfg =>
             {
-                cfg.AddProfile(new MapperConfig()); 
+                cfg.AddProfile(new MapperConfig());
             });
 
             _mapper = config.CreateMapper();
+
+            _service = new ProductService(_mongoRepository.Object, _produtoRepository.Object, _mapper);
         }
 
 
@@ -54,13 +54,13 @@ namespace Api.Catalogo.Tests
             // Arrange
             var produto = ProductFactoryTests.CriarProdutoAddDto();
 
-            _mongoRepository.Setup(c => c.Insert(It.IsAny<Product>())).Returns(Task.CompletedTask);
+            _mongoRepository.Setup(c => c.InsertAsync(It.IsAny<Products>())).Returns(Task.CompletedTask);
 
             // Act
             var result = await _service.Insert(produto);
 
             // Assert
-            _mongoRepository.Verify(c => c.Insert(It.IsAny<Product>()), Times.Once);
+            _mongoRepository.Verify(c => c.InsertAsync(It.IsAny<Products>()), Times.Once);
 
 
             result.Success.Should().BeTrue();
@@ -94,7 +94,7 @@ namespace Api.Catalogo.Tests
             // Arrange
             var produto = ProductFactoryTests.CriarProduto();
 
-            _mongoRepository.Setup(c => c.GetById(It.IsAny<string>(), It.IsAny<Guid>())).ReturnsAsync((Product)null);
+            _mongoRepository.Setup(c => c.GetById(It.IsAny<string>(), It.IsAny<Guid>())).ReturnsAsync((Products)null);
 
             // Act
             var result = await _service.GetById(nameof(produto.ProductId), Guid.Parse(produto.ProductId!));
@@ -115,7 +115,7 @@ namespace Api.Catalogo.Tests
             // Arrange
             var produto = ProductFactoryTests.CriarProdutoLista();
 
-            _mongoRepository.Setup(c => c.GetByName(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(new PagedResult<Product> {
+            _mongoRepository.Setup(c => c.GetByName(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(new PagedResult<Products> {
                 Items = produto,
                 TotalCount = produto.Count
             });
@@ -137,7 +137,7 @@ namespace Api.Catalogo.Tests
             // Arrange
             var produto = ProductFactoryTests.CriarProdutoLista();
 
-            _mongoRepository.Setup(c => c.GetByName(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(new PagedResult<Product>
+            _mongoRepository.Setup(c => c.GetByName(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(new PagedResult<Products>
             {
                 Items = null,
                 TotalCount = 0
@@ -160,13 +160,13 @@ namespace Api.Catalogo.Tests
             // Arrange
             var produto = ProductFactoryTests.CriarProdutoAddDto();
 
-            _mongoRepository.Setup(c => c.Insert(It.IsAny<Product>())).Returns(Task.CompletedTask);
+            _mongoRepository.Setup(c => c.InsertAsync(It.IsAny<Products>())).Returns(Task.CompletedTask);
 
             // Act
             var result = await _service.Insert(produto);
 
             // Assert
-            _mongoRepository.Verify(c => c.Insert(It.IsAny<Product>()), Times.Once);
+            _mongoRepository.Verify(c => c.InsertAsync(It.IsAny<Products>()), Times.Once);
 
             result?.Message.Should().Contain("Produto inserido com sucesso");
             result?.Errors.Should().BeNull();
@@ -184,7 +184,7 @@ namespace Api.Catalogo.Tests
             var result = await _service.Insert(produto);
 
             // Assert
-            _mongoRepository.Verify(c => c.Insert(It.IsAny<Product>()), Times.Never);
+            _mongoRepository.Verify(c => c.InsertAsync(It.IsAny<Products>()), Times.Never);
 
             result?.Errors.Should().HaveCountGreaterThan(0);
             result?.Success.Should().BeFalse();
@@ -197,13 +197,13 @@ namespace Api.Catalogo.Tests
             // Arrange
             var produtos = ProductFactoryTests.CriarProdutoAddDtoLista();
 
-            _mongoRepository.Setup(c => c.InsertMany(It.IsAny<List<Product>>())).Returns(Task.CompletedTask);
+            _mongoRepository.Setup(c => c.InsertMany(It.IsAny<List<Products>>())).Returns(Task.CompletedTask);
 
             // Act
             var result = await _service.InsertMany(produtos);
 
             // Assert
-            _mongoRepository.Verify(c => c.InsertMany(It.IsAny<List<Product>>()), Times.Once);
+            _mongoRepository.Verify(c => c.InsertMany(It.IsAny<List<Products>>()), Times.Once);
 
             result?.Message.Should().Contain("Produtos inserido com sucesso");
             result?.Errors.Should().BeNull();
@@ -220,13 +220,13 @@ namespace Api.Catalogo.Tests
             var produtoInvalido = ProductFactoryTests.CriarProdutoAddDtoInvalido();
             produtos.Add(produtoInvalido);
 
-            _mongoRepository.Setup(c => c.InsertMany(It.IsAny<List<Product>>())).Returns(Task.CompletedTask);
+            _mongoRepository.Setup(c => c.InsertMany(It.IsAny<List<Products>>())).Returns(Task.CompletedTask);
 
             // Act
             var result = await _service.InsertMany(produtos);
 
             // Assert
-            _mongoRepository.Verify(c => c.InsertMany(It.IsAny<List<Product>>()), Times.Never);
+            _mongoRepository.Verify(c => c.InsertMany(It.IsAny<List<Products>>()), Times.Never);
 
             result?.Errors.Should().HaveCountGreaterThan(0);
             result?.Success.Should().BeFalse();
@@ -243,17 +243,17 @@ namespace Api.Catalogo.Tests
             {
                 ProductId = Guid.NewGuid().ToString(),
                 Name = "HeadSet Logitec",
-                Preco = 850.0m,
+                Price = 850.0m,
                 Active = produto.Active
             };
 
-            _mongoRepository.Setup(c => c.UpdateAsync(It.IsAny<string>(), It.IsAny<Product>())).Returns(Task.CompletedTask);
+            _mongoRepository.Setup(c => c.UpdateAsync(It.IsAny<string>(), It.IsAny<Products>())).Returns(Task.CompletedTask);
 
             // Act
             var result = await _service.Update(newProduto);
 
             // Assert
-            _mongoRepository.Verify(c => c.UpdateAsync(It.IsAny<string>(), It.IsAny<Product>()), Times.Once);
+            _mongoRepository.Verify(c => c.UpdateAsync(It.IsAny<string>(), It.IsAny<Products>()), Times.Once);
 
             result?.Message.Should().Contain("Produtos atualizado com sucesso");
             result?.Errors.Should().BeNull();
@@ -270,17 +270,17 @@ namespace Api.Catalogo.Tests
             var produtoAtualizado = new ProductUpdateDto
             {
                 Name = string.Empty,
-                Preco = 0,
+                Price = 0,
                 Active = produto.Active
             };
 
-            _mongoRepository.Setup(c => c.UpdateAsync(It.IsAny<string>(), It.IsAny<Product>())).Returns(Task.CompletedTask);
+            _mongoRepository.Setup(c => c.UpdateAsync(It.IsAny<string>(), It.IsAny<Products>())).Returns(Task.CompletedTask);
 
             // Act
             var result = await _service.Update(produtoAtualizado);
 
             // Assert
-            _mongoRepository.Verify(c => c.UpdateAsync(It.IsAny<string>(), It.IsAny<Product>()), Times.Never);
+            _mongoRepository.Verify(c => c.UpdateAsync(It.IsAny<string>(), It.IsAny<Products>()), Times.Never);
 
             result?.Errors.Should().HaveCountGreaterThan(0);
             result?.Success.Should().BeFalse();
@@ -345,7 +345,7 @@ namespace Api.Catalogo.Tests
             };
 
             _produtoRepository.Setup(c => c.GetAll(It.IsAny<ProductFilter>())).ReturnsAsync(
-                new PagedResult<Product> 
+                new PagedResult<Products> 
                 {
                     Items = produtoLista,
                     TotalCount = produtoLista.Count
@@ -369,7 +369,7 @@ namespace Api.Catalogo.Tests
         {
             // Arrange
             _produtoRepository.Setup(c => c.GetAll(It.IsAny<ProductFilter>())).ReturnsAsync(
-                new PagedResult<Product>
+                new PagedResult<Products>
                 {
                     Items = null,
                     TotalCount = 0

@@ -1,9 +1,8 @@
-﻿namespace Api.Catalogo.Configurations;
-
-using Microsoft.OpenApi.Any;
-using Microsoft.OpenApi.Models;
+﻿using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Reflection;
+
+namespace Catalogo.Api.Configurations;
 
 public class SwaggerSchemaFilterConfig : ISchemaFilter
 {

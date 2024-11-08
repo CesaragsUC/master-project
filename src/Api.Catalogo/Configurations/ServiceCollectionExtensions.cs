@@ -1,6 +1,8 @@
-﻿using Api.Catalogo.DbContext;
+﻿
+using Catalog.Infrastructure.Configurations;
+using Catalog.Infrastructure.Context;
 
-namespace Api.Catalogo.Configurations;
+namespace Catalogo.Api.Configurations;
 
 public static class ServiceCollectionExtensions
 {

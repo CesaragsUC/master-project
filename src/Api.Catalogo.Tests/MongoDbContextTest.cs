@@ -1,5 +1,7 @@
-﻿using Api.Catalogo.Abstractions;
-using Api.Catalogo.DbContext;
+﻿
+using Catalog.Domain.Abstractions;
+using Catalog.Infrastructure.Configurations;
+using Catalog.Infrastructure.Context;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 

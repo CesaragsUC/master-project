@@ -3,7 +3,6 @@ using Domain.Handlers.Comands;
 using Domain.Interfaces;
 using Domain.Models;
 using MassTransit;
-using MediatR;
 using Moq;
 
 //https://goatreview-com.cdn.ampproject.org/c/s/goatreview.com/mediatr-quickly-test-handlers-with-unit-tests/amp/

@@ -1,5 +1,5 @@
-﻿using Api.Catalogo.Abstractions;
-using Api.Catalogo.Repository;
+﻿using Catalog.Domain.Abstractions;
+using Catalog.Infrastructure.Repository;
 using MongoDB.Driver;
 using Moq;
 

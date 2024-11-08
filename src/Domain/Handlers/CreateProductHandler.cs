@@ -1,4 +1,4 @@
-﻿using Domain.Events;
+﻿
 using Domain.Handlers.Comands;
 using Domain.Interfaces;
 using Domain.Models;
@@ -6,6 +6,7 @@ using Domain.Validation;
 using FluentValidation;
 using MassTransit;
 using MediatR;
+using Messaging.Contracts.Events.Product;
 using Serilog;
 
 namespace Domain.Handlers

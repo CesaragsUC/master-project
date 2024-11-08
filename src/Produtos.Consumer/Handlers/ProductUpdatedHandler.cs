@@ -1,6 +1,8 @@
-﻿using Domain.Events;
-using Domain.Interfaces;
+﻿
+using Catalog.Domain.Abstractions;
+using Catalog.Domain.Models;
 using MediatR;
+using Messaging.Contracts.Events.Product;
 using Serilog;
 
 namespace Produtos.Consumer.Handlers;
@@ -19,7 +21,7 @@ public class ProductUpdatedHandler :
     {
         try
         {
-            await _repository.UpdateAsync(nameof(request.ProductId), request, nameof(Domain.Models.Product));
+            await _repository.UpdateAsync(nameof(request.ProductId), request, nameof(Products));
 
             Log.Information("Atualizado produto nome: {Nome} - {Data}", request.Name, DateTime.Now);
 

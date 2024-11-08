@@ -1,5 +1,5 @@
-﻿using Domain.Events;
-using MassTransit;
+﻿using MassTransit;
+using Messaging.Contracts.Events.Product;
 using Serilog;
 
 using IMediator = MediatR.IMediator;

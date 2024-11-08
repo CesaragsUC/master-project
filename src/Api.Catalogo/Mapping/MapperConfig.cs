@@ -1,6 +1,6 @@
-﻿using Api.Catalogo.Dtos;
-using Api.Catalogo.Models;
+﻿using Application.Dtos.Dtos.Produtos;
 using AutoMapper;
+using Catalog.Domain.Models;
 
 namespace Api.Catalogo.Mapping
 {
@@ -8,9 +8,9 @@ namespace Api.Catalogo.Mapping
     {
         public MapperConfig()
         {
-            CreateMap<ProductCreateDto, Product>().ReverseMap();
-            CreateMap<ProductUpdateDto, Product>().ReverseMap();
-            CreateMap<Product, ProductDto>().ReverseMap();
+            CreateMap<ProductCreateDto, Products>().ReverseMap();
+            CreateMap<ProductUpdateDto, Products>().ReverseMap();
+            CreateMap<Products, ProductDto>().ReverseMap();
         }
     }
 }

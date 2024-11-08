@@ -1,18 +1,18 @@
-﻿using Api.Catalogo.Dtos;
-using Api.Catalogo.Models;
+﻿using Application.Dtos.Dtos.Produtos;
 using Bogus;
-namespace Api.Catalogo.Tests;
+using Catalog.Domain.Models;
+namespace Catalogo.Api.Tests;
 
 public static class ProductFactoryTests
 {
-    public static List<Product> CriarProdutoLista(int total = 10)
+    public static List<Products> CriarProdutoLista(int total = 10)
     {
        
-        var produtos = new List<Product>();
+        var produtos = new List<Products>();
         for (int i = 0; i < total; i++)
         {
             Faker faker = new Faker("pt_BR");
-            produtos.Add(new Product
+            produtos.Add(new Products
             {
                 _id = faker.Random.Guid().ToString(),
                 ProductId = faker.Random.Guid().ToString(),
@@ -26,11 +26,11 @@ public static class ProductFactoryTests
         return produtos;
     }
 
-    public static Product CriarProduto()
+    public static Products CriarProduto()
     {
         Faker faker = new Faker("pt_BR");
 
-        var produto = new Product
+        var produto = new Products
         {
             _id = faker.Random.Guid().ToString(),
             ProductId = faker.Random.Guid().ToString(),

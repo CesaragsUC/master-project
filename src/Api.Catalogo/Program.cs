@@ -1,9 +1,12 @@
-using Api.Catalogo.Abstractions;
-using Api.Catalogo.Configurations;
-using Api.Catalogo.DbContext;
-using Api.Catalogo.Filters;
-using Api.Catalogo.Repository;
-using Api.Catalogo.Services;
+
+using Catalog.Domain.Abstractions;
+using Catalog.Infrastructure.Context;
+using Catalog.Infrastructure.Repository;
+using Catalog.Service.Abstractions;
+using Catalog.Service.Services;
+using Catalog.Services.Abstractions;
+using Catalog.Services.Filters;
+using Catalogo.Api.Configurations;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using System.Reflection;
