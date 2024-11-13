@@ -26,6 +26,145 @@ public class ProductService : IProductService
         _mapper = mapper;
     }
 
+
+    public async Task<ResponseResult<bool>> Insert(ProductCreateDto obj)
+    {
+        try
+        {
+            var validationResponse = await ProdutoValidation(obj, new ProductCreateValidator());
+
+            if (!validationResponse.Success)
+            {
+                return validationResponse;
+            }
+
+            var product = _mapper.Map<Products>(obj);
+
+            await _repository.InsertAsync(product);
+
+            return new ResponseResult<bool>
+            {
+                Success = true,
+                Message = "Produto inserido com sucesso"
+            };
+        }
+        catch (Exception ex)
+        {
+            return new ResponseResult<bool>
+            {
+                Success = false,
+                Errors = new string[] { ex.Message }
+            };
+        }
+    }
+
+    public async Task<ResponseResult<bool>> InsertMany(List<ProductCreateDto> obj)
+    {
+        try
+        {
+            var validationResponse = await ProdutoValidation(obj, new AddProductListDto());
+
+            if (!validationResponse.Success)
+            {
+                return validationResponse;
+            }
+
+            var produtos = obj.Select(p => new Products
+            {
+                Name = p.Name,
+                Price = Convert.ToDecimal(p.Price),
+                Active = Convert.ToBoolean(p.Active),
+                CreatAt = DateTime.Now
+            }).ToList();
+
+            await _repository.InsertMany(produtos);
+
+            return new ResponseResult<bool>
+            {
+                Success = true,
+                Message = "Produtos inserido com sucesso"
+            };
+        }
+        catch (Exception ex)
+        {
+            return new ResponseResult<bool>
+            {
+                Success = false,
+                Errors = new string[] { ex.Message }
+            };
+        }
+    }
+
+    public async Task<ResponseResult<bool>> Update(ProductUpdateDto obj)
+    {
+        try
+        {
+            var validationResponse = await ProdutoValidation(obj, new ProductUpdateValidator());
+
+            if (!validationResponse.Success)
+            {
+                return validationResponse;
+            }
+
+            var product = _mapper.Map<Products>(obj);
+
+            await _repository.UpdateAsync(nameof(obj.ProductId), product);
+
+            return new ResponseResult<bool>
+            {
+                Success = true,
+                Message = "Produtos atualizado com sucesso"
+            };
+        }
+        catch (Exception ex)
+        {
+            return new ResponseResult<bool>
+            {
+                Success = false,
+                Errors = new string[] { ex.Message }
+            };
+
+        }
+    }
+
+    // Exemplo como usar o UpdateAsync com Expression
+    public async Task<ResponseResult<bool>> DemoUpdate2(ProductUpdateDto obj)
+    {
+        try
+        {
+            var validationResponse = await ProdutoValidation(obj, new ProductUpdateValidator());
+
+            if (!validationResponse.Success)
+            {
+                return validationResponse;
+            }
+
+            // Define a condição para encontrar o produto com o Id especificado
+            Expression<Func<Products, bool>> whereCondition = p => p.ProductId == obj.ProductId;
+
+            // Define o campo que deseja atualizar 
+            Expression<Func<Products, decimal?>> fieldToUpdate = p => p.Price;
+
+            // Chama o método UpdateAsync para atualizar o preço do produto
+            await _repository.UpdateAsync(whereCondition, fieldToUpdate, obj.Price);
+
+            return new ResponseResult<bool>
+            {
+                Success = true,
+                Message = "Produtos atualizado com sucesso"
+            };
+        }
+        catch (Exception ex)
+        {
+            return new ResponseResult<bool>
+            {
+                Success = false,
+                Errors = new string[] { ex.Message }
+            };
+
+        }
+    }
+
     public async Task<ResponseResult<bool>> Delete(string field, Guid id)
     {
         try
@@ -188,144 +327,6 @@ public class ProductService : IProductService
             };
         }
 
-    }
-
-    public async Task<ResponseResult<bool>> Insert(ProductCreateDto obj)
-    {
-        try
-        {
-            var validationResponse = await ProdutoValidation(obj, new ProductCreateValidator());
-
-            if (!validationResponse.Success)
-            {
-                return validationResponse;
-            }
-
-            var product = _mapper.Map<Products>(obj);
-
-            await _repository.InsertAsync(product);
-
-            return new ResponseResult<bool>
-            {
-                Success = true,
-                Message = "Produto inserido com sucesso"
-            };
-        }
-        catch (Exception ex)
-        {
-            return new ResponseResult<bool>
-            {
-                Success = false,
-                Errors = new string[] { ex.Message }
-            };
-        }
-    }
-
-    public async Task<ResponseResult<bool>> InsertMany(List<ProductCreateDto> obj)
-    {
-        try
-        {
-            var validationResponse = await ProdutoValidation(obj, new AddProductListDto());
-
-            if (!validationResponse.Success)
-            {
-                return validationResponse;
-            }
-
-            var produtos = obj.Select(p => new Products
-            {
-                Name = p.Name,
-                Price = Convert.ToDecimal(p.Price),
-                Active = Convert.ToBoolean(p.Active),
-                CreatAt = DateTime.Now
-            }).ToList();
-
-            await _repository.InsertMany(produtos);
-
-            return new ResponseResult<bool>
-            {
-                Success = true,
-                Message = "Produtos inserido com sucesso"
-            };
-        }
-        catch (Exception ex)
-        {
-            return new ResponseResult<bool>
-            {
-                Success = false,
-                Errors = new string[] { ex.Message }
-            };
-        }
-    }
-
-    public async Task<ResponseResult<bool>> Update(ProductUpdateDto obj)
-    {
-        try
-        {
-            var validationResponse = await ProdutoValidation(obj, new ProductUpdateValidator());
-
-            if (!validationResponse.Success)
-            {
-                return validationResponse;
-            }
-
-            var product = _mapper.Map<Products>(obj);
-
-            await _repository.UpdateAsync(nameof(obj.ProductId), product);
-
-            return new ResponseResult<bool>
-            {
-                Success = true,
-                Message = "Produtos atualizado com sucesso"
-            };
-        }
-        catch (Exception ex)
-        {
-            return new ResponseResult<bool>
-            {
-                Success = false,
-                Errors = new string[] { ex.Message }
-            };
-
-        }
-    }
-
-    // Exemplo como usar o UpdateAsync com Expression
-    public async Task<ResponseResult<bool>> DemoUpdate2(ProductUpdateDto obj)
-    {
-        try
-        {
-            var validationResponse = await ProdutoValidation(obj, new ProductUpdateValidator());
-
-            if (!validationResponse.Success)
-            {
-                return validationResponse;
-            }
-
-            // Define a condição para encontrar o produto com o Id especificado
-            Expression<Func<Products, bool>> whereCondition = p => p.ProductId == obj.ProductId;
-
-            // Define o campo que deseja atualizar 
-            Expression<Func<Products, decimal?>> fieldToUpdate = p => p.Price;
-
-            // Chama o método UpdateAsync para atualizar o preço do produto
-            await _repository.UpdateAsync(whereCondition, fieldToUpdate, obj.Price);
-
-            return new ResponseResult<bool>
-            {
-                Success = true,
-                Message = "Produtos atualizado com sucesso"
-            };
-        }
-        catch (Exception ex)
-        {
-            return new ResponseResult<bool>
-            {
-                Success = false,
-                Errors = new string[] { ex.Message }
-            };
-
-        }
     }
 
     private async Task<ResponseResult<bool>> ProdutoValidation<T>(T obj, AbstractValidator<T> validator)

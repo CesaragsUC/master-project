@@ -1,25 +1,109 @@
-var builder = WebApplication.CreateBuilder(args);
+using Api.Gateway.Configuration;
+using Api.Gateway.Dto;
+using Api.Gateway.Services;
+using Microsoft.OpenApi.Models;
+using Ocelot.Middleware;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
+using Serilog;
 
-// Add services to the container.
-
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+Log.Logger = new LoggerConfiguration()
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .CreateLogger();
+try
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    var builder = WebApplication.CreateBuilder(args);
+
+    // Add services to the container.
+
+    builder.Services.AddControllers();
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddSwaggerForOcelot(builder.Configuration, (o) =>
+    {
+        o.GenerateDocsForGatewayItSelf = true;
+    });
+    builder.Services.AddSwaggerGen(cf =>
+    {
+        cf.SwaggerDoc("v1", new OpenApiInfo { Title = "Gateway", Version = "v1" });
+    });
+
+    builder.Services.AddOceloConfigurations(builder.Configuration);
+
+    builder.Services.AddOpenTelemetry()
+      .ConfigureResource(resource => resource.AddService("Api.Gateway"))
+      .WithTracing(builder =>
+      {
+          builder
+              .AddAspNetCoreInstrumentation()
+              .AddHttpClientInstrumentation()
+                .AddJaegerExporter(options =>
+                {
+                    options.AgentHost = "localhost";
+                    options.AgentPort = 6831;
+                });
+      });
+
+
+    builder.Services.AddAuthentication("Bearer")
+        .AddJwtBearer("Bearer", options =>
+        {
+            options.Authority = "http://localhost:8180/realms/casoft";
+            options.Audience = "casoft-system";
+            options.RequireHttpsMetadata = false;
+        });
+
+
+    builder.Services.AddHttpClient<AuthenticationService>();
+    builder.Services.AddHttpClient();
+
+    var app = builder.Build();
+
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI();
+        app.UseSwaggerForOcelotUI();
+    }
+
+
+    app.UseHttpsRedirection();
+
+    app.UseAuthentication();
+
+    app.UseRouting();
+    app.MapControllers();
+    app.UseAuthorization();
+
+#pragma warning disable ASP0014
+    app.UseEndpoints(endpoints =>
+    {
+        endpoints.MapControllers();
+    });
+    #pragma warning restore ASP0014
+
+    // call the authentication service
+    app.MapPost("/api/masterauth/login", async (LoginDto loginDto, AuthenticationService authenticationService) =>
+    {
+        var result = await authenticationService.Authenticate(loginDto);
+        return Results.Ok(result);
+    });
+
+    // call the logout service
+    app.MapPost("/api/masterauth/logout", async (string refreshToken, AuthenticationService authenticationService) =>
+    {
+        await authenticationService.Logout(refreshToken);
+        return Results.Ok("Logout Successful");
+    });
+
+    app.UseOcelot().Wait();
+    app.Run();
 }
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
-
-app.Run();
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Host terminated unexpectedly");
+}
+finally
+{
+    Log.CloseAndFlush();
+}

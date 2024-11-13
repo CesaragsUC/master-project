@@ -2,17 +2,20 @@
 using Domain.Handlers.Comands;
 using Domain.Handlers.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Controllers
 {
+    [Authorize]
     [ApiController]
-    [Route("api/produtos")]
-    public class ProductController(IMediator _mediator) : Controller
+    [Route("api/product")]
+    public class ProductController(IMediator _mediator) : ControllerBase
     {
 
         [Route("all")]
         [HttpGet]
+        [Authorize(Roles = "Read")]
         public async Task<IActionResult> Get([FromQuery] ProductQuery produto)
         {
             var result = await _mediator.Send(produto);
@@ -22,6 +25,7 @@ namespace Api.Controllers
 
         [Route("get")]
         [HttpGet]
+        [Authorize(Roles = "Read")]
         public async Task<IActionResult> Get([FromQuery] ProductByIdQuery produto)
         {
             var result = await _mediator.Send(produto);
@@ -30,6 +34,8 @@ namespace Api.Controllers
         }
 
         [HttpPost]
+        [Route("add")]
+        [Authorize(Roles = "Create")]
         public async Task<IActionResult> Add([FromBody] CreateProductCommand produto)
         {
             var result = await _mediator.Send(produto);
@@ -38,7 +44,8 @@ namespace Api.Controllers
         }
 
         [HttpPost]
-        [Route("cadastrar-criar-com-bogus/{total:int}")]
+        [Route("product-create-with-bogus/{total:int}")]
+        [Authorize(Roles = "Create")]
         public async Task<IActionResult> AddMany(int total)
         {
             foreach (var item in await CriarListaProduto(total))
@@ -50,6 +57,8 @@ namespace Api.Controllers
         }
 
         [HttpPut]
+        [Route("update")]
+        [Authorize(Roles = "Update")]
         public async Task<IActionResult> Update([FromBody] UpdateProductCommand produto)
         {
             var result = await _mediator.Send(produto);
@@ -58,7 +67,9 @@ namespace Api.Controllers
         }
 
         [HttpDelete]
-        public async Task<IActionResult> Delete([FromBody] DeleteProductCommand produto)
+        [Route("delete")]
+        [Authorize(Roles = "Delete")]
+        public async Task<IActionResult> Delete([FromQuery] DeleteProductCommand produto)
         {
             var result = await _mediator.Send(produto);
 

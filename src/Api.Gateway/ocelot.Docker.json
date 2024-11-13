@@ -1,0 +1,46 @@
+{
+  "GlobalConfiguration": {},
+  "Routes": [
+    {
+      "UpstreamPathTemplate": "/catalog/{everything}", //rota publica
+      "DownstreamPathTemplate": "/api/catalog/{everything}", //rota privada
+      "DownstreamScheme": "https",
+      "UpstreamHttpMethod": [ "GET" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "catalog", // Subdomínio para o serviço Catalog
+          "Port": 80
+        }
+      ],
+      "RateLimitOptions": {
+        "ClientWhitelist": [],
+        "EnableRateLimiting": true,
+        "PeriodTimespan": 5, 
+        "Period": "10s", 
+        "Limit": 10 
+      },
+      "FileCacheOptions": {
+        "TtlSeconds": 10 
+      }
+    },
+    {
+      "UpstreamPathTemplate": "/product/{everything}", //rota publica
+      "DownstreamPathTemplate": "/api/product/{everything}", //rota privada
+      "DownstreamScheme": "https",
+      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ], 
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "product",
+          "Port": 80
+        }
+      ],
+      "RateLimitOptions": {
+        "ClientWhitelist": [],
+        "EnableRateLimiting": true,
+        "PeriodTimespan": 5, 
+        "Period": "10s", 
+        "Limit": 10
+      }
+    }
+  ]
+}

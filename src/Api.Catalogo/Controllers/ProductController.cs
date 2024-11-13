@@ -2,38 +2,29 @@
 using Bogus;
 using Catalog.Services.Abstractions;
 using Catalog.Services.Filters;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Api.Catalogo.Controllers;
 
+[Authorize]
+[Route("api/catalog")]
 [ApiController]
-[Route("api/produtos")]
-public class ProductController(IProductService service) : Controller
+public class ProductController(IProductService service) : ControllerBase
 {
 
     [HttpGet]
-    [Route("produtos")]
+    [Route("all")]
+    [Authorize(Roles = "Read")]
     public async Task<IActionResult> Index([FromQuery] ProductFilter filter)
     {
-        var filters = new ProductFilter
-        {
-            OnlyActive = filter.OnlyActive,
-            Name = filter.Name,
-            MinPrice = filter.MinPrice,
-            MaxPrice = filter.MaxPrice,
-            Page = filter.Page,
-            PageSize = filter.PageSize,
-            OrderBy = filter.OrderBy,
-            OrderDirection = filter.OrderDirection
-        };
-
-        var produtos = await service.GetAll(filters);
+        var produtos = await service.GetAll(filter);
         return Ok(produtos);
     }
 
     [HttpGet]
-    [Route("produtos/{id:guid}")]
+    [Route("product/{id:guid}")]
     public async Task<IActionResult> Get(Guid id)
     {
         var produto = await service.GetById("ProdutoId",id);
@@ -41,7 +32,7 @@ public class ProductController(IProductService service) : Controller
     }
 
     [HttpGet]
-    [Route("produtos/{nome}")]
+    [Route("product/{name}")]
     public async Task<IActionResult> GetByName(string nome)
     {
         var produto = await service.GetByName("Nome", nome);
@@ -49,7 +40,7 @@ public class ProductController(IProductService service) : Controller
     }
 
     [HttpPost]
-    [Route("produtos")]
+    [Route("product")]
     public async Task<IActionResult> Insert(ProductCreateDto produto)
     {
         var response = await service.Insert(produto);
@@ -57,7 +48,7 @@ public class ProductController(IProductService service) : Controller
     }
 
     [HttpPost]
-    [Route("produtos-criar-com-bogus/{total:int}")]
+    [Route("product-create-with-bogus/{total:int}")]
     public async Task<IActionResult> InsertMany(int total)
     {
         var response = await service.InsertMany(await CreateListProduct(total));
@@ -65,7 +56,7 @@ public class ProductController(IProductService service) : Controller
     }
 
     [HttpPut]
-    [Route("produtos")]
+    [Route("product")]
     public async Task<IActionResult> Update(ProductUpdateDto produto)
     {
         var response = await service.Update(produto);
@@ -73,7 +64,7 @@ public class ProductController(IProductService service) : Controller
     }
 
     [HttpDelete]
-    [Route("produtos/{id:guid}")]
+    [Route("product/{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
         var response = await service.Delete("ProdutoId",id);
