@@ -1,10 +1,17 @@
 using Application.Dtos.Settings;
+using Auth.Api.Abstractions;
+using Auth.Api.Services;
 using Keycloak.AuthServices.Authentication;
 using Keycloak.AuthServices.Authorization;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using Serilog;
 using System.Security.Claims;
+
+Log.Logger = new LoggerConfiguration()
+    .Enrich.FromLogContext()
+    .WriteTo.Console()
+    .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +20,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddScoped<IAuthKeyCloakService, KeycloakAuthService>();
 
 builder.Services.AddOpenTelemetry()
   .ConfigureResource(resource => resource.AddService("Auth.Api"))
@@ -33,6 +42,11 @@ builder.Services.AddOpenTelemetry()
 builder.Services.AddKeycloakWebApiAuthentication(builder.Configuration, KeycloakAuthenticationOptions.Section);
 
 builder.Services.AddKeycloakAuthorization(builder.Configuration, KeycloakAuthenticationOptions.Section);
+
+// bind the KeycloakSettings to the configuration
+builder.Services.Configure<KeycloakSettings>(
+    builder.Configuration.GetSection(KeycloakAuthenticationOptions.Section));
+
 
 builder.Services.AddHttpClient();
 

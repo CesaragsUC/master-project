@@ -1,59 +1,72 @@
 ﻿namespace Api.Gateway.Services;
 
 using Api.Gateway.Dto;
+using Application.Dtos.Dtos.Login;
+using Application.Dtos.Settings;
+using Microsoft.Extensions.Options;
 using Serilog;
 using System.Net.Http;
 using System.Net.Http.Json; // para usar JsonContent
+using System.Text.Json;
 
 public class AuthenticationService
 {
     private readonly HttpClient _httpClient;
+    private readonly IOptions<EndPointUri> authUri;
 
-    public AuthenticationService(HttpClient httpClient)
+    public AuthenticationService(HttpClient httpClient,
+        IOptions<EndPointUri> endPoint)
     {
         _httpClient = httpClient;
+        authUri = endPoint;
     }
 
-    public async Task<string> Authenticate(LoginDto loginDto)
+    public async Task<TokenResponse> Authenticate(LoginDto loginDto)
     {
         try
         {
-            var uri = "https://localhost:7123/api/auth/login";
-
             var requestContent = JsonContent.Create(loginDto);
 
-            var response = await _httpClient.PostAsync(uri, requestContent);
+            var response = await _httpClient.PostAsync($"{authUri.Value.AuthApi}/login", requestContent);
 
             if (response.IsSuccessStatusCode)
             {
-                return await response.Content.ReadAsStringAsync();
+                var responseContent = await response.Content.ReadAsStringAsync();
+                return JsonSerializer.Deserialize<TokenResponse>(responseContent);
             }
             else
             {
-                return string.Empty;
+                return null!;
             }
         }
         catch (Exception ex)
         {
-            Log.Error("An error occour during request authentication",ex);
+            Log.Error(ex, "An error occour during request authentication", ex.Message);
             throw;
         }
 
     }
 
-    public async Task Logout(string refreshToken)
+    public async Task<string> Logout(string refreshToken)
     {
         try
         {
-            var uri = "https://localhost:7123/api/auth/logout";
-
             var requestContent = JsonContent.Create(refreshToken);
 
-            var response = await _httpClient.PostAsync(uri, requestContent);
+            var response = await _httpClient.PostAsync($"{authUri.Value.AuthApi}/logout", requestContent);
+
+            if (response.IsSuccessStatusCode)
+            {
+               return await response.Content.ReadAsStringAsync();
+            }
+            else
+            {
+                return "Fail to request logout.";
+            }
         }
         catch (Exception ex)
         {
-            Log.Error("An error occour during request logout", ex);
+            Log.Error(ex, "An error occour during request logout", ex.Message);
             throw;
         }
 

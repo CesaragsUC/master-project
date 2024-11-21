@@ -1,48 +1,40 @@
 ﻿using Azure.Storage.Blobs;
-using Catalog.Domain.Abstractions;
-using Catalog.Infrastructure.Configurations;
-using Catalog.Infrastructure.Context;
-using Catalog.Infrastructure.Repository;
-using Catalog.Service.Abstractions;
-using Catalog.Service.Services;
-using Catalog.Services.Abstractions;
-using Catalog.Services.Filters;
+using Domain.Interfaces;
+using Infrasctructure;
+using Infrastructure.Configurations;
+using Infrastructure.Services;
 using Keycloak.AuthServices.Authentication;
 using Keycloak.AuthServices.Authorization;
+using MassTransit;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-using System.Reflection;
+using Domain.Configurations;
 
-namespace Catalogo.Api.Configurations;
+namespace Product.Api.Configuration;
 
-public static class ServiceCollectionExtensions
+public static class ServiceCollectionExtension
 {
-
-    public static void AddServices(this IServiceCollection services, IConfiguration configuration)
+    public static void AddServices(this IServiceCollection services,IConfiguration configuration)
     {
-        services.AddScoped(typeof(IMongoRepository<>), typeof(MongoRepository<>));
-        services.AddScoped<IProductRepository, ProductRepository>();
-        services.AddScoped<IProductService, ProductService>();
-        services.AddScoped<IMongoDbContext, MongoDbContext>();
-        services.AddScoped<IQueryFilter, ProductFilter>();
-        services.AddAutoMapper(Assembly.GetExecutingAssembly());
-        services.MongoDbService(configuration);
+        services.AddMediatrService();
+        services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+        services.AddScoped<IBobStorageService, BobStorageService>();
 
+        services.PostgresDbService(configuration);
+
+        ////opção 1 com classe de configuração
+        //builder.Services.AddScoped<IMigratorService, MigratorService>();
+
+        ////opção 2 com extensão
+        services.ConfigureFluentMigration(configuration);
 
         services.AddSwaggerServices();
         services.AddKeycloakServices(configuration);
         services.AddOpenTelemetryServices();
         services.AddAzureBlobServices(configuration);
-    }
-
-    public static IServiceCollection MongoDbService(this IServiceCollection services, IConfiguration configuration)
-    {
-        services.Configure<MongoDbSettings>(configuration.GetSection(nameof(MongoDbSettings)));
-        services.AddSingleton<MongoDbContext>();
-
-        return services;
+        services.AddMassTransientServices();
     }
 
     public static void AddSwaggerServices(this IServiceCollection services)
@@ -100,7 +92,7 @@ public static class ServiceCollectionExtensions
     public static void AddOpenTelemetryServices(this IServiceCollection services)
     {
         services.AddOpenTelemetry()
-        .ConfigureResource(resource => resource.AddService("Catalog.Api"))
+        .ConfigureResource(resource => resource.AddService("Product.Api"))
         .WithTracing(builder =>
         {
             builder
@@ -125,5 +117,21 @@ public static class ServiceCollectionExtensions
             return new BlobServiceClient(blobContainers.ConnectionStrings);
         });
 
+    }
+
+    public static void AddMassTransientServices(this IServiceCollection services)
+    {
+        services.AddMassTransit(m =>
+        {
+            m.UsingRabbitMq((ctx, cfg) =>
+            {
+                cfg.Host("localhost", "/", c =>
+                {
+                    c.Username("guest");
+                    c.Password("guest");
+                });
+                cfg.ConfigureEndpoints(ctx);
+            });
+        });
     }
 }

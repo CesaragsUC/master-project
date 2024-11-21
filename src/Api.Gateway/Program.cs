@@ -15,47 +15,23 @@ try
 {
     var builder = WebApplication.CreateBuilder(args);
 
-    // Add services to the container.
-
     builder.Services.AddControllers();
     builder.Services.AddEndpointsApiExplorer();
+
     builder.Services.AddSwaggerForOcelot(builder.Configuration, (o) =>
     {
         o.GenerateDocsForGatewayItSelf = true;
     });
+
     builder.Services.AddSwaggerGen(cf =>
     {
         cf.SwaggerDoc("v1", new OpenApiInfo { Title = "Gateway", Version = "v1" });
     });
 
     builder.Services.AddOceloConfigurations(builder.Configuration);
-
-    builder.Services.AddOpenTelemetry()
-      .ConfigureResource(resource => resource.AddService("Api.Gateway"))
-      .WithTracing(builder =>
-      {
-          builder
-              .AddAspNetCoreInstrumentation()
-              .AddHttpClientInstrumentation()
-                .AddJaegerExporter(options =>
-                {
-                    options.AgentHost = "localhost";
-                    options.AgentPort = 6831;
-                });
-      });
+    builder.Services.AddServices(builder.Configuration);
 
 
-    builder.Services.AddAuthentication("Bearer")
-        .AddJwtBearer("Bearer", options =>
-        {
-            options.Authority = "http://localhost:8180/realms/casoft";
-            options.Audience = "casoft-system";
-            options.RequireHttpsMetadata = false;
-        });
-
-
-    builder.Services.AddHttpClient<AuthenticationService>();
-    builder.Services.AddHttpClient();
 
     var app = builder.Build();
 
@@ -92,8 +68,8 @@ try
     // call the logout service
     app.MapPost("/api/masterauth/logout", async (string refreshToken, AuthenticationService authenticationService) =>
     {
-        await authenticationService.Logout(refreshToken);
-        return Results.Ok("Logout Successful");
+        var result = await authenticationService.Logout(refreshToken);
+        return Results.Ok(result);
     });
 
     app.UseOcelot().Wait();
