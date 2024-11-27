@@ -239,10 +239,10 @@ public class ProductService : IProductService
             {
                 Data = produtos.Items?.Select(p => _mapper.Map<ProductDto>(p)).ToList(),
                 Success = true,
-                TotalItems = produtos.Items!.Count,
+                TotalItems = produtos.TotalCount,
                 Page = filtro.Page,
                 PageSize = filtro.PageSize,
-                TotalPages = (int)Math.Ceiling((double)produtos.Items!.Count / filtro.PageSize)
+                TotalPages = (int)Math.Ceiling((double)produtos.TotalCount / filtro.PageSize)
             };
         }
         catch (Exception ex)

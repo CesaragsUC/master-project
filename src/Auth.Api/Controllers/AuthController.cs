@@ -25,9 +25,9 @@ public class AuthController : ControllerBase
     {
         var tokenResponse = await _authService.GetToken(loginRequest.Email!, loginRequest.Password!);
 
-        if (tokenResponse == null)
+        if (!tokenResponse.Succeeded)
         {
-            return Unauthorized("Invalid credentials");
+            return BadRequest(tokenResponse);
         }
 
         return Ok(tokenResponse);

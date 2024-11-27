@@ -18,6 +18,7 @@ public class ProductRepository : IProductRepository
         _mongoCollection = dbContext.GetCollection<Products>(typeof(Products).Name);
     }
     public async Task<PagedResult<Products>> GetAll(ProductFilter filter)
+    
     {
         var builder = Builders<Products>.Filter;
         var filterDefinition = builder.Empty;
@@ -52,6 +53,7 @@ public class ProductRepository : IProductRepository
             TotalCount = (int)totalItems,
             Page = filter.Page,
             PageSize = filter.PageSize
+
         };
     }
 }

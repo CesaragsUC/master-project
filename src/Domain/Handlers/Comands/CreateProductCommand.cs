@@ -1,9 +1,10 @@
-﻿using MediatR;
+﻿using Application.Dtos.Dtos.Response;
+using MediatR;
 using System.ComponentModel.DataAnnotations;
 
 namespace Domain.Handlers.Comands
 {
-    public class CreateProductCommand : IRequest<bool>
+    public class CreateProductCommand : IRequest<Result<bool>>
     {
         public string? Name { get; set; }
 

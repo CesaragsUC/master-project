@@ -39,8 +39,7 @@ namespace Api.Controllers
         public async Task<IActionResult> Add([FromBody] CreateProductCommand produto)
         {
             var result = await _mediator.Send(produto);
-
-            return Ok(result);
+            return result.Succeeded ? Ok(result) : BadRequest(result);
         }
 
         [HttpPost]

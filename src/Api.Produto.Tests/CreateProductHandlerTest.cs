@@ -41,7 +41,7 @@ namespace Tests
             var result = await _handler.Handle(command, CancellationToken.None);
 
             // Act
-            Assert.True(result);
+            Assert.True(result.Succeeded);
 
             _repository.Verify(r => r.Add(It.IsAny<Product>()), Times.Once);
         }
@@ -57,7 +57,7 @@ namespace Tests
             var result = await _handler.Handle(command, CancellationToken.None);
 
             // Act
-            Assert.False(result);
+            Assert.False(result.Succeeded);
             _repository.Verify(r => r.Add(It.IsAny<Product>()), Times.Never);
         }
     }

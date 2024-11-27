@@ -2,5 +2,4 @@
 
 public interface IAuthKeyCloakService : IAuthService
 {
-    Task<bool> SpecificKeyCloackMethod();
 }

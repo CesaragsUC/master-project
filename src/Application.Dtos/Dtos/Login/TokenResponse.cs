@@ -12,5 +12,6 @@ public record TokenResponse
 
     [JsonPropertyName("expires_in")]
     public int ExpiresIn { get; set; }
-}
 
+    public UserInfoResponse? User { get; set; }
+}

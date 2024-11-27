@@ -1,3 +1,5 @@
+using Application.Dtos.Abstractions;
+using Application.Dtos.Dtos.Response;
 using Application.Dtos.Settings;
 using Auth.Api.Abstractions;
 using Auth.Api.Services;
@@ -22,6 +24,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddScoped<IAuthKeyCloakService, KeycloakAuthService>();
+builder.Services.AddScoped(typeof(IResult<>), typeof(Result<>));
 
 builder.Services.AddOpenTelemetry()
   .ConfigureResource(resource => resource.AddService("Auth.Api"))

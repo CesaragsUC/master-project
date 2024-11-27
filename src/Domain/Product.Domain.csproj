@@ -15,6 +15,7 @@
 		<PackageReference Include="Serilog" Version="4.0.1" />
 	</ItemGroup>
 	<ItemGroup>
+	  <ProjectReference Include="..\Application.Dtos\Application.Dtos.csproj" />
 	  <ProjectReference Include="..\Messaging.Contracts\Messaging.Contracts.csproj" />
 	</ItemGroup>
 </Project>

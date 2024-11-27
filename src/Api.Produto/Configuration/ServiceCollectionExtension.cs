@@ -11,6 +11,8 @@ using Microsoft.OpenApi.Models;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Domain.Configurations;
+using Application.Dtos.Dtos.Response;
+using Application.Dtos.Abstractions;
 
 namespace Product.Api.Configuration;
 
@@ -21,7 +23,7 @@ public static class ServiceCollectionExtension
         services.AddMediatrService();
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
         services.AddScoped<IBobStorageService, BobStorageService>();
-
+        services.AddScoped(typeof(IResult<>), typeof(Result<>));
         services.PostgresDbService(configuration);
 
         ////opção 1 com classe de configuração

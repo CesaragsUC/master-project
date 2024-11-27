@@ -1,4 +1,6 @@
-﻿using Azure.Storage.Blobs;
+﻿using Application.Dtos.Abstractions;
+using Application.Dtos.Dtos.Response;
+using Azure.Storage.Blobs;
 using Catalog.Domain.Abstractions;
 using Catalog.Infrastructure.Configurations;
 using Catalog.Infrastructure.Context;
@@ -27,6 +29,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IProductService, ProductService>();
         services.AddScoped<IMongoDbContext, MongoDbContext>();
         services.AddScoped<IQueryFilter, ProductFilter>();
+        services.AddScoped(typeof(IResult<>), typeof(Result<>));
         services.AddAutoMapper(Assembly.GetExecutingAssembly());
         services.MongoDbService(configuration);
 
@@ -50,7 +53,7 @@ public static class ServiceCollectionExtensions
 
         services.AddSwaggerGen(cf =>
         {
-            cf.SwaggerDoc("v1", new OpenApiInfo { Title = "Product Service", Version = "v1" });
+            cf.SwaggerDoc("v1", new OpenApiInfo { Title = "Product Catalog", Version = "v1" });
 
             // Configuração do esquema de segurança JWT para o Swagger
             cf.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme

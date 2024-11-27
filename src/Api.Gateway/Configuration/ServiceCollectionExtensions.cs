@@ -18,6 +18,8 @@ public static class ServiceCollectionExtensions
         services.AddJwtServices(configuration);
         services.AddOpenTelemetryServices();
         services.AddAuthServices(configuration);
+        services.AddCors(configuration);
+
     }
 
     public static IServiceCollection AddOceloConfigurations(this IServiceCollection services, ConfigurationManager configuration)
@@ -52,6 +54,30 @@ public static class ServiceCollectionExtensions
     public static void AddAuthServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<EndPointUri>(configuration.GetSection("EndPointUri"));
+
+    }
+
+    public static void AddCors(this IServiceCollection services, IConfiguration configuration)
+    {
+        var _fontUri = configuration.GetSection("FrontEndUri").Get<FrontEndUri>();  
+
+        services.AddCors(options =>
+        {
+            options.AddPolicy(_fontUri.Name!, policy =>
+            {
+                 policy.AllowAnyOrigin()
+                        .AllowAnyMethod()
+                        .AllowAnyHeader();
+            });
+
+            options.AddPolicy("Production", policy =>
+            {
+                policy.WithOrigins(_fontUri.Uri!)
+                      .AllowAnyHeader()
+                      .SetIsOriginAllowedToAllowWildcardSubdomains()
+                      .AllowAnyMethod();
+            });
+        });
 
     }
 

@@ -1,4 +1,4 @@
-﻿
+﻿using Application.Dtos.Dtos.Response;
 using Domain.Handlers.Comands;
 using Domain.Interfaces;
 using Domain.Models;
@@ -11,7 +11,7 @@ using Serilog;
 
 namespace Domain.Handlers
 {
-    public class CreateProductHandler : IRequestHandler<CreateProductCommand, bool>
+    public class CreateProductHandler : IRequestHandler<CreateProductCommand, Result<bool>>
     {
         private readonly IRepository<Product> _repository;
         private readonly IPublishEndpoint _publish;
@@ -27,7 +27,7 @@ namespace Domain.Handlers
             _bobStorageService = bobStorageService;
         }
 
-        public async Task<bool> Handle(CreateProductCommand request, CancellationToken cancellationToken)
+        public async Task<Result<bool>> Handle(CreateProductCommand request, CancellationToken cancellationToken)
         {
             try
             {
@@ -35,7 +35,7 @@ namespace Domain.Handlers
 
                 if (!validationResponse.Success)
                 {
-                    return false;
+                    return  await Result<bool>.FailureAsync(500, validationResponse.Errors?.ToList()!);
                 }
 
                 var produto = new Product
@@ -63,11 +63,11 @@ namespace Domain.Handlers
             catch (Exception ex)
             {
                 Log.Error(ex, "Erro ao adicionar produto");
-                return false;
+                return await Result<bool>.FailureAsync(500, ex.Message!); 
             }
 
 
-            return true;
+            return await Result<bool>.SuccessAsync(); 
         }
 
         private async Task<string> UploadImage(string? base64Image)

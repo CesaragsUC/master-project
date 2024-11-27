@@ -1,10 +1,9 @@
 using Api.Gateway.Configuration;
 using Api.Gateway.Dto;
 using Api.Gateway.Services;
+using Application.Dtos.Settings;
 using Microsoft.OpenApi.Models;
 using Ocelot.Middleware;
-using OpenTelemetry.Resources;
-using OpenTelemetry.Trace;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -31,7 +30,7 @@ try
     builder.Services.AddOceloConfigurations(builder.Configuration);
     builder.Services.AddServices(builder.Configuration);
 
-
+    var _fontUri = builder.Configuration.GetSection("FrontEndUri").Get<FrontEndUri>();
 
     var app = builder.Build();
 
@@ -48,6 +47,9 @@ try
     app.UseAuthentication();
 
     app.UseRouting();
+
+    app.UseCors(_fontUri?.Name!);
+
     app.MapControllers();
     app.UseAuthorization();
 
@@ -71,6 +73,8 @@ try
         var result = await authenticationService.Logout(refreshToken);
         return Results.Ok(result);
     });
+
+
 
     app.UseOcelot().Wait();
     app.Run();
