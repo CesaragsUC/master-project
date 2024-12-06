@@ -1,4 +1,5 @@
 ﻿
+using Application.Dtos.Dtos.Response;
 using Domain.Handlers.Comands;
 using Domain.Interfaces;
 using Domain.Models;
@@ -11,7 +12,7 @@ using Serilog;
 
 namespace Domain.Handlers
 {
-    public class UpdateProductHandler : IRequestHandler<UpdateProductCommand, bool>
+    public class UpdateProductHandler : IRequestHandler<UpdateProductCommand, Result<bool>>
     {
         private readonly IPublishEndpoint _publish;
         private readonly IRepository<Product> _repository;
@@ -27,7 +28,7 @@ namespace Domain.Handlers
             _publish = publish;
         }
 
-        public async Task<bool> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
+        public async Task<Result<bool>> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
         {
             try
             {
@@ -35,12 +36,12 @@ namespace Domain.Handlers
 
                 if (!validationResponse.Success)
                 {
-                    return false;
+                    return  await Result<bool>.FailureAsync(400, validationResponse?.Errors?.ToList()); 
                 }
 
                 var produto = _repository.FindOne(x => x.Id == request.Id);
 
-                if (produto == null) return false;
+                if (produto == null) return await Result<bool>.FailureAsync(400, $"Product {request.Id} not find"); 
 
                 produto.Name = request.Name;
                 produto.Price = request.Price;
@@ -60,12 +61,12 @@ namespace Domain.Handlers
                     ImageUri = produto.ImageUri
                 });
 
-                return true;
+                return await Result<bool>.SuccessAsync($"Product {request.Id} updated successfuly");
             }
             catch (Exception ex)
             {
-                Log.Error(ex, "Erro ao atualizar produto");
-                return false;
+                Log.Error(ex, "Fail to updated product");
+                return  await Result<bool>.FailureAsync(400, ex.Message); 
             }
         }
         private async Task<string> UploadImage(string? base64Image,string? oldBlobName)

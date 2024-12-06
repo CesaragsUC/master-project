@@ -1,19 +1,26 @@
-﻿using MediatR;
+﻿using Application.Dtos.Dtos.Response;
+using MediatR;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Domain.Handlers.Comands
 {
-    public class UpdateProductCommand : IRequest<bool>
+    public class UpdateProductCommand : IRequest<Result<bool>>
     {
+        [JsonPropertyName("id")]
         public Guid Id { get; set; }
 
+        [JsonPropertyName("name")]
         public string? Name { get; set; }
 
+        [JsonPropertyName("price")]
         public decimal Price { get; set; }
 
+        [JsonPropertyName("active")]
         public bool Active { get; set; }
 
         [Base64String]
+        [JsonPropertyName("imageBase64")]
         public string? ImageBase64 { get; set; }
     }
 }

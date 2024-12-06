@@ -280,7 +280,8 @@ public class ProductService : IProductService
                     Name = produto.Name,
                     Price = produto.Price,
                     Active = produto.Active,
-                    CreatAt = produto.CreatAt
+                    CreatAt = produto.CreatAt,
+                    ImageUri = produto.ImageUri
                 },
                 Success = true
 

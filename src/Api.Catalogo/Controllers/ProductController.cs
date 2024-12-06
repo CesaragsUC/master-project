@@ -27,8 +27,8 @@ public class ProductController(IProductService service) : ControllerBase
     [Route("product/{id:guid}")]
     public async Task<IActionResult> Get(Guid id)
     {
-        var produto = await service.GetById("ProdutoId",id);
-        return Ok(produto);
+        var product = await service.GetById("ProductId", id);
+        return Ok(product);
     }
 
     [HttpGet]

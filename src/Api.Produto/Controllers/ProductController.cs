@@ -62,17 +62,17 @@ namespace Api.Controllers
         {
             var result = await _mediator.Send(produto);
 
-            return Ok(result);
+            return result.Succeeded ?  Ok(result) : BadRequest(result);
         }
 
         [HttpDelete]
         [Route("delete")]
         [Authorize(Roles = "Delete")]
-        public async Task<IActionResult> Delete([FromQuery] DeleteProductCommand produto)
+        public async Task<IActionResult> Delete(Guid id)
         {
-            var result = await _mediator.Send(produto);
+            var result = await _mediator.Send(new DeleteProductCommand(id));
 
-            return Ok(result);
+            return result.Succeeded ?  Ok(result) : BadRequest(result);
         }
 
         private async Task<List<CreateProductCommand>> CriarListaProduto(int total)

@@ -32,7 +32,7 @@ public class ProdutctUpdatedConsumer : IConsumer<ProductUpdatedEvent>
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "Erro ao adicionar produto");
+            Log.Error(ex, "Fail to add product");
         }
 
         await Task.CompletedTask;

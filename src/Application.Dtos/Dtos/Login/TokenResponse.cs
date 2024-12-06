@@ -2,6 +2,9 @@
 
 namespace Application.Dtos.Dtos.Login;
 
+/// <summary>
+/// this class is used to bind keycloak response
+/// </summary>
 public record TokenResponse
 {
     [JsonPropertyName("access_token")]

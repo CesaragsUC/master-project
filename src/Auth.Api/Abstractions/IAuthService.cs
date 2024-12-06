@@ -5,7 +5,7 @@ namespace Auth.Api.Abstractions;
 
 public interface IAuthService
 {
-    Task<Result<TokenResponse>> GetToken(string email, string password);
+    Task<Result<LoginResponse>> GetToken(string email, string password);
     Task<UserInfoResponse> GetUserInfo(string accessToken);
     Task<Result<bool>> Logout(string refreshToken);
 }

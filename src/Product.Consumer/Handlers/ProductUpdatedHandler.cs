@@ -22,13 +22,13 @@ public class ProductUpdatedHandler :
         {
             await _repository.UpdateAsync(nameof(request.ProductId), request, nameof(Products));
 
-            Log.Information("Atualizado produto nome: {Nome} - {Data}", request.Name, DateTime.Now);
+            Log.Information("Product: {Nome} - {Data} was updated.", request.Name, DateTime.Now);
 
             return true;
         }
         catch (Exception ex)
         {
-            Log.Error("Falha ao integrar produto", ex);
+            Log.Error("Fail to updated product", ex);
             return false;
         }
     }

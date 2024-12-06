@@ -2,6 +2,9 @@
 
 namespace Application.Dtos.Dtos.Login;
 
+/// <summary>
+/// this class is used to bind with keycloak response
+/// </summary>
 public class UserInfoResponse
 {
     [JsonPropertyName("sub")]
