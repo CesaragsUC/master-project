@@ -229,7 +229,7 @@ public class ProductService : IProductService
                 {
                     Data = null,
                     Success = false,
-                    Errors = new string[] { "Filtro inválido" }
+                    Errors = new string[] { "Invalid filter" }
                 };
             }
 
@@ -268,7 +268,7 @@ public class ProductService : IProductService
                 return new ResponseResult<ProductDto>
                 {
                     Success = false,
-                    Errors = new string[] { "Produto não encontrado" }
+                    Errors = new string[] { "Product not found" }
                 };
             }
 
@@ -308,7 +308,7 @@ public class ProductService : IProductService
                 return new ResponseResult<List<ProductDto>>
                 {
                     Success = false,
-                    Errors = new string[] { "Produto não encontrado" }
+                    Errors = new string[] { "Product not found" }
                 };
             }
 

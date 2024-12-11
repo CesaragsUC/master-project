@@ -102,7 +102,7 @@ namespace Api.Catalogo.Tests
             // Assert
             _mongoRepository.Verify(c => c.GetById(It.IsAny<string>(), It.IsAny<Guid>()), Times.Once);
 
-            result?.Errors.Should().Contain("Produto não encontrado");
+            result?.Errors.Should().Contain("Product not found");
             result?.Success.Should().BeFalse();
             result?.Data.Should().BeNull();
         }
@@ -147,7 +147,7 @@ namespace Api.Catalogo.Tests
             var result = await _service.GetByName("Nome", produto!.FirstOrDefault()?.Name!);
 
             // Assert
-            result?.Errors.Should().Contain("Produto não encontrado");
+            result?.Errors.Should().Contain("Product not found");
             result?.Success.Should().BeFalse();
             result?.Data.Should().BeNull();
             result?.Data?.Count.Should().BeLessThanOrEqualTo(0);
@@ -382,7 +382,7 @@ namespace Api.Catalogo.Tests
             _produtoRepository.Verify(c => c.GetAll(It.IsAny<ProductFilter>()), Times.Never);
 
             result?.Errors.Should().HaveCountGreaterThan(0);
-            result?.Errors.Should().Contain("Filtro inválido");
+            result?.Errors.Should().Contain("Invalid filter");
             result?.Success.Should().BeFalse();
             result?.Data.Should().BeNull();
             result?.Data?.Count.Should().BeGreaterThan(0);

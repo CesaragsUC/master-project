@@ -5,11 +5,18 @@ on:
       - main
   pull_request:
     types: [opened, synchronize, reopened]
+env:
+    DOTNET_VERSION: '8.0.x'
 jobs:
   build:
     name: Build and analyze
     runs-on: ubuntu-latest
     steps:
+      - name: Configure Encoding
+        run: |
+          export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
+          export LANG=en_US.UTF-8
+      
       - name: Installing coverage
         run: dotnet tool install --global dotnet-coverage
 
