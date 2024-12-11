@@ -2,6 +2,7 @@
 using Domain.Handlers.Comands;
 using Domain.Interfaces;
 using Domain.Models;
+using MassTransit;
 using MediatR;
 using Moq;
 using System.Linq.Expressions;
@@ -13,6 +14,7 @@ namespace Tests
 
         private readonly Mock<IRepository<Product>> _repository;
         private readonly Mock<IMediator> _mediator;
+        private readonly Mock<IPublishEndpoint> _publish;
         private DeleteProductHandler _handler;
         public DeleteProductHandlerTest()
         {
@@ -20,8 +22,9 @@ namespace Tests
 
             _repository = new Mock<IRepository<Product>>();
             _mediator = new Mock<IMediator>();
+            _publish = new Mock<IPublishEndpoint>();
 
-            _handler = new DeleteProductHandler(_repository.Object);
+            _handler = new DeleteProductHandler(_repository.Object, _publish.Object);
         }
 
 
@@ -29,10 +32,7 @@ namespace Tests
         [Trait("Produtoservice", "ProductDeleteHandler")]
         public async Task Test1()
         {
-            var command = new DeleteProductCommand
-            {
-                Id = Guid.NewGuid()
-            };
+            var command = new DeleteProductCommand(Guid.NewGuid());
 
             // Configura o callback para o método FindOne
             _repository.Setup(r => r.FindOne(It.IsAny<Expression<Func<Product, bool>>>(), null))
@@ -61,7 +61,7 @@ namespace Tests
             var result = await _handler.Handle(command, CancellationToken.None);
 
             // Act
-            Assert.True(result);
+            Assert.True(result.Succeeded);
             _repository.Verify(r => r.FindOne(It.IsAny<Expression<Func<Product, bool>>>(), null), Times.Once);
             _repository.Verify(r => r.Delete(It.IsAny<Product>()), Times.Once);
         }
@@ -72,15 +72,13 @@ namespace Tests
         {
             // Arrange
 
-            var command = new DeleteProductCommand
-            {
-                Id = Guid.Empty
-            };
+            var command = new DeleteProductCommand(Guid.Empty);
+
 
             var result = await _handler.Handle(command, CancellationToken.None);
 
             // Act
-            Assert.False(result);
+            Assert.False(result.Succeeded);
             _repository.Verify(r => r.FindOne(It.IsAny<Expression<Func<Product, bool>>>(), null), Times.Never);
             _repository.Verify(r => r.Delete(It.IsAny<Product>()), Times.Never);
         }
