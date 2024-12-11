@@ -16,7 +16,7 @@ using Application.Dtos.Abstractions;
 
 namespace Product.Api.Configuration;
 
-public static class ServiceCollectionExtension
+public static class ServiceCollectionExtensions
 {
     public static void AddServices(this IServiceCollection services,IConfiguration configuration)
     {
