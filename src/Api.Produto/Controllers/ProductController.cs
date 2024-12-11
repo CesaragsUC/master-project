@@ -79,6 +79,9 @@ namespace Api.Controllers
         {
             Faker faker = new Faker("pt_BR");
 
+            const int MaxProducts = 1000;
+            total = Math.Clamp(total, 1, MaxProducts);
+
             var produtos = new List<CreateProductCommand>();
 
             for (int i = 0; i < total; i++)

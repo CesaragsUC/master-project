@@ -2,6 +2,8 @@
 using Product.Consumer.Configurations;
 using Serilog;
 
+namespace Product.Consumer;
+
 class Program
 {
     public static async Task Main(string[] args)
