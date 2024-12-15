@@ -34,7 +34,7 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\Domain\Product.Domain.csproj" />
-	  <ProjectReference Include="..\Infrasctructure\Product.Infrastructure.csproj" />
+	  <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

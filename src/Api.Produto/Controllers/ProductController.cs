@@ -42,18 +42,6 @@ namespace Api.Controllers
             return result.Succeeded ? Ok(result) : BadRequest(result);
         }
 
-        [HttpPost]
-        [Route("product-create-with-bogus/{total:int}")]
-        [Authorize(Roles = "Create")]
-        public async Task<IActionResult> AddMany(int total)
-        {
-            foreach (var item in await CriarListaProduto(total))
-            {
-                await _mediator.Send(item);
-            }
-
-            return Ok($"Foi inserido um total de {total} produtos.");
-        }
 
         [HttpPut]
         [Route("update")]
@@ -75,29 +63,5 @@ namespace Api.Controllers
             return result.Succeeded ?  Ok(result) : BadRequest(result);
         }
 
-        private async Task<List<CreateProductCommand>> CriarListaProduto(int total)
-        {
-            Faker faker = new Faker("pt_BR");
-
-            const int MaxProducts = 1000;
-            total = Math.Clamp(total, 1, MaxProducts);
-
-            var produtos = new List<CreateProductCommand>();
-
-            for (int i = 0; i < total; i++)
-            {
-                var produto = new CreateProductCommand
-                {
-                    Name = faker.Commerce.ProductName(),
-                    Price = faker.Random.Decimal(1, 100),
-                    Active = faker.Random.Bool(),
-                    
-                };
-
-                produtos.Add(produto);
-            }
-
-            return produtos;
-        }
     }
 }
