@@ -36,7 +36,7 @@ public static class ServiceCollectionExtensions
 
         services.AddSwaggerServices();
         services.AddKeycloakServices(configuration);
-        services.AddOpenTelemetryServices();
+        services.AddOpenTelemetryServices(configuration);
         services.AddAzureBlobServices(configuration);
     }
 
@@ -100,10 +100,16 @@ public static class ServiceCollectionExtensions
         services.AddKeycloakAuthorization(authorizationOptions!);
     }
 
-    public static void AddOpenTelemetryServices(this IServiceCollection services)
+    public static void AddOpenTelemetryServices(this IServiceCollection services, IConfiguration configuration)
     {
+        var jaegerConfig = configuration.GetSection("OpenTelemetry");
+        var serviceName = jaegerConfig.GetValue<string>("ServiceName");
+        var jaegerHost = jaegerConfig.GetValue<string>("Jaeger:AgentHost");
+        var jaegerPort = jaegerConfig.GetValue<int>("Jaeger:AgentPort");
+
+
         services.AddOpenTelemetry()
-        .ConfigureResource(resource => resource.AddService("Catalog.Api"))
+        .ConfigureResource(resource => resource.AddService(serviceName))
         .WithTracing(builder =>
         {
             builder
@@ -111,8 +117,8 @@ public static class ServiceCollectionExtensions
                 .AddHttpClientInstrumentation()
                   .AddJaegerExporter(options =>
                   {
-                      options.AgentHost = "localhost";
-                      options.AgentPort = 6831;
+                      options.AgentHost = jaegerHost;
+                      options.AgentPort = jaegerPort;
                   });
         });
 

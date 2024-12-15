@@ -1,0 +1,225 @@
+services:
+
+  casoft-store-api-gateway:
+    image: cesarags/casoft-store-api-gateway:v1
+    container_name: casoft-store-api-gateway
+    build:
+        context: ../src
+        dockerfile: ./Api.Gateway/Dockerfile
+    environment:
+      - KeycloakSettings__AuthServerUrl= ${KEYCLOAK_REALM_URL}
+      - KeycloakSettings__Audience= ${KEYCLOAK_CLIENT_ID}
+      - EndPointUri__AuthApi= ${ENDPOINT_URI_AUTH_API}
+      - FrontEndUri__Uri=${FRONTEND_URI}
+      - FrontEndUri__Name=${FRONTEND_NAME}
+      - OPENTELEMETRY__SERVICE_NAME=Api.Gateway
+      - OPENTELEMETRY__JAEGER__AGENTHOST=${OPEN_TELEMETRY_HOST}
+      - OPENTELEMETRY__JAEGER__AGENTPORT=6831
+      - ASPNETCORE_ENVIRONMENT=Docker 
+      - ASPNETCORE_URLS=http://*:5214
+    ports:
+      - "5214:5214"
+    depends_on:
+      - casoft-store-product-service
+      - casoft-store-catalog
+      - casoft-store-consumer
+      - casoft-store-auth
+      - casoft-store-keycloak
+
+  casoft-store-product-service:
+    image: cesarags/casoft-store-product-service:v1
+    container_name: casoft-store-product-service
+    build:
+        context: ../src
+        dockerfile: ./Api.Produto/Dockerfile
+    environment:
+      - KEYCLOAK__REALM=${KEYCLOAK_REALM}
+      - KEYCLOAK__AUTH_SERVER_URL=${KEYCLOAK_SERVER_URL}
+      - KEYCLOAK__SSL_REQUIRED=${KEYCLOAK_SSL_REQUIRED}
+      - KEYCLOAK__RESOURCE=${KEYCLOAK_CLIENT_ID}
+      - KEYCLOAK__VERIFY_TOKEN_AUDIENCE=true
+      - KEYCLOAK__CREDENTIALS__SECRET=${KEYCLOAK_SECRET}
+      - CONNECTIONSTRINGS__DEFAULTCONNECTION=${PRODUCT_SERVICE_DB}
+      - OPENTELEMETRY__SERVICE_NAME=Product.Api
+      - OPENTELEMETRY__JAEGER__AGENTHOST=${OPEN_TELEMETRY_HOST}
+      - OPENTELEMETRY__JAEGER__AGENTPORT=6831
+      - RABBITMQTRANSPORT__HOST=${RABBITMQ_HOST}
+      - RABBITMQTRANSPORT__PORT=${RABBITMQ_PORT}
+      - RABBITMQTRANSPORT__USER=${RABBITMQ_USER}
+      - RABBITMQTRANSPORT__PASS=${RABBITMQ_PASS}
+      - ASPNETCORE_ENVIRONMENT=Docker 
+      - ASPNETCORE_URLS=http://*:5256
+    ports:
+      - "5256:5256"
+    depends_on:
+      - casoft-store-postgres-db
+
+  casoft-store-catalog:
+    image: cesarags/casoft-store-catalog:v1
+    container_name: casoft-store-catalog
+    build:
+        context: ../src
+        dockerfile: ./Api.Catalogo/Dockerfile
+    environment:
+      - KEYCLOAK__REALM=${KEYCLOAK_REALM}
+      - KEYCLOAK__AUTH_SERVER_URL=${KEYCLOAK_SERVER_URL}
+      - KEYCLOAK__SSL_REQUIRED=${KEYCLOAK_SSL_REQUIRED}
+      - KEYCLOAK__RESOURCE=${KEYCLOAK_CLIENT_ID}
+      - KEYCLOAK__VERIFY_TOKEN_AUDIENCE=true
+      - KEYCLOAK__CREDENTIALS__SECRET=${KEYCLOAK_SECRET}
+      - OPENTELEMETRY__SERVICE_NAME=Catalog.Api
+      - OPENTELEMETRY__JAEGER__AGENTHOST=${OPEN_TELEMETRY_HOST}
+      - OPENTELEMETRY__JAEGER__AGENTPORT=6831
+      - ASPNETCORE_ENVIRONMENT=Docker 
+      - ASPNETCORE_URLS=http://*:5294
+    ports:
+      - "5294:5294"
+    depends_on:
+      - casoft-store-mongodb
+
+  casoft-store-auth:
+    image: cesarags/casoft-store-auth:v1
+    container_name: casoft-store-auth
+    build:
+        context: ../src
+        dockerfile: ./Auth.Api/Dockerfile
+    environment:
+      - KEYCLOAK__REALM=${KEYCLOAK_REALM}
+      - KEYCLOAK__AUTH_SERVER_URL=${KEYCLOAK_AUTH_SERVER_URL}
+      - KEYCLOAK__SSL_REQUIRED=${KEYCLOAK_SSL_REQUIRED}
+      - KEYCLOAK__RESOURCE=${KEYCLOAK_CLIENT_ID}
+      - KEYCLOAK__VERIFY_TOKEN_AUDIENCE=true
+      - KEYCLOAK__CREDENTIALS__SECRET=${KEYCLOAK_SECRET}
+      - OPENTELEMETRY__SERVICE_NAME=Auth.Api
+      - OPENTELEMETRY__JAEGER__AGENTHOST=${OPEN_TELEMETRY_HOST}
+      - OPENTELEMETRY__JAEGER__AGENTPORT=6831
+      - ASPNETCORE_ENVIRONMENT=Docker 
+      - ASPNETCORE_URLS=http://*:5283
+    ports:
+      - "5283:5283"
+    depends_on:
+      - casoft-store-keycloak
+
+  casoft-store-consumer:
+    image: cesarags/casoft-consumer:v1
+    container_name: casoft-consumer
+    build:
+        context: ../src
+        dockerfile: ./Product.Consumer/Dockerfile
+    environment:
+      - QUARTZENDPOINT__QUEUENAME=${QUARTZ_JOB_QUEUE_NAME}
+      - QUARTZENDPOINT__PREFETCHCOUNT=${QUARTZ_JOB_PREFETCH_COUNT}
+      - CONNECTIONSTRINGS__QUARTZ=${QUARTZ_JOB_DB_CONNECTION_STRING}
+      - MONGODBSETTINGS__CONNECTIONSTRING=${MONGO_SERVER_URL}
+      - MONGODBSETTINGS__DATABASENAME=${MONGO_DATABASE_NAME}
+      - RABBITMQTRANSPORT__HOST=${RABBITMQ_HOST}
+      - RABBITMQTRANSPORT__PORT=${RABBITMQ_PORT}
+      - RABBITMQTRANSPORT__USER=${RABBITMQ_USER}
+      - RABBITMQTRANSPORT__PASS=${RABBITMQ_PASS}
+    depends_on:
+      - casoft-store-rabbitmq
+      - casoft-store-mongodb
+      - casoft-store-sqlserver-db
+
+  casoft-store-sqlserver-db:
+        image: mcr.microsoft.com/mssql/server:2022-CU12-ubuntu-22.04
+        container_name: casoft-store-sqlserver-db
+        restart: always
+        ports:
+          - "1433:1433"
+        environment:
+          SA_PASSWORD: ${SQL_SERVER_SA_PASSWORD}
+          ACCEPT_EULA: "Y"
+        volumes:
+          - sqlvolume:/data
+
+  casoft-store-postgres-db:
+    image: postgres:latest
+    container_name: casoft-store-postgres-db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+        - postgresql:/var/lib/postgresql
+        - postgresql_data:/var/lib/postgresql/data
+
+  casoft-store-mongodb:
+    image: mongo:latest
+    container_name: casoft-store-mongodb
+    ports:
+      - "27017:27017"
+    environment:
+       MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASS}
+    restart: always  
+    volumes:
+      - mongo_data:/data/db
+
+  casoft-store-rabbitmq:
+    image: rabbitmq:3-management
+    container_name: casoft-store-rabbitmq
+    environment:
+        RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+        RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
+    ports:
+      - "5672:5672"
+      - "15672:15672"    
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+ #https://medium.com/@fingervinicius/easy-running-keycloak-with-docker-compose-b0d7a4ee2358
+  casoft-store-keycloak:
+    container_name: casoft-store-keycloak
+    image: quay.io/keycloak/keycloak:26.0
+    command: start
+    environment:
+      KC_HOSTNAME: localhost
+      KC_HOSTNAME_PORT: 8180
+      KC_HOSTNAME_STRICT_BACKCHANNEL: false
+      KC_HTTP_ENABLED: true
+      KC_HOSTNAME_STRICT_HTTPS: false
+      KC_HEALTH_ENABLED: false
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://casoft-store-postgres-db/${POSTGRES_DB}
+      KC_DB_USERNAME: ${POSTGRES_USER}
+      KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - 8180:8080
+    restart: always
+    depends_on:
+      - casoft-store-postgres-db
+
+  #https://www.jaegertracing.io/docs/1.6/getting-started/
+  casoft-store-jaeger:
+    image: jaegertracing/all-in-one:1.44
+    container_name: casoft-store-jaeger
+    ports:
+    - "16686:16686" # Interface Web do Jaeger
+    - "16687:16687" # Endpoint de configuração do gRPC
+    - "6831:6831/udp" # Porta para o agente Jaeger receber spans (UDP)
+    - "6832:6832/udp" # Porta opcional para comunicação entre agentes (se necessário)
+
+volumes:
+  sqlvolume:
+    driver: local
+  mongo_data:
+    driver: local
+  postgresql_data:
+    driver: local
+  postgresql:
+    driver: local
+  rabbitmq_data:
+    driver: local
+
+networks:
+  default:
+    name: casoft-network
+
+
+# docker compose --project-name casoft-store up -d
+# docker compose --project-name casoft-store up --build -d

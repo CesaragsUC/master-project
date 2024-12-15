@@ -16,7 +16,7 @@ public static class ServiceCollectionExtensions
         services.AddHttpClient();
 
         services.AddJwtServices(configuration);
-        services.AddOpenTelemetryServices();
+        services.AddOpenTelemetryServices(configuration);
         services.AddAuthServices(configuration);
         services.AddCors(configuration);
 
@@ -81,10 +81,16 @@ public static class ServiceCollectionExtensions
 
     }
 
-    public static void AddOpenTelemetryServices(this IServiceCollection services)
+    public static void AddOpenTelemetryServices(this IServiceCollection services, IConfiguration configuration)
     {
+        var jaegerConfig = configuration.GetSection("OpenTelemetry");
+        var serviceName = jaegerConfig.GetValue<string>("ServiceName");
+        var jaegerHost = jaegerConfig.GetValue<string>("Jaeger:AgentHost");
+        var jaegerPort = jaegerConfig.GetValue<int>("Jaeger:AgentPort");
+
+
         services.AddOpenTelemetry()
-        .ConfigureResource(resource => resource.AddService("Gateway.Api"))
+        .ConfigureResource(resource => resource.AddService(serviceName))
         .WithTracing(builder =>
         {
             builder
@@ -92,8 +98,8 @@ public static class ServiceCollectionExtensions
                 .AddHttpClientInstrumentation()
                   .AddJaegerExporter(options =>
                   {
-                      options.AgentHost = "localhost";
-                      options.AgentPort = 6831;
+                      options.AgentHost = jaegerHost;
+                      options.AgentPort = jaegerPort;
                   });
         });
 
