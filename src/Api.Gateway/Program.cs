@@ -34,12 +34,11 @@ try
 
     var app = builder.Build();
 
-    if (app.Environment.IsDevelopment())
-    {
-        app.UseSwagger();
-        app.UseSwaggerUI();
-        app.UseSwaggerForOcelotUI();
-    }
+
+    app.UseSwagger();
+    app.UseSwaggerUI();
+    app.UseSwaggerForOcelotUI();
+
 
 
     app.UseHttpsRedirection();
@@ -58,7 +57,7 @@ try
     {
         endpoints.MapControllers();
     });
-    #pragma warning restore ASP0014
+#pragma warning restore ASP0014
 
     // call the authentication service
     app.MapPost("/api/masterauth/login", async (LoginDto loginDto, AuthenticationService authenticationService) =>

@@ -34,9 +34,9 @@ public static class ServiceCollectionExtensions
 
         services.AddSwaggerServices();
         services.AddKeycloakServices(configuration);
-        services.AddOpenTelemetryServices();
+        services.AddOpenTelemetryServices(configuration);
         services.AddAzureBlobServices(configuration);
-        services.AddMassTransientServices();
+        services.AddMassTransientServices(configuration);
     }
 
     public static void AddSwaggerServices(this IServiceCollection services)
@@ -91,23 +91,6 @@ public static class ServiceCollectionExtensions
         services.AddKeycloakAuthorization(authorizationOptions!);
     }
 
-    public static void AddOpenTelemetryServices(this IServiceCollection services)
-    {
-        services.AddOpenTelemetry()
-        .ConfigureResource(resource => resource.AddService("Product.Api"))
-        .WithTracing(builder =>
-        {
-            builder
-                .AddAspNetCoreInstrumentation()
-                .AddHttpClientInstrumentation()
-                  .AddJaegerExporter(options =>
-                  {
-                      options.AgentHost = "localhost";
-                      options.AgentPort = 6831;
-                  });
-        });
-
-    }
 
     public static void AddAzureBlobServices(this IServiceCollection services, IConfiguration configuration)
     {
@@ -121,16 +104,45 @@ public static class ServiceCollectionExtensions
 
     }
 
-    public static void AddMassTransientServices(this IServiceCollection services)
+    public static void AddOpenTelemetryServices(this IServiceCollection services, IConfiguration configuration)
     {
+        var jaegerConfig = configuration.GetSection("OpenTelemetry");
+        var serviceName = jaegerConfig.GetValue<string>("ServiceName");
+        var jaegerHost = jaegerConfig.GetValue<string>("Jaeger:AgentHost");
+        var jaegerPort = jaegerConfig.GetValue<int>("Jaeger:AgentPort");
+
+
+        services.AddOpenTelemetry()
+        .ConfigureResource(resource => resource.AddService(serviceName))
+        .WithTracing(builder =>
+        {
+            builder
+                .AddAspNetCoreInstrumentation()
+                .AddHttpClientInstrumentation()
+                  .AddJaegerExporter(options =>
+                  {
+                      options.AgentHost = jaegerHost;
+                      options.AgentPort = jaegerPort;
+                  });
+        });
+
+    }
+
+    public static void AddMassTransientServices(this IServiceCollection services, IConfiguration configuration)
+    {
+        var rabbitmqConfig = configuration.GetSection("RabbitMqTransport");
+        var host = rabbitmqConfig.GetValue<string>("Host");
+        var user = rabbitmqConfig.GetValue<string>("User");
+        var pass = rabbitmqConfig.GetValue<string>("Pass");
+
         services.AddMassTransit(m =>
         {
             m.UsingRabbitMq((ctx, cfg) =>
             {
-                cfg.Host("localhost", "/", c =>
+                cfg.Host(host, "/", c =>
                 {
-                    c.Username("guest");
-                    c.Password("guest");
+                    c.Username(user);
+                    c.Password(pass);
                 });
                 cfg.ConfigureEndpoints(ctx);
             });

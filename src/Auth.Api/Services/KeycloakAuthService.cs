@@ -5,6 +5,7 @@ using Auth.Api.Abstractions;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using Serilog;
+using System.Diagnostics;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 using System.Text.Json;
@@ -27,6 +28,9 @@ public class KeycloakAuthService : IAuthKeyCloakService
 
     public async Task<Result<LoginResponse>> GetToken(string email, string password)
     {
+        var activity = Activity.Current;
+        activity?.AddTag("email", email);
+
         var keycloakUrl = $"{_keyCloakOptions.Value.AuthServerUrl}/token";
         var clientId = _keyCloakOptions.Value.Resource;
         var clientSecret = _keyCloakOptions.Value.Credentials?.Secret; 

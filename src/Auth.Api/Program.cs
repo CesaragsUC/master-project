@@ -41,6 +41,26 @@ builder.Services.AddOpenTelemetry()
   });
 
 
+var jaegerConfig = builder.Configuration.GetSection("OpenTelemetry");
+var serviceName = jaegerConfig.GetValue<string>("ServiceName");
+var jaegerHost = jaegerConfig.GetValue<string>("Jaeger:AgentHost");
+var jaegerPort = jaegerConfig.GetValue<int>("Jaeger:AgentPort");
+
+
+builder.Services.AddOpenTelemetry()
+    .ConfigureResource(resource => resource.AddService(serviceName))
+    .WithTracing(builder =>
+    {
+        builder
+            .AddAspNetCoreInstrumentation()
+            .AddHttpClientInstrumentation()
+              .AddJaegerExporter(options =>
+              {
+                  options.AgentHost = jaegerHost;
+                  options.AgentPort = jaegerPort;
+              });
+    });
+
 
 builder.Services.AddKeycloakWebApiAuthentication(builder.Configuration, KeycloakAuthenticationOptions.Section);
 
@@ -55,12 +75,10 @@ builder.Services.AddHttpClient();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+
+app.UseSwagger();
+app.UseSwaggerUI();
+
 
 app.UseHttpsRedirection();
 
