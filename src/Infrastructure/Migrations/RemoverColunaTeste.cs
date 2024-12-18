@@ -1,7 +1,9 @@
 ﻿using FluentMigrator;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Infrastructure.Migrations;
 
+[ExcludeFromCodeCoverage]
 [Migration(202411071418)]
 public class RemoverColunaTeste : Migration
 {

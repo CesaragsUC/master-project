@@ -1,12 +1,13 @@
 ﻿using FluentMigrator;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Infrastructure.Migrations;
 
 /// <summary>
 /// Não existe classe Categoria, então é criada a tabela Categoria via migração
 /// </summary>
-
+[ExcludeFromCodeCoverage]
 [Migration(202409281048)]
 public class Categoria : Migration
 {

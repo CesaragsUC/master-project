@@ -1,5 +1,8 @@
-﻿namespace Catalog.Infrastructure.Configurations;
+﻿using System.Diagnostics.CodeAnalysis;
 
+namespace Catalog.Infrastructure.Configurations;
+
+[ExcludeFromCodeCoverage]
 public class MongoDbSettings
 {
     public string? ConnectionString { get; set; }

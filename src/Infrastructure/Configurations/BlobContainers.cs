@@ -1,5 +1,8 @@
-﻿namespace Infrastructure.Configurations
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Infrastructure.Configurations
 {
+    [ExcludeFromCodeCoverage]
     public class BlobContainers
     {
         public string? ConnectionStrings { get; set; }

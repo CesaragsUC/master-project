@@ -1,10 +1,11 @@
 ﻿using Domain.Interfaces;
 using MongoDB.Driver;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace Infrastructure.Repository
 {
-
+    [ExcludeFromCodeCoverage]
     public class MongoRepository<TEntity> : IMongoRepository<TEntity> where TEntity : class
     {
         private readonly IMongoDbContext _dbContext;

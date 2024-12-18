@@ -3,10 +3,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace Infrastructure.Configurations;
 
+[ExcludeFromCodeCoverage]
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection PostgresDbService(this IServiceCollection services, IConfiguration configuration)

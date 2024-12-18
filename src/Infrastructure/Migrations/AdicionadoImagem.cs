@@ -1,7 +1,9 @@
 ﻿using FluentMigrator;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Infrastructure.Migrations;
 
+[ExcludeFromCodeCoverage]
 [Migration(202411071326)]
 public class AdicionadoImagem : Migration
 {

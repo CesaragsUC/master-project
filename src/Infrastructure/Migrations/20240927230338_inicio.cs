@@ -1,8 +1,9 @@
 ﻿using FluentMigrator;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Infrastructure.Migrations;
 
-
+[ExcludeFromCodeCoverage]
 [Migration(202409270001)]
 public class Inicio : Migration
 {

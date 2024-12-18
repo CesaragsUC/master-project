@@ -3,10 +3,12 @@ using FluentMigrator.Runner;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace Infrastructure;
 
+[ExcludeFromCodeCoverage]
 public class MigratorService : IMigratorService
 {
     private readonly IServiceProvider _serviceProvider;

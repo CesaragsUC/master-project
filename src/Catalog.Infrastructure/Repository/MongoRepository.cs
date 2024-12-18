@@ -2,12 +2,14 @@
 using Catalog.Domain.Models;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 using System.Reflection;
 
 namespace Catalog.Infrastructure.Repository
 {
 
+    [ExcludeFromCodeCoverage]
     public class MongoRepository<TEntity> : IMongoRepository<TEntity> where TEntity : class
     {
         private readonly IMongoCollection<TEntity> _mongoCollection;

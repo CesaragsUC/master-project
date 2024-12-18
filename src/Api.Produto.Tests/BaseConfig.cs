@@ -1,8 +1,10 @@
 ﻿using Domain.Handlers;
 using Microsoft.Extensions.DependencyInjection;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Tests;
 
+[ExcludeFromCodeCoverage]
 public abstract class BaseConfig
 {
     protected void InitializeMediatrService()

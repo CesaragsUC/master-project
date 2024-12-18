@@ -4,11 +4,12 @@ using Catalog.Service.Abstractions;
 using Catalog.Services.Filters;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Catalog.Infrastructure.Repository;
 
 
-
+[ExcludeFromCodeCoverage]
 public class ProductRepository : IProductRepository
 {
     private readonly IMongoCollection<Products> _mongoCollection;
