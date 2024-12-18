@@ -1,4 +1,4 @@
-﻿using Application.Dtos.Dtos.Response;
+﻿
 using Domain.Handlers.Comands;
 using Domain.Interfaces;
 using Domain.Models;
@@ -7,6 +7,7 @@ using FluentValidation;
 using MassTransit;
 using MediatR;
 using Messaging.Contracts.Events.Product;
+using ResultNet;
 using Serilog;
 
 namespace Domain.Handlers

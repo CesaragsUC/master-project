@@ -119,19 +119,7 @@ services:
     depends_on:
       - casoft-store-rabbitmq
       - casoft-store-mongodb
-      - casoft-store-sqlserver-db
-
-  casoft-store-sqlserver-db:
-        image: mcr.microsoft.com/mssql/server:2022-CU12-ubuntu-22.04
-        container_name: casoft-store-sqlserver-db
-        restart: always
-        ports:
-          - "1433:1433"
-        environment:
-          SA_PASSWORD: ${SQL_SERVER_SA_PASSWORD}
-          ACCEPT_EULA: "Y"
-        volumes:
-          - sqlvolume:/data
+      - casoft-store-postgres-db
 
   casoft-store-postgres-db:
     image: postgres:latest
@@ -143,8 +131,8 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-        - postgresql:/var/lib/postgresql
-        - postgresql_data:/var/lib/postgresql/data
+        - postgresql_vol:/var/lib/postgresql/data
+        #- /mnt/g/DevProjetos/Dotnet8/Apis/master-project/docker/scripts/:/docker-entrypoint-initdb.d
 
   casoft-store-mongodb:
     image: mongo:latest
@@ -156,7 +144,7 @@ services:
        MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASS}
     restart: always  
     volumes:
-      - mongo_data:/data/db
+      - mongo_vol:/data/db
 
   casoft-store-rabbitmq:
     image: rabbitmq:3-management
@@ -168,7 +156,7 @@ services:
       - "5672:5672"
       - "15672:15672"    
     volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
+      - rabbitmq_vol:/var/lib/rabbitmq
 
  #https://medium.com/@fingervinicius/easy-running-keycloak-with-docker-compose-b0d7a4ee2358
   casoft-store-keycloak:
@@ -205,15 +193,11 @@ services:
     - "6832:6832/udp" # Porta opcional para comunicação entre agentes (se necessário)
 
 volumes:
-  sqlvolume:
+  mongo_vol:
     driver: local
-  mongo_data:
+  postgresql_vol:
     driver: local
-  postgresql_data:
-    driver: local
-  postgresql:
-    driver: local
-  rabbitmq_data:
+  rabbitmq_vol:
     driver: local
 
 networks:

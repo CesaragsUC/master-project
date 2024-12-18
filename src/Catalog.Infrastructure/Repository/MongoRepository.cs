@@ -19,7 +19,7 @@ namespace Catalog.Infrastructure.Repository
             _dbContext = dbContext;
         }
 
-        public async Task<PagedResult<TEntity>> GetAll(int page = 1, int pageSize = 10, string sort = "asc")
+        public async Task<PagedResult<TEntity>> GetAllAsync(int page = 1, int pageSize = 10, string sort = "asc")
         {
             var builder = Builders<TEntity>.Filter;
             var filterDefinition = builder.Empty;

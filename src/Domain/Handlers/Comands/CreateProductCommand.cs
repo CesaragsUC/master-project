@@ -1,6 +1,7 @@
-﻿using Application.Dtos.Dtos.Response;
+﻿
 using MediatR;
 using System.ComponentModel.DataAnnotations;
+using ResultNet;
 
 namespace Domain.Handlers.Comands
 {

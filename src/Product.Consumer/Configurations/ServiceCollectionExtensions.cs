@@ -27,7 +27,7 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection QuartzJobServices(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("quartz");
+        var connectionString = configuration.GetConnectionString("quartz-postgres");
 
         services.AddQuartz(q =>
         {
@@ -47,7 +47,7 @@ public static class ServiceCollectionExtensions
             {
                 s.UseProperties = true;
                 s.RetryInterval = TimeSpan.FromSeconds(15);
-                s.UseSqlServer(connectionString!);
+                s.UsePostgres(connectionString!);
                 s.UseNewtonsoftJsonSerializer();
 
                 s.UseClustering(c =>

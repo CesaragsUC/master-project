@@ -1,5 +1,5 @@
-﻿using Application.Dtos.Dtos.Response;
-using MediatR;
+﻿using MediatR;
+using ResultNet;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 

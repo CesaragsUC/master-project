@@ -189,7 +189,7 @@ public class MongoRepositoryTest
                                     It.IsAny<CancellationToken>()))
                                     .ReturnsAsync(mockCursor.Object); // Retorna o cursor mockado
 
-        var result = await repository.GetAll();
+        var result = await repository.GetAllAsync();
 
         Assert.True(result.Items.Count > 0);
         Assert.True(result != null);

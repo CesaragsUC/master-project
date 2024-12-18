@@ -1,4 +1,4 @@
-﻿using Application.Dtos.Dtos.Response;
+﻿using ResultNet;
 using MediatR;
 
 namespace Domain.Handlers.Comands

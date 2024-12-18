@@ -1,5 +1,5 @@
 ﻿
-using Application.Dtos.Dtos.Response;
+using ResultNet;
 using Domain.Handlers.Comands;
 using Domain.Interfaces;
 using Domain.Models;

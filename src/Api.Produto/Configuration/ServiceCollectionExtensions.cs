@@ -11,8 +11,7 @@ using Microsoft.OpenApi.Models;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Domain.Configurations;
-using Application.Dtos.Dtos.Response;
-using Application.Dtos.Abstractions;
+using ResultNet;
 
 namespace Product.Api.Configuration;
 
