@@ -16,7 +16,7 @@ COPY ["Api.Produto/Product.Api.csproj", "Api.Produto/"]
 COPY ["Application.Dtos/Application.Dtos.csproj", "Application.Dtos/"]
 COPY ["Domain/Product.Domain.csproj", "Domain/"]
 COPY ["Messaging.Contracts/Messaging.Contracts.csproj", "Messaging.Contracts/"]
-COPY ["Infrasctructure/Product.Infrastructure.csproj", "Infrasctructure/"]
+COPY ["Infrastructure/Infrastructure.csproj", "Infrasctructure/"]
 RUN dotnet restore "./Api.Produto/Product.Api.csproj"
 COPY . .
 WORKDIR "/src/Api.Produto"

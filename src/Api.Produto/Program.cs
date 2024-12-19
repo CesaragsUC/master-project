@@ -34,7 +34,7 @@ try
 }
 catch (Exception ex)
 {
-    Log.Error(ex, "Erro ao iniciar a aplicação");
+    Log.Error(ex, "Erro ao iniciar a aplicacao");
     throw;
 }
 

@@ -1,10 +1,22 @@
 {
   "profiles": {
-    "Product.Consumer": {
-      "commandName": "Project"
+    "Product.Consumer Prod": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Production"
+      }
     },
-    "Container (Dockerfile)": {
-      "commandName": "Docker"
+    "Product.Consumer Dev": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "Container Docker": {
+      "commandName": "Docker",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Docker"
+      }
     }
   }
 }

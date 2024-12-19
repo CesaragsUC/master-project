@@ -5,6 +5,7 @@ using Catalog.Infrastructure.Repository;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Product.Consumer.Jobs;
 using Quartz;
 using System.Reflection;
@@ -16,18 +17,23 @@ namespace Product.Consumer.Configurations;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddServices(this IServiceCollection services,
+        IConfiguration configuration, 
+        IHostEnvironment environment)
     {
-        services.QuartzJobServices(configuration);
+        services.QuartzJobServices(configuration, environment);
         services.MassTransitServices(configuration);
         services.MongoDbService(configuration);
         services.AddMediatrService();
         return services;
     }
 
-    public static IServiceCollection QuartzJobServices(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection QuartzJobServices(this IServiceCollection services, 
+        IConfiguration configuration, 
+        IHostEnvironment environment)
     {
-        var connectionString = configuration.GetConnectionString("quartz-postgres");
+
+        var connectionString = configuration.GetConnectionString("PostgreSql");
 
         services.AddQuartz(q =>
         {

@@ -9,6 +9,12 @@
 	
 	<ItemGroup>
 		<!--Obrigatorio para app console: Isso faz appsettings.json sera copiado para o diretório de saída na build. No arquivo .csproj-->
+		<None Update="appsettings.Development.json">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="appsettings.Docker.json">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
 		<None Update="appsettings.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>

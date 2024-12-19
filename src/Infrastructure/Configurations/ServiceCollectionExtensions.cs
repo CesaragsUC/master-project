@@ -13,6 +13,7 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection PostgresDbService(this IServiceCollection services, IConfiguration configuration)
     {
+        var teste = configuration.GetConnectionString("DefaultConnection");
         services.AddDbContextPool<ProductPgDbContext>(opt =>
                                                       opt.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
 

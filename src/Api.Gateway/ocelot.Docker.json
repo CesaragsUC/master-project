@@ -1,46 +1,56 @@
 {
-  "GlobalConfiguration": {},
+  "GlobalConfiguration": {
+  },
   "Routes": [
     {
-      "UpstreamPathTemplate": "/catalog/{everything}", //rota publica
+      "UpstreamPathTemplate": "/casoft/catalog/{everything}", //rota publica
       "DownstreamPathTemplate": "/api/catalog/{everything}", //rota privada
-      "DownstreamScheme": "https",
+      "DownstreamScheme": "http",
       "UpstreamHttpMethod": [ "GET" ],
       "DownstreamHostAndPorts": [
         {
-          "Host": "catalog", // Subdomínio para o serviço Catalog
-          "Port": 80
+          "Host": "casoft-store-catalog", //host api catalog
+          "Port": 5294 //port api catalog
         }
       ],
       "RateLimitOptions": {
         "ClientWhitelist": [],
         "EnableRateLimiting": true,
-        "PeriodTimespan": 5, 
-        "Period": "10s", 
-        "Limit": 10 
-      },
-      "FileCacheOptions": {
-        "TtlSeconds": 10 
+        "PeriodTimespan": 5, // define o tempo de espera que o usuario tera para fazer a proxima requisicao apos atingir o limite.
+        "Period": "10s", //define o tempo de espera para a proxima requisicao.
+        "Limit": 10 // define o numero máximo de requisições permitidas dentro do período definido (Period).
       }
     },
     {
-      "UpstreamPathTemplate": "/product/{everything}", //rota publica
+      "UpstreamPathTemplate": "/casoft/product/{everything}", //rota publica
       "DownstreamPathTemplate": "/api/product/{everything}", //rota privada
-      "DownstreamScheme": "https",
-      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ], 
+      "DownstreamScheme": "http",
+      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ], //verbos permitidos
       "DownstreamHostAndPorts": [
         {
-          "Host": "product",
-          "Port": 80
+          "Host": "casoft-store-product-service", //host api product
+          "Port": 5256 // port for api product
         }
       ],
       "RateLimitOptions": {
         "ClientWhitelist": [],
         "EnableRateLimiting": true,
-        "PeriodTimespan": 5, 
-        "Period": "10s", 
+        "PeriodTimespan": 5,
+        "Period": "10s",
         "Limit": 10
       }
+    },
+    {
+      "UpstreamPathTemplate": "/casoft/auth/{everything}", //rota publica
+      "DownstreamPathTemplate": "/api/auth/{everything}", //rota privada
+      "DownstreamScheme": "http",
+      "UpstreamHttpMethod": [ "GET", "POST" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "casoft-store-auth", //host api auth
+          "Port": 5283 //port api auth
+        }
+      ]
     }
   ]
 }

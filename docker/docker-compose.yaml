@@ -53,6 +53,8 @@ services:
       - "5256:5256"
     depends_on:
       - casoft-store-postgres-db
+      - casoft-store-rabbitmq
+    restart: always  
 
   casoft-store-catalog:
     image: cesarags/casoft-store-catalog:v1
@@ -109,7 +111,7 @@ services:
     environment:
       - QUARTZENDPOINT__QUEUENAME=${QUARTZ_JOB_QUEUE_NAME}
       - QUARTZENDPOINT__PREFETCHCOUNT=${QUARTZ_JOB_PREFETCH_COUNT}
-      - CONNECTIONSTRINGS__QUARTZ=${QUARTZ_JOB_DB_CONNECTION_STRING}
+      - CONNECTIONSTRINGS__POSTGRESQL=${QUARTZ_JOB_DB_CONNECTION_STRING}
       - MONGODBSETTINGS__CONNECTIONSTRING=${MONGO_SERVER_URL}
       - MONGODBSETTINGS__DATABASENAME=${MONGO_DATABASE_NAME}
       - RABBITMQTRANSPORT__HOST=${RABBITMQ_HOST}
@@ -120,6 +122,7 @@ services:
       - casoft-store-rabbitmq
       - casoft-store-mongodb
       - casoft-store-postgres-db
+    restart: always  
 
   casoft-store-postgres-db:
     image: postgres:latest
@@ -127,12 +130,13 @@ services:
     ports:
       - "5432:5432"
     environment:
-      POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
         - postgresql_vol:/var/lib/postgresql/data
-        #- /mnt/g/DevProjetos/Dotnet8/Apis/master-project/docker/scripts/:/docker-entrypoint-initdb.d
+        - ./postgres/init.sh:/docker-entrypoint-initdb.d/init.sh
+    restart: always        
 
   casoft-store-mongodb:
     image: mongo:latest

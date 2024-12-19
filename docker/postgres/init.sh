@@ -1,42 +1,47 @@
+#!/usr/bin/env bash
 
-DO $$
-BEGIN
-   IF NOT EXISTS (
-      SELECT FROM pg_database WHERE datname = 'quartznet'
-   ) THEN
-      PERFORM dblink_exec('dbname=postgres', 'CREATE DATABASE quartznet');
-   END IF;
-END
-$$;
+set -e  # Para parar a execução se algum comando falhar
 
-set client_min_messages = WARNING;
-DROP TABLE IF EXISTS qrtz_fired_triggers;
-DROP TABLE IF EXISTS qrtz_paused_trigger_grps;
-DROP TABLE IF EXISTS qrtz_scheduler_state;
-DROP TABLE IF EXISTS qrtz_locks;
-DROP TABLE IF EXISTS qrtz_simprop_triggers;
-DROP TABLE IF EXISTS qrtz_simple_triggers;
-DROP TABLE IF EXISTS qrtz_cron_triggers;
-DROP TABLE IF EXISTS qrtz_blob_triggers;
-DROP TABLE IF EXISTS qrtz_triggers;
-DROP TABLE IF EXISTS qrtz_job_details;
-DROP TABLE IF EXISTS qrtz_calendars;
-set client_min_messages = NOTICE;
+echo "Inicializando os bancos de dados..."
 
-CREATE TABLE qrtz_job_details
-  (
-    sched_name TEXT NOT NULL,
-	job_name  TEXT NOT NULL,
-    job_group TEXT NOT NULL,
-    description TEXT NULL,
-    job_class_name   TEXT NOT NULL, 
-    is_durable BOOL NOT NULL,
-    is_nonconcurrent BOOL NOT NULL,
-    is_update_data BOOL NOT NULL,
-	requests_recovery BOOL NOT NULL,
-    job_data BYTEA NULL,
-    PRIMARY KEY (sched_name,job_name,job_group)
-);
+# Conectar ao PostgreSQL como superusuário e criar os bancos
+psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "postgres" <<-EOSQL
+    CREATE DATABASE quartznet;
+EOSQL
+
+echo "Bancos de dados criados com sucesso!"
+
+# Executar comandos no banco `quartznet`
+echo "Criando tabelas no banco quartznet..."
+psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "quartznet" <<-EOSQL
+    set client_min_messages = WARNING;
+
+    DROP TABLE IF EXISTS qrtz_fired_triggers;
+    DROP TABLE IF EXISTS qrtz_paused_trigger_grps;
+    DROP TABLE IF EXISTS qrtz_scheduler_state;
+    DROP TABLE IF EXISTS qrtz_locks;
+    DROP TABLE IF EXISTS qrtz_simprop_triggers;
+    DROP TABLE IF EXISTS qrtz_simple_triggers;
+    DROP TABLE IF EXISTS qrtz_cron_triggers;
+    DROP TABLE IF EXISTS qrtz_blob_triggers;
+    DROP TABLE IF EXISTS qrtz_triggers;
+    DROP TABLE IF EXISTS qrtz_job_details;
+    DROP TABLE IF EXISTS qrtz_calendars;
+
+    CREATE TABLE qrtz_job_details (
+        sched_name TEXT NOT NULL,
+        job_name TEXT NOT NULL,
+        job_group TEXT NOT NULL,
+        description TEXT NULL,
+        job_class_name TEXT NOT NULL,
+        is_durable BOOL NOT NULL,
+        is_nonconcurrent BOOL NOT NULL,
+        is_update_data BOOL NOT NULL,
+        requests_recovery BOOL NOT NULL,
+        job_data BYTEA NULL,
+        PRIMARY KEY (sched_name, job_name, job_group)
+    );
+
 
 CREATE TABLE qrtz_triggers
   (
@@ -179,3 +184,8 @@ create index idx_qrtz_ft_trig_inst_name on qrtz_fired_triggers(instance_name);
 create index idx_qrtz_ft_job_name on qrtz_fired_triggers(job_name);
 create index idx_qrtz_ft_job_group on qrtz_fired_triggers(job_group);
 create index idx_qrtz_ft_job_req_recovery on qrtz_fired_triggers(requests_recovery);
+
+    set client_min_messages = NOTICE;
+EOSQL
+
+echo "Tabelas no banco quartznet criadas com sucesso!"

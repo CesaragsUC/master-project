@@ -8,6 +8,8 @@ class Program
 {
     public static async Task Main(string[] args)
     {
+        Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
+
         Log.Logger = new LoggerConfiguration()
             .Enrich.FromLogContext()
             .WriteTo.Console()
@@ -23,6 +25,6 @@ class Program
             .ConfigureServices((context, services) =>
             {
                 // Registra os serviços da aplicação.
-                services.AddServices(context.Configuration);
+                services.AddServices(context.Configuration, context.HostingEnvironment);
             });
 }
