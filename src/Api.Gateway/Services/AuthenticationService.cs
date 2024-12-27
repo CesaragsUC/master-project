@@ -26,6 +26,7 @@ public class AuthenticationService
         try
         {
             var requestContent = JsonContent.Create(loginDto);
+            Log.Information( "Request to Uri:", authUri.Value.AuthApi);
 
             var response = await _httpClient.PostAsync($"{authUri.Value.AuthApi}/login", requestContent);
 

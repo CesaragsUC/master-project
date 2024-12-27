@@ -6,6 +6,7 @@ namespace Catalog.Domain.Abstractions;
 
 public interface IMongoRepository<TEntity> where TEntity : class
 {
+    string GetConnectionDetails();
     Task<PagedResult<TEntity>> GetAllAsync(int page = 1, int pageSize = 10, string sort = "asc");
     Task<TEntity> GetById(string field, Guid id);
     Task<PagedResult<TEntity>> GetByName(string field, string nome);

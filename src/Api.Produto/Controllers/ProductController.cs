@@ -1,5 +1,4 @@
-﻿using Bogus;
-using Domain.Handlers.Comands;
+﻿using Domain.Handlers.Comands;
 using Domain.Handlers.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

@@ -71,6 +71,8 @@ public static class ServiceCollectionExtensions
                     Array.Empty<string>()
                 }
             });
+
+
         });
 
     }
@@ -81,7 +83,13 @@ public static class ServiceCollectionExtensions
                     .GetSection(KeycloakAuthenticationOptions.Section)
                     .Get<KeycloakAuthenticationOptions>();
 
-        services.AddKeycloakAuthentication(authenticationOptions!);
+        var metaDataConfig = configuration.GetSection("Keycloak:MetadataAddress");
+
+        services.AddKeycloakAuthentication(authenticationOptions!, options =>
+        {
+            options.MetadataAddress = metaDataConfig.Value!;
+            options.RequireHttpsMetadata = false;
+        });
 
 
         var authorizationOptions = configuration
@@ -134,6 +142,8 @@ public static class ServiceCollectionExtensions
         var host = rabbitmqConfig.GetValue<string>("Host");
         var user = rabbitmqConfig.GetValue<string>("User");
         var pass = rabbitmqConfig.GetValue<string>("Pass");
+
+        Console.WriteLine($"RabbitMQ Host: {host}, User: {user}");
 
         services.AddMassTransit(m =>
         {

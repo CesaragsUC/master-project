@@ -12,11 +12,8 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "Container Docker": {
-      "commandName": "Docker",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Docker"
-      }
+    "Container (Dockerfile)": {
+      "commandName": "Docker"
     }
   }
 }

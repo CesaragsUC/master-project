@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Product.Consumer.Configurations;
 using Serilog;
 
@@ -8,8 +9,6 @@ class Program
 {
     public static async Task Main(string[] args)
     {
-        Environment.SetEnvironmentVariable("ASPNETCORE_ENVIRONMENT", "Development");
-
         Log.Logger = new LoggerConfiguration()
             .Enrich.FromLogContext()
             .WriteTo.Console()
@@ -25,6 +24,6 @@ class Program
             .ConfigureServices((context, services) =>
             {
                 // Registra os serviços da aplicação.
-                services.AddServices(context.Configuration, context.HostingEnvironment);
+                services.AddServices();
             });
 }

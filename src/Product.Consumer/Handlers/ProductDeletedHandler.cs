@@ -3,6 +3,7 @@ using Catalog.Domain.Models;
 
 using MediatR;
 using Messaging.Contracts.Events.Product;
+using MongoDB.Bson;
 using Serilog;
 
 namespace Product.Consumer.Handlers;
@@ -21,9 +22,10 @@ public class ProductDeletedHandler :
     {
         try
         {
-            await _repository.Delete(nameof(request.ProductId), Guid.Parse(request.ProductId!), nameof(Products));
+            var connectionDetails = _repository.GetConnectionDetails();
+            Log.Information("Conexão: {ConnectionDetails}", connectionDetails);
 
-            Log.Information("Product {Id} was removed", request.ProductId);
+            await _repository.Delete(nameof(request.ProductId), Guid.Parse(request.ProductId!), nameof(Products));
 
             return true;
         }

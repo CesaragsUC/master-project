@@ -17,6 +17,18 @@ public class ProductRepository : IProductRepository
     public ProductRepository(IMongoDbContext dbContext)
     {
         _mongoCollection = dbContext.GetCollection<Products>(typeof(Products).Name);
+
+
+        var client = dbContext.Database.Client;
+
+        // Obtenha as configurações do cliente
+        var settings = client.Settings;
+        // Obtenha o nome do banco de dados
+        var databaseName = dbContext.Database.DatabaseNamespace.DatabaseName;
+
+        // Retorne as informações detalhadas da conexão
+        Console.WriteLine($"Host: {settings.Server.Host}, Port: {settings.Server.Port}, Database: {databaseName}");
+
     }
     public async Task<PagedResult<Products>> GetAll(ProductFilter filter)
     

@@ -9,7 +9,7 @@
       "UpstreamHttpMethod": [ "GET" ],
       "DownstreamHostAndPorts": [
         {
-          "Host": "casoft-store-catalog", //host api catalog
+          "Host": "casoft-store-catalog", // container name api catalog
           "Port": 5294 //port api catalog
         }
       ],
@@ -28,7 +28,7 @@
       "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ], //verbos permitidos
       "DownstreamHostAndPorts": [
         {
-          "Host": "casoft-store-product-service", //host api product
+          "Host": "casoft-store-product-service", // container name api product
           "Port": 5256 // port for api product
         }
       ],
@@ -47,7 +47,7 @@
       "UpstreamHttpMethod": [ "GET", "POST" ],
       "DownstreamHostAndPorts": [
         {
-          "Host": "casoft-store-auth", //host api auth
+          "Host": "casoft-store-auth", // container name api auth
           "Port": 5283 //port api auth
         }
       ]

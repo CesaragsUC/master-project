@@ -5,7 +5,6 @@ using Catalog.Infrastructure.Repository;
 using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Product.Consumer.Jobs;
 using Quartz;
 using System.Reflection;
@@ -17,21 +16,18 @@ namespace Product.Consumer.Configurations;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddServices(this IServiceCollection services,
-        IConfiguration configuration, 
-        IHostEnvironment environment)
+    public static IServiceCollection AddServices(this IServiceCollection services)
     {
-        services.QuartzJobServices(configuration, environment);
-        services.MassTransitServices(configuration);
-        services.MongoDbService(configuration);
+        services.QuartzJobServices();
+        services.MassTransitServices();
+        services.MongoDbService();
         services.AddMediatrService();
         return services;
     }
 
-    public static IServiceCollection QuartzJobServices(this IServiceCollection services, 
-        IConfiguration configuration, 
-        IHostEnvironment environment)
+    public static IServiceCollection QuartzJobServices(this IServiceCollection services)
     {
+        var configuration = GetConfigBuilder().Build();
 
         var connectionString = configuration.GetConnectionString("PostgreSql");
 
@@ -86,8 +82,13 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection MassTransitServices(this IServiceCollection services, IConfiguration configuration)
-    {
+    public static IServiceCollection MassTransitServices(this IServiceCollection services)
+    { 
+
+        var configuration = GetConfigBuilder().Build();
+
+        var myConnString = configuration.GetSection("RabbitMqTransport");
+
         services.Configure<RabbitMqTransportOptions>(configuration.GetSection("RabbitMqTransport"));
 
         services.AddMassTransit(x =>
@@ -115,8 +116,12 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static IServiceCollection MongoDbService(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection MongoDbService(this IServiceCollection services)
     {
+        var configuration = GetConfigBuilder().Build();
+
+        var myConnString = configuration.GetSection(nameof(MongoDbSettings));
+
         services.Configure<MongoDbSettings>(configuration.GetSection(nameof(MongoDbSettings)));
         services.AddScoped(typeof(IMongoRepository<>), typeof(MongoRepository<>));
         services.AddSingleton<IMongoDbContext,MongoDbContext>();
@@ -130,5 +135,17 @@ public static class ServiceCollectionExtensions
         services.AddMediatR(cfg => {
             cfg.RegisterServicesFromAssemblies(Assembly.GetExecutingAssembly());
         });
+    }
+
+    private static IConfigurationBuilder GetConfigBuilder()
+    {
+        var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
+        var builder = new ConfigurationBuilder()
+            .AddJsonFile($"appsettings.json", true, true)
+            .AddJsonFile($"appsettings.{environmentName}.json", true, true)
+            .AddEnvironmentVariables();
+
+        return builder;
     }
 }

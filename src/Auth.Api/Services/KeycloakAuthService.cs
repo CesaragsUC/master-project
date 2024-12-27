@@ -33,7 +33,10 @@ public class KeycloakAuthService : IAuthKeyCloakService
 
         var keycloakUrl = $"{_keyCloakOptions.Value.AuthServerUrl}/token";
         var clientId = _keyCloakOptions.Value.Resource;
-        var clientSecret = _keyCloakOptions.Value.Credentials?.Secret; 
+        var clientSecret = _keyCloakOptions.Value.Credentials?.Secret;
+        var realm = _keyCloakOptions.Value.Realm;
+
+        Console.WriteLine($"Keycloak URL: {keycloakUrl} - clientId {clientId} - clientSecret: {clientSecret} - realm: {realm}");
 
         var requestContent = new FormUrlEncodedContent(new[]
         {

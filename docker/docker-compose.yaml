@@ -1,4 +1,12 @@
 services:
+  
+  casoft-store-web:
+     image: cesarags/casoft-store-web:v1
+     container_name: casoft-store-web
+     ports:
+      - "4200:80"
+     depends_on:
+      - casoft-store-api-gateway
 
   casoft-store-api-gateway:
     image: cesarags/casoft-store-api-gateway:v1
@@ -7,11 +15,11 @@ services:
         context: ../src
         dockerfile: ./Api.Gateway/Dockerfile
     environment:
-      - KeycloakSettings__AuthServerUrl= ${KEYCLOAK_REALM_URL}
-      - KeycloakSettings__Audience= ${KEYCLOAK_CLIENT_ID}
-      - EndPointUri__AuthApi= ${ENDPOINT_URI_AUTH_API}
-      - FrontEndUri__Uri=${FRONTEND_URI}
-      - FrontEndUri__Name=${FRONTEND_NAME}
+      - KEYCLOAKSETTINGS__AUTHSERVERURL=${KEYCLOAK_REALM_URL}
+      - KEYCLOAKSETTINGS__AUDIENCE=${KEYCLOAK_CLIENT_ID}
+      - ENDPOINTURI__AUTHAPI=${AUTH_URI_ENDPOINT}
+      - FRONTENDURI__URI=${FRONT_END_URI}
+      - FRONTENDURI__NAME=${FRONT_END_NAME}
       - OPENTELEMETRY__SERVICE_NAME=Api.Gateway
       - OPENTELEMETRY__JAEGER__AGENTHOST=${OPEN_TELEMETRY_HOST}
       - OPENTELEMETRY__JAEGER__AGENTPORT=6831
@@ -38,7 +46,8 @@ services:
       - KEYCLOAK__SSL_REQUIRED=${KEYCLOAK_SSL_REQUIRED}
       - KEYCLOAK__RESOURCE=${KEYCLOAK_CLIENT_ID}
       - KEYCLOAK__VERIFY_TOKEN_AUDIENCE=true
-      - KEYCLOAK__CREDENTIALS__SECRET=${KEYCLOAK_SECRET}
+      - KEYCLOAK__CREDENTIALS__SECRET=${KEYCLOAK_CLIENT_SECRET}
+      - KEYCLOAK__METADATADDRESS=${KEYCLOAK_METADATA_ADRESS}
       - CONNECTIONSTRINGS__DEFAULTCONNECTION=${PRODUCT_SERVICE_DB}
       - OPENTELEMETRY__SERVICE_NAME=Product.Api
       - OPENTELEMETRY__JAEGER__AGENTHOST=${OPEN_TELEMETRY_HOST}
@@ -47,6 +56,8 @@ services:
       - RABBITMQTRANSPORT__PORT=${RABBITMQ_PORT}
       - RABBITMQTRANSPORT__USER=${RABBITMQ_USER}
       - RABBITMQTRANSPORT__PASS=${RABBITMQ_PASS}
+      - BLOBCONTAINERS__CONNECTIONSTRINGS=${AZURE_BLOB_URL}
+      - BLOBCONTAINERS__CONTAINERNAME=${BLOB_CONTAINER_NAME}
       - ASPNETCORE_ENVIRONMENT=Docker 
       - ASPNETCORE_URLS=http://*:5256
     ports:
@@ -54,6 +65,7 @@ services:
     depends_on:
       - casoft-store-postgres-db
       - casoft-store-rabbitmq
+      - casoft-store-keycloak
     restart: always  
 
   casoft-store-catalog:
@@ -72,12 +84,15 @@ services:
       - OPENTELEMETRY__SERVICE_NAME=Catalog.Api
       - OPENTELEMETRY__JAEGER__AGENTHOST=${OPEN_TELEMETRY_HOST}
       - OPENTELEMETRY__JAEGER__AGENTPORT=6831
+      - MONGODBSETTINGS__CONNECTIONSTRING=${MONGO_SERVER_URL}
+      - MONGODBSETTINGS__DATABASENAME=${MONGO_DATABASE_NAME}
       - ASPNETCORE_ENVIRONMENT=Docker 
       - ASPNETCORE_URLS=http://*:5294
     ports:
       - "5294:5294"
     depends_on:
       - casoft-store-mongodb
+      - casoft-store-keycloak
 
   casoft-store-auth:
     image: cesarags/casoft-store-auth:v1
@@ -91,7 +106,7 @@ services:
       - KEYCLOAK__SSL_REQUIRED=${KEYCLOAK_SSL_REQUIRED}
       - KEYCLOAK__RESOURCE=${KEYCLOAK_CLIENT_ID}
       - KEYCLOAK__VERIFY_TOKEN_AUDIENCE=true
-      - KEYCLOAK__CREDENTIALS__SECRET=${KEYCLOAK_SECRET}
+      - KEYCLOAK__CREDENTIALS__SECRET=${KEYCLOAK_CLIENT_SECRET}
       - OPENTELEMETRY__SERVICE_NAME=Auth.Api
       - OPENTELEMETRY__JAEGER__AGENTHOST=${OPEN_TELEMETRY_HOST}
       - OPENTELEMETRY__JAEGER__AGENTPORT=6831
@@ -118,6 +133,7 @@ services:
       - RABBITMQTRANSPORT__PORT=${RABBITMQ_PORT}
       - RABBITMQTRANSPORT__USER=${RABBITMQ_USER}
       - RABBITMQTRANSPORT__PASS=${RABBITMQ_PASS}
+      - ASPNETCORE_ENVIRONMENT=Production 
     depends_on:
       - casoft-store-rabbitmq
       - casoft-store-mongodb
@@ -144,6 +160,7 @@ services:
     ports:
       - "27017:27017"
     environment:
+       MONGO_INITDB_DATABASE: admin
        MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
        MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASS}
     restart: always  
@@ -168,8 +185,10 @@ services:
     image: quay.io/keycloak/keycloak:26.0
     command: start
     environment:
-      KC_HOSTNAME: localhost
-      KC_HOSTNAME_PORT: 8180
+      KC_HOSTNAME: casoft-store-keycloak
+      KC_HOSTNAME_URL: http://casoft-store-keycloak:8080
+      KC_HOSTNAME_ADMIN_URL: http://casoft-store-keycloak:8080
+      KC_HOSTNAME_PORT: 8080
       KC_HOSTNAME_STRICT_BACKCHANNEL: false
       KC_HTTP_ENABLED: true
       KC_HOSTNAME_STRICT_HTTPS: false
@@ -181,11 +200,11 @@ services:
       KC_DB_USERNAME: ${POSTGRES_USER}
       KC_DB_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - 8180:8080
+      - 8080:8080
     restart: always
     depends_on:
       - casoft-store-postgres-db
-
+      
   #https://www.jaegertracing.io/docs/1.6/getting-started/
   casoft-store-jaeger:
     image: jaegertracing/all-in-one:1.44

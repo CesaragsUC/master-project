@@ -25,6 +25,7 @@ public class ProductController(IProductService service) : ControllerBase
 
     [HttpGet]
     [Route("product/{id:guid}")]
+    [Authorize(Roles = "Read")]
     public async Task<IActionResult> Get(Guid id)
     {
         var product = await service.GetById("ProductId", id);
@@ -33,6 +34,7 @@ public class ProductController(IProductService service) : ControllerBase
 
     [HttpGet]
     [Route("product/{name}")]
+    [Authorize(Roles = "Read")]
     public async Task<IActionResult> GetByName(string nome)
     {
         var produto = await service.GetByName("Nome", nome);
@@ -41,6 +43,7 @@ public class ProductController(IProductService service) : ControllerBase
 
     [HttpPost]
     [Route("product")]
+    [Authorize(Roles = "Create")]
     public async Task<IActionResult> Insert(ProductCreateDto produto)
     {
         var response = await service.Insert(produto);
@@ -49,6 +52,7 @@ public class ProductController(IProductService service) : ControllerBase
 
     [HttpPost]
     [Route("product-create-with-bogus/{total:int}")]
+    [Authorize(Roles = "Create")]
     public async Task<IActionResult> InsertMany(int total)
     {
         var response = await service.InsertMany(await CreateListProduct(total));
@@ -57,6 +61,7 @@ public class ProductController(IProductService service) : ControllerBase
 
     [HttpPut]
     [Route("product")]
+    [Authorize(Roles = "Update")]
     public async Task<IActionResult> Update(ProductUpdateDto produto)
     {
         var response = await service.Update(produto);
@@ -65,6 +70,7 @@ public class ProductController(IProductService service) : ControllerBase
 
     [HttpDelete]
     [Route("product/{id:guid}")]
+    [Authorize(Roles = "Delete")]
     public async Task<IActionResult> Delete(Guid id)
     {
         var response = await service.Delete("ProdutoId",id);

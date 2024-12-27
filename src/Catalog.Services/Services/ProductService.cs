@@ -8,6 +8,7 @@ using Catalog.Services.Abstractions;
 using Catalog.Services.Filters;
 using FluentValidation;
 using MongoDB.Driver;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 
 namespace Catalog.Service.Services;
@@ -127,7 +128,8 @@ public class ProductService : IProductService
         }
     }
 
-    // Exemplo como usar o UpdateAsync com Expression
+    // Usage UpdateAsync with Expression
+    [ExcludeFromCodeCoverage]
     public async Task<ResponseResult<bool>> DemoUpdate2(ProductUpdateDto obj)
     {
         try

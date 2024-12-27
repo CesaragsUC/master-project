@@ -32,6 +32,8 @@ public static class ServiceCollectionExtensions
             .AddJsonFile($"ocelot.{environment}.json", optional: false, reloadOnChange: true)
             .AddEnvironmentVariables();
 
+        Console.WriteLine($"Api.Gateway Environment: {environment}");
+
         services.AddOcelot().AddCacheManager(x => x.WithDictionaryHandle());
 
         return services;
