@@ -53,6 +53,9 @@ Design Pattern:
 - Redis
 - Angular v18 for FrontEnd. You can find [HERE](https://github.com/CesaragsUC/master-project-web)
 
+  ![design](https://github.com/user-attachments/assets/2199c7e4-16dc-4ce0-803c-86c16162abae)
+
+
 ⭐ Give a Start!
 
 If you found this project useful, don't forget to give it a ⭐ on GitHub!
