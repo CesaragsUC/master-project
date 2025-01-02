@@ -1,7 +1,9 @@
 ﻿using MassTransit;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Casoft.MessageBus;
 
+[ExcludeFromCodeCoverage]
 public class MessageBus : IMessageBus
 {
     private readonly IPublishEndpoint _publish;
