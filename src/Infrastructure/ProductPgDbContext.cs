@@ -1,5 +1,4 @@
-﻿using Domain.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Infrastructure;
@@ -29,6 +28,6 @@ public class ProductPgDbContext : DbContext
         base.OnModelCreating(modelBuilder);
     }
 
-    public DbSet<Product> Products { get; set; }
+    public DbSet<Product.Domain.Models.Product> Products { get; set; }
 
 }

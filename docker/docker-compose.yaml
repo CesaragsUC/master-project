@@ -5,6 +5,10 @@ services:
      container_name: casoft-store-web
      ports:
       - "4200:80"
+     environment:
+        - NODE_ENV=docker
+        - API_URL=http://localhost:5214/casoft/
+        - IMAGES_URL=http://localhost:5214/
      depends_on:
       - casoft-store-api-gateway
 

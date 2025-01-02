@@ -1,4 +1,4 @@
-﻿namespace Domain.Models;
+﻿namespace Product.Domain.Models;
 
 public class ResponseResult<T>
 {

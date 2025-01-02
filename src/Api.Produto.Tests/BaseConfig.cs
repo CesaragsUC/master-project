@@ -1,8 +1,8 @@
-﻿using Domain.Handlers;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Product.Domain.Handlers;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Tests;
+namespace Product.Api.Tests;
 
 [ExcludeFromCodeCoverage]
 public abstract class BaseConfig

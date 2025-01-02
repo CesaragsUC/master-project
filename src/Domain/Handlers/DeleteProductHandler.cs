@@ -1,23 +1,23 @@
-﻿using ResultNet;
-using Domain.Handlers.Comands;
+﻿using Domain.Handlers.Comands;
 using Domain.Interfaces;
-using Domain.Models;
-using MassTransit;
 using MediatR;
-using Messaging.Contracts.Events.Product;
+using Product.Domain.Abstractions;
+using Product.Domain.Events;
+using ResultNet;
 using Serilog;
 
-namespace Domain.Handlers
+namespace Product.Domain.Handlers
 {
     public class DeleteProductHandler : IRequestHandler<DeleteProductCommand, Result<bool>>
     {
-        private readonly IRepository<Product> _repository;
-        private readonly IPublishEndpoint _publish;
+        private readonly IRepository<Models.Product> _repository;
+        private readonly IProductService _productService;
 
-        public DeleteProductHandler(IRepository<Product> repository, IPublishEndpoint publish)
+        public DeleteProductHandler(IRepository<Models.Product> repository,
+            IProductService productService)
         {
             _repository = repository;
-            _publish = publish;
+            _productService = productService;
         }
         public async Task<Result<bool>> Handle(DeleteProductCommand request, CancellationToken cancellationToken)
         {
@@ -30,9 +30,9 @@ namespace Domain.Handlers
 
                 await _repository.Delete(produto);
 
-                await _publish.Publish<ProductDeletedEvent>(new ProductDeletedEvent
+                await _productService.PublishProductDeletedEvent(new ProductDeletedDomainEvent
                 {
-                    ProductId = produto.Id.ToString(),
+                    ProductId = produto.Id.ToString()
                 });
 
                 return  await Result<bool>.SuccessAsync($"Product {request.Id} deleted successfuly");

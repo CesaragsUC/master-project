@@ -1,25 +1,23 @@
-﻿using Domain.Handlers;
-using Domain.Handlers.Comands;
-using Domain.Handlers.Queries;
+﻿using Domain.Handlers.Queries;
 using Domain.Interfaces;
-using Domain.Models;
 using MediatR;
 using Moq;
+using Product.Domain.Handlers;
 using System.Linq.Expressions;
 
-namespace Tests;
+namespace Product.Api.Tests;
 
 public class ProductQueryHandlerTest : BaseConfig
 {
 
-    private readonly Mock<IRepository<Product>> _repository;
+    private readonly Mock<IRepository<Product.Domain.Models.Product>> _repository;
     private readonly Mock<IMediator> _mediator;
     private ProdutoQueryHandler _handler;
     public ProductQueryHandlerTest()
     {
         InitializeMediatrService();
 
-        _repository = new Mock<IRepository<Product>>();
+        _repository = new Mock<IRepository<Product.Domain.Models.Product>>();
         _mediator = new Mock<IMediator>();
         _handler = new ProdutoQueryHandler(_repository.Object);
     }
@@ -49,12 +47,12 @@ public class ProductQueryHandlerTest : BaseConfig
     {
         var command = new ProductByIdQuery { Id = Guid.NewGuid() };
 
-        _repository.Setup(r => r.FindOne(It.IsAny<Expression<Func<Product, bool>>>(), null))
-                   .Callback<Expression<Func<Product, bool>>, FindOptions?>((predicate, options) =>
+        _repository.Setup(r => r.FindOne(It.IsAny<Expression<Func<Product.Domain.Models.Product, bool>>>(), null))
+                   .Callback<Expression<Func<Product.Domain.Models.Product, bool>>, FindOptions?>((predicate, options) =>
                    { })
-                   .Returns<Expression<Func<Product, bool>>, FindOptions?>((predicate, options) =>
+                   .Returns<Expression<Func<Product.Domain.Models.Product, bool>>, FindOptions?>((predicate, options) =>
                    {
-                       var product = new Product
+                       var product = new Product.Domain.Models.Product
                        {
                            Id = command.Id,
                            Name = "Produtos Teste",

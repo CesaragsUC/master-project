@@ -1,31 +1,31 @@
 ﻿
-using ResultNet;
 using Domain.Handlers.Comands;
 using Domain.Interfaces;
-using Domain.Models;
 using Domain.Validation;
 using FluentValidation;
-using MassTransit;
 using MediatR;
-using Messaging.Contracts.Events.Product;
+using Product.Domain.Abstractions;
+using Product.Domain.Events;
+using Product.Domain.Models;
+using ResultNet;
 using Serilog;
 
-namespace Domain.Handlers
+namespace Product.Domain.Handlers
 {
     public class UpdateProductHandler : IRequestHandler<UpdateProductCommand, Result<bool>>
     {
-        private readonly IPublishEndpoint _publish;
-        private readonly IRepository<Product> _repository;
+        private readonly IProductService _productService;
+        private readonly IRepository<Models.Product> _repository;
         private readonly IBobStorageService _bobStorageService;
 
         public UpdateProductHandler
-            (IRepository<Product> repository,
+            (IRepository<Models.Product> repository,
             IBobStorageService bobStorageService,
-            IPublishEndpoint publish)
+            IProductService productService)
         {
             _repository = repository;
             _bobStorageService = bobStorageService;
-            _publish = publish;
+            _productService = productService;
         }
 
         public async Task<Result<bool>> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
@@ -52,7 +52,7 @@ namespace Domain.Handlers
 
                 await _repository.Update(produto);
 
-                await _publish.Publish<ProductUpdatedEvent>(new ProductUpdatedEvent
+                await _productService.PublishProductUpdatedEvent(new ProductUpdatedDomainEvent
                 {
                     ProductId = produto.Id.ToString(),
                     Name = produto.Name,

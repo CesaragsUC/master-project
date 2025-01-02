@@ -10,9 +10,9 @@ using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-using Domain.Configurations;
 using ResultNet;
-using MassTransit.Testing;
+using Product.Services.Configuration;
+using Product.Domain.Configurations;
 
 namespace Product.Api.Configuration;
 
@@ -25,6 +25,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IBobStorageService, BobStorageService>();
         services.AddScoped(typeof(IResult<>), typeof(Result<>));
         services.PostgresDbService(configuration);
+        services.AddProductServices(configuration);
 
         ////opção 1 com classe de configuração
         //builder.Services.AddScoped<IMigratorService, MigratorService>();
