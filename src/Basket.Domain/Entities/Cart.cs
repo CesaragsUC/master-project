@@ -1,5 +1,9 @@
-﻿namespace Basket.Domain.Entities;
+﻿using System.Diagnostics.CodeAnalysis;
 
+namespace Basket.Domain.Entities;
+
+
+[ExcludeFromCodeCoverage]
 public class Cart
 {
     public Guid Id { get; set; }
