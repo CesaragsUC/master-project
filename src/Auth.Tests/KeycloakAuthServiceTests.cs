@@ -142,5 +142,45 @@ namespace Auth.Tests
             Assert.False(result.Succeeded);
         }
 
+
+        [Fact(DisplayName = "Teste 01 - Realizar logout com sucesso")]
+        [Trait("Auth", "KeycloakAuthServiceTests")]
+        public async Task GetToken_ShouldLogout_Success()
+        {
+            // Arrange
+
+            var tokenResponse = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0L2F1dGgvcmVhbG1zL3JlYWxtIiwic3ViIjoidXNlcl9pZCIsImF1ZCI6ImNsaWVudF9pZCIsImV4cCI6MTc0NjI3ODQwMCwiaWF0IjoxNzQ2MTkyMDAwLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJyb2xlcyI6WyJ1c2VyIiwiYWRtaW4iXX0.cJYKi9Vy1AiOqK9e7sDjkUOZGfDi_8ENML3o6sdON90";
+         
+            var keycloakSettings = new KeycloakSettings
+            {
+                AuthServerUrl = "http://localhost",
+                Resource = "client_id",
+                Credentials = new Credentials { Secret = "client_secret" },
+                Realm = "realm"
+            };
+
+            _keyCloakOptionsMock.Setup(x => x.Value).Returns(keycloakSettings);
+
+            var mockHandler = new Mock<HttpMessageHandler>();
+
+            // Mock da falha na chamada para obter o token
+            mockHandler.Protected()
+                .Setup<Task<HttpResponseMessage>>(
+                    "SendAsync",
+                    ItExpr.Is<HttpRequestMessage>(req =>
+                        req.Method == HttpMethod.Post && req.RequestUri.ToString().Contains("/logout")),
+                    ItExpr.IsAny<CancellationToken>())
+                .ReturnsAsync(new HttpResponseMessage(HttpStatusCode.OK));
+
+            var httpClient = new HttpClient(mockHandler.Object)
+            {
+                BaseAddress = new Uri(keycloakSettings.AuthServerUrl)
+            };
+
+            var result = await new KeycloakAuthService(httpClient, _keyCloakOptionsMock.Object).Logout(tokenResponse);
+
+            // Assert
+            Assert.True(result.Succeeded);
+        }
     }
 }
