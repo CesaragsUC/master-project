@@ -40,7 +40,7 @@ namespace Auth.Tests
                 ExpiresIn = 3600
             };
 
-            // Mock da resposta de informações do usuário
+            // Mock da resposta de informaÃ§Ãµes do usuÃ¡rio
             var userInfoResponse = new UserInfoResponse
             {
                 Sub = "user_id",
@@ -48,7 +48,7 @@ namespace Auth.Tests
                 Name = "Test User"
             };
 
-            // Mock das configurações de Keycloak
+            // Mock das configuraÃ§Ãµes de Keycloak
             var keycloakSettings = new KeycloakSettings
             {
                 AuthServerUrl = "http://localhost",
@@ -74,7 +74,7 @@ namespace Auth.Tests
                     Content = new StringContent(JsonSerializer.Serialize(tokenResponse))
                 });
 
-            // Mock da chamada para obter as informações do usuário
+            // Mock da chamada para obter as informaÃ§Ãµes do usuÃ¡rio
             mockHandler.Protected()
                 .Setup<Task<HttpResponseMessage>>(
                     "SendAsync",
@@ -182,5 +182,6 @@ namespace Auth.Tests
             // Assert
             Assert.True(result.Succeeded);
         }
+
     }
 }
