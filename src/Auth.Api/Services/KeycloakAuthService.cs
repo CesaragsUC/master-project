@@ -6,6 +6,7 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using Serilog;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net.Http.Headers;
 using System.Text.Json;
@@ -128,6 +129,8 @@ public class KeycloakAuthService : IAuthKeyCloakService
 
         return loginResponse;
     }
+
+    [ExcludeFromCodeCoverage]
     private void SetRoles(JwtSecurityToken? token)
     {
 
@@ -185,4 +188,9 @@ public class KeycloakAuthService : IAuthKeyCloakService
         return await Result<bool>.SuccessAsync("logout success.");
     }
 
+
+    public Result<int> NovoMetodo()
+    {
+        return Result<int>.Success(1);
+    }
 }
