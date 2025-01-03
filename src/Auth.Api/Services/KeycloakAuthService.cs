@@ -61,8 +61,14 @@ public class KeycloakAuthService : IAuthKeyCloakService
         var tokenResponse =  JsonSerializer.Deserialize<TokenResponse>(responseContent);
 
         var userInfo = await GetUserInfo(tokenResponse!.AccessToken!);
+        if (userInfo == null)
+        {
+            Log.Error("Failed to fetch user info: {Message}", response.StatusCode);
+            return await Result<LoginResponse>.FailureAsync(400, "An error occour during login");
+        }
 
-        var handler = new JwtSecurityTokenHandler();
+
+            var handler = new JwtSecurityTokenHandler();
         var token = handler.ReadJwtToken(tokenResponse.AccessToken);
 
         SetRoles(token);
@@ -188,9 +194,4 @@ public class KeycloakAuthService : IAuthKeyCloakService
         return await Result<bool>.SuccessAsync("logout success.");
     }
 
-
-    public Result<int> NovoMetodo()
-    {
-        return Result<int>.Success(1);
-    }
 }
