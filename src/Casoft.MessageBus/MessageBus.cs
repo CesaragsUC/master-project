@@ -15,7 +15,7 @@ public class MessageBus : IMessageBus
 
     public async Task PublishAsync<T>(T message)
     {
-        if (message != null)
+        if (message is not null)
         {
             await _publish.Publish(message);
         }
