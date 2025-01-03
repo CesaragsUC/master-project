@@ -218,6 +218,7 @@ namespace Auth.Tests
         }
 
 
+
         [Fact(DisplayName = "Teste 04 - Realizar logout com sucesso")]
         [Trait("Auth", "KeycloakAuthServiceTests")]
         public async Task GetToken_ShouldLogout_Success()
@@ -258,6 +259,7 @@ namespace Auth.Tests
             Assert.True(result.Succeeded);
         }
 
+
         [Fact(DisplayName = "Teste 05 - Realizar logout com falha")]
         [Trait("Auth", "KeycloakAuthServiceTests")]
         public async Task GetToken_Should_Fail()
@@ -297,5 +299,6 @@ namespace Auth.Tests
             // Assert
             Assert.False(result.Succeeded);
         }
+
     }
 }
