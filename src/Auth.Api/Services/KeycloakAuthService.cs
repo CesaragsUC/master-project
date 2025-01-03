@@ -75,12 +75,6 @@ public class KeycloakAuthService : IAuthKeyCloakService
 
         var loginResponse = await GetLoginResponse(token, userInfo, tokenResponse);
 
-        if (loginResponse == null)
-        {
-            Log.Error("Failed to authenticate with Keycloak: {StatusCode}", response.StatusCode);
-            return await Result<LoginResponse>.FailureAsync(400, "An error occour during login");
-        }
-
         return await Result<LoginResponse>.SuccessAsync(loginResponse!);
     }
 
