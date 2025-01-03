@@ -1,5 +1,7 @@
 # Casoft Store :rocket:
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=CesaragsUC_master-project&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=CesaragsUC_master-project)
+
 **Casoft Store** is a Poc for a e-Commerce using .Net Core 8x.
 
 Since it is a PoC, it does not have all the real features of an e-Commerce, so I added basic features of a virtual store.
