@@ -35,9 +35,9 @@
       "RateLimitOptions": {
         "ClientWhitelist": [],
         "EnableRateLimiting": true,
-        "PeriodTimespan": 5, 
+        "PeriodTimespan": 5,
         "Period": "10s",
-        "Limit": 10 
+        "Limit": 10
       }
     },
     {
@@ -52,5 +52,17 @@
         }
       ]
     },
+    {
+      "UpstreamPathTemplate": "/casoft/cart/{everything}", //rota publica
+      "DownstreamPathTemplate": "/api/cart/{everything}", //rota privada
+      "DownstreamScheme": "https",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost", //host api cart
+          "Port": 7281 //port api cart
+        }
+      ]
+    }
   ]
 }

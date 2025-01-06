@@ -6,14 +6,14 @@ using Npgsql;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
-namespace Infrastructure;
+namespace Infrastructure.Services;
 
 [ExcludeFromCodeCoverage]
 public class MigratorService : IMigratorService
 {
     private readonly IServiceProvider _serviceProvider;
     private readonly IConfiguration _configuration;
-    public MigratorService( IConfiguration configuration)
+    public MigratorService(IConfiguration configuration)
     {
         _configuration = configuration;
 
@@ -29,7 +29,7 @@ public class MigratorService : IMigratorService
     public async Task EnsureDatabaseExists()
     {
         var defaultConnectionString = _configuration.GetConnectionString("DefaultConnection");
-        var connectionStringWithoutDatabase =  RemoveDatabaseFromConnectionString(defaultConnectionString);
+        var connectionStringWithoutDatabase = RemoveDatabaseFromConnectionString(defaultConnectionString);
 
         using (var connection = new NpgsqlConnection(connectionStringWithoutDatabase))
         {
@@ -45,7 +45,7 @@ public class MigratorService : IMigratorService
                 {
                     using (var createCommand = new NpgsqlCommand($"CREATE DATABASE \"{dbName}\"", connection))
                     {
-                       await createCommand.ExecuteNonQueryAsync();
+                        await createCommand.ExecuteNonQueryAsync();
                     }
                 }
             }
@@ -88,8 +88,8 @@ public class MigratorService : IMigratorService
         var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
 
         // Reverte para a versão especificada
-         runner.MigrateDown(targetVersion);
-        
+        runner.MigrateDown(targetVersion);
+
         await Task.CompletedTask;
     }
 
@@ -115,6 +115,6 @@ public class MigratorService : IMigratorService
     {
         var builder = new NpgsqlConnectionStringBuilder(connectionString);
         builder.Database = string.Empty; // Remove o nome do banco de dados
-        return  builder.ToString();
+        return builder.ToString();
     }
 }

@@ -1,10 +1,9 @@
 ﻿using Domain.Interfaces;
-using Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 
-namespace Infrasctructure;
+namespace Infrastructure.Repository;
 
 [ExcludeFromCodeCoverage]
 public class Repository<TEntity> : IRepository<TEntity> where TEntity : class

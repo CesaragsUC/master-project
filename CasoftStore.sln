@@ -89,6 +89,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Basket.Domain", "src\Basket
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.Tests", "src\Auth.Tests\Auth.Tests.csproj", "{DD62885A-1CE4-435D-A2A2-A2FC14643CF1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Basket.Test", "src\Basket.Test\Basket.Test.csproj", "{06AD6604-F991-4EA4-A9E8-06968C8DC7C5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -223,6 +225,10 @@ Global
 		{DD62885A-1CE4-435D-A2A2-A2FC14643CF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DD62885A-1CE4-435D-A2A2-A2FC14643CF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DD62885A-1CE4-435D-A2A2-A2FC14643CF1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06AD6604-F991-4EA4-A9E8-06968C8DC7C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06AD6604-F991-4EA4-A9E8-06968C8DC7C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06AD6604-F991-4EA4-A9E8-06968C8DC7C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06AD6604-F991-4EA4-A9E8-06968C8DC7C5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -267,6 +273,7 @@ Global
 		{6684C4E2-3416-4604-B278-D5EC482A483D} = {2A6CFD7D-4804-4490-AE6D-8E36387CABC1}
 		{CBC39590-5CAD-496F-806F-B0CAF1179BD4} = {AD162F7B-588E-4BE2-B8D3-B357FA35B81E}
 		{DD62885A-1CE4-435D-A2A2-A2FC14643CF1} = {C56846FC-76CD-4EC8-8748-FFC729678CA3}
+		{06AD6604-F991-4EA4-A9E8-06968C8DC7C5} = {AD162F7B-588E-4BE2-B8D3-B357FA35B81E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {97771150-AEAB-48C1-B546-BC1ED7374A93}

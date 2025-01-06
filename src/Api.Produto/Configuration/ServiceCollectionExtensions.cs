@@ -1,6 +1,5 @@
 ﻿using Azure.Storage.Blobs;
 using Domain.Interfaces;
-using Infrasctructure;
 using Infrastructure.Configurations;
 using Infrastructure.Services;
 using Keycloak.AuthServices.Authentication;
@@ -13,6 +12,7 @@ using OpenTelemetry.Trace;
 using ResultNet;
 using Product.Services.Configuration;
 using Product.Domain.Configurations;
+using Infrastructure.Repository;
 
 namespace Product.Api.Configuration;
 
