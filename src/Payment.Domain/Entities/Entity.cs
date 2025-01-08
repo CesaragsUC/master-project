@@ -1,5 +1,8 @@
-﻿namespace Billing.Domain.Entities;
+﻿using System.Diagnostics.CodeAnalysis;
 
+namespace Billing.Domain.Entities;
+
+[ExcludeFromCodeCoverage]
 public abstract class Entity
 {
     public Guid Id { get; set; }

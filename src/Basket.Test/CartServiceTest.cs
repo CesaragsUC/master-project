@@ -105,4 +105,20 @@ public class CartServiceTest
         // Assert
         Assert.False(result.Succeeded);
     }
+
+    [Fact]
+    [Trait("Basket.Services", "Cache Redis")]
+    public async Task GetCartAsync_ShouldLogErrorAndThrowException_WhenExceptionOccurs()
+    {
+        // Arrange
+        var customerId = Guid.NewGuid();
+        var exception = new Exception("Test exception");
+        _cacheServiceMock.Setup(x => x.GetOrCreateAsync(It.IsAny<string>(), It.IsAny<Func<Task<Cart>>>(), It.IsAny<DistributedCacheEntryOptions>(),null))
+                         .ThrowsAsync(exception);
+
+        // Act & Assert
+        var ex = await Assert.ThrowsAsync<Exception>(() => _cartService.GetCartAsync(customerId));
+        Assert.Equal("Test exception", ex.Message);
+        _cacheServiceMock.Verify(x => x.GetOrCreateAsync(It.IsAny<string>(), It.IsAny<Func<Task<Cart>>>(), It.IsAny<DistributedCacheEntryOptions>(),null), Times.Once);
+    }
 }
