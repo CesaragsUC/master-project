@@ -5,7 +5,6 @@ using Basket.Api.Extensions;
 using Basket.Domain.Abstractions;
 using Basket.Domain.Entities;
 using Microsoft.Extensions.Caching.Distributed;
-using MongoDB.Driver;
 using ResultNet;
 using Serilog;
 using System.Diagnostics.CodeAnalysis;
@@ -15,15 +14,15 @@ namespace Basket.Api.Services;
 public class CartService : ICartService
 {
     private readonly ICartRepository _cartRepository;
-    private readonly IDistributedCache _redisDatabase;
+    private readonly ICacheService _cacheService;
     private readonly IMapper _mapper;
 
     public CartService(ICartRepository cartRepository,
-        IDistributedCache redisDatabase,
+        ICacheService cacheService,
         IMapper mapper)
     {
         _cartRepository = cartRepository;
-        _redisDatabase = redisDatabase;
+        _cacheService = cacheService;
         _mapper = mapper;
     }
 
@@ -43,7 +42,7 @@ public class CartService : ICartService
         {
             var cacheKey = $"cart:{customerId}";
 
-            var cart = await _redisDatabase.GetOrCreateAsync(cacheKey, async () =>
+            var cart = await _cacheService.GetOrCreateAsync(cacheKey, async () =>
             {
                 var cartFromDb = await _cartRepository.GetAsync(customerId);
 
@@ -74,7 +73,7 @@ public class CartService : ICartService
 
         var cacheKey = $"cart:{cart.CustomerId}";
 
-        var result = await _redisDatabase.GetOrCreateAsync(
+        var result = await _cacheService.GetOrCreateAsync(
             key: cacheKey,
             factory: async () =>
             {

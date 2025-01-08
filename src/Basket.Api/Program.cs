@@ -17,6 +17,7 @@ builder.Services.AddSwaggerGen();
 // Register services
 builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<ICartService, CartService>();
+builder.Services.AddScoped<ICacheService, CacheService>();
 builder.Services.AddMongoDb(builder.Configuration);
 builder.Services.AddMemoryCache();
 

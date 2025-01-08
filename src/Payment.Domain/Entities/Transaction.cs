@@ -1,6 +1,10 @@
-﻿namespace Payment.Domain.Entities;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
-public class Transaction
+namespace Billing.Domain.Entities;
+
+
+[Table("Transactions")]
+public class Transaction : Entity
 {
     public string? AuthorizationCode { get; set; }
     public string? CreditCardCompany { get; set; }

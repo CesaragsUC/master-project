@@ -1,4 +1,4 @@
-﻿namespace Payment.Domain.Entities;
+﻿namespace Billing.Domain.Entities;
 
 public enum PaymentMethod
 {
