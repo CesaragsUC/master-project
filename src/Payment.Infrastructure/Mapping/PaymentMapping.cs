@@ -2,9 +2,11 @@
 using Billing.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Billing.Infrastructure.Mapping;
 
+[ExcludeFromCodeCoverage]
 public class PaymentMapping : IEntityTypeConfiguration<Payment>
 {
     public void Configure(EntityTypeBuilder<Payment> builder)

@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Basket.Api.Abstractions;
 using Basket.Api.Dtos;
-using Basket.Api.Extensions;
 using Basket.Domain.Abstractions;
 using Basket.Domain.Entities;
 using Microsoft.Extensions.Caching.Distributed;
