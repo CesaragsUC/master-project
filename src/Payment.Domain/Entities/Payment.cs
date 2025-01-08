@@ -1,6 +1,9 @@
-﻿namespace Payment.Domain.Entities;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
-public class Payment
+namespace Billing.Domain.Entities;
+
+[Table("Payments")]
+public class Payment : Entity
 {
     public Payment()
     {

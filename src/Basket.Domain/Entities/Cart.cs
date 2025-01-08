@@ -1,13 +1,17 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using MongoDB.Bson.Serialization.Attributes;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Basket.Domain.Entities;
-
 
 [ExcludeFromCodeCoverage]
 public class Cart
 {
-    public Guid Id { get; set; }
-    public Guid CustomerId { get; set; }
+    [BsonElement("CustomerId")]
+    public string? CustomerId { get; set; }
+
+    [BsonElement("Items")]
     public List<CartItem> Items { get; set; } = new();
+
+    [BsonElement("TotalPrice")]
     public decimal TotalPrice => Items.Sum(item => item.TotalPrice);
 }

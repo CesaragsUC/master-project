@@ -43,7 +43,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Auth", "Auth", "{C56846FC-7
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Auth.Api", "src\Auth.Api\Auth.Api.csproj", "{2265C4D0-F309-4226-A5F2-028C8C773FB9}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Payment", "Payment", "{BDDB4CB9-BE1B-4499-90AA-0C7D260FB47D}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Billing", "Billing", "{BDDB4CB9-BE1B-4499-90AA-0C7D260FB47D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Order", "Order", "{33784963-1073-480C-8440-76CC97927538}"
 EndProject
@@ -55,7 +55,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Product.Domain", "src\Domai
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Infrastructure", "src\Infrastructure\Infrastructure.csproj", "{E8E36D04-3A9F-4F21-AE01-3B972FDD1B50}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Payment.Api", "src\Payment.Api\Payment.Api.csproj", "{237FCE4B-6014-43CC-8E34-EB96C8C8C2DD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Billing.Api", "src\Payment.Api\Billing.Api.csproj", "{237FCE4B-6014-43CC-8E34-EB96C8C8C2DD}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Order.Api", "src\Order.Api\Order.Api.csproj", "{A4D2E298-FBAF-431A-9F36-33ECD3973DD0}"
 EndProject
@@ -73,11 +73,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discount.Domain", "src\Disc
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Discount.Infrastructure", "src\Discount.Infrastructure\Discount.Infrastructure.csproj", "{8E32C64C-C50F-4B97-BF61-DB033B969121}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Payment.Domain", "src\Payment.Domain\Payment.Domain.csproj", "{A3AA5732-AC1A-4C0A-8B6B-248B5C3EA4A1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Billing.Domain", "src\Payment.Domain\Billing.Domain.csproj", "{A3AA5732-AC1A-4C0A-8B6B-248B5C3EA4A1}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Payment.Infrastructure", "src\Payment.Infrastructure\Payment.Infrastructure.csproj", "{2A8179F5-934E-4226-95AE-95B066209734}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Billing.Infrastructure", "src\Payment.Infrastructure\Billing.Infrastructure.csproj", "{2A8179F5-934E-4226-95AE-95B066209734}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Payment.Service", "src\Payment.Service\Payment.Service.csproj", "{4BB711E2-42DC-4273-8B57-49D44996CD5C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Billing.Service", "src\Payment.Service\Billing.Service.csproj", "{4BB711E2-42DC-4273-8B57-49D44996CD5C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Basket.Infrastructure", "src\Basket.Infrastructure\Basket.Infrastructure.csproj", "{629637AF-F4E9-4254-931F-1BE72CF50060}"
 EndProject
@@ -87,7 +87,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Product.Services", "src\Pro
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Basket.Domain", "src\Basket.Domain\Basket.Domain.csproj", "{CBC39590-5CAD-496F-806F-B0CAF1179BD4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.Tests", "src\Auth.Tests\Auth.Tests.csproj", "{DD62885A-1CE4-435D-A2A2-A2FC14643CF1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Auth.Tests", "src\Auth.Tests\Auth.Tests.csproj", "{DD62885A-1CE4-435D-A2A2-A2FC14643CF1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Basket.Test", "src\Basket.Test\Basket.Test.csproj", "{06AD6604-F991-4EA4-A9E8-06968C8DC7C5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -223,6 +225,10 @@ Global
 		{DD62885A-1CE4-435D-A2A2-A2FC14643CF1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DD62885A-1CE4-435D-A2A2-A2FC14643CF1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DD62885A-1CE4-435D-A2A2-A2FC14643CF1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{06AD6604-F991-4EA4-A9E8-06968C8DC7C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{06AD6604-F991-4EA4-A9E8-06968C8DC7C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{06AD6604-F991-4EA4-A9E8-06968C8DC7C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{06AD6604-F991-4EA4-A9E8-06968C8DC7C5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -267,6 +273,7 @@ Global
 		{6684C4E2-3416-4604-B278-D5EC482A483D} = {2A6CFD7D-4804-4490-AE6D-8E36387CABC1}
 		{CBC39590-5CAD-496F-806F-B0CAF1179BD4} = {AD162F7B-588E-4BE2-B8D3-B357FA35B81E}
 		{DD62885A-1CE4-435D-A2A2-A2FC14643CF1} = {C56846FC-76CD-4EC8-8748-FFC729678CA3}
+		{06AD6604-F991-4EA4-A9E8-06968C8DC7C5} = {AD162F7B-588E-4BE2-B8D3-B357FA35B81E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {97771150-AEAB-48C1-B546-BC1ED7374A93}

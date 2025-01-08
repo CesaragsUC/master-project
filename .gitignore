@@ -276,4 +276,4 @@ __pycache__/
 
 # End of https://www.toptal.com/developers/gitignore/api/aspnetcore
 /docker/.env
-/docker/mongo/init-mongo.js
+#docker/mongo/init-mongo.js

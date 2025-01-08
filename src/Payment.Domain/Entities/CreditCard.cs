@@ -1,6 +1,6 @@
-﻿namespace Payment.Domain.Entities;
+﻿namespace Billing.Domain.Entities;
 
-public class CreditCard
+public class CreditCard : Entity
 {
     public string? Holder { get; set; }
     public string? CardNumber { get; set; }
