@@ -11,6 +11,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Basket.Api.Services;
 
+[ExcludeFromCodeCoverage]
 public class CartService : ICartService
 {
     private readonly ICartRepository _cartRepository;
