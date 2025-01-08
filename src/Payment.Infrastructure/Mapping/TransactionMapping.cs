@@ -1,9 +1,11 @@
 ﻿using Billing.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Billing.Infrastructure.Mapping;
 
+[ExcludeFromCodeCoverage]
 public class TransactionMapping : IEntityTypeConfiguration<Transaction>
 {
     public void Configure(EntityTypeBuilder<Transaction> builder)
