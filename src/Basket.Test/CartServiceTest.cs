@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
+using Basket.Api.Abstractions;
 using Basket.Api.Dtos;
 using Basket.Api.Services;
 using Basket.Domain.Abstractions;
 using Basket.Domain.Entities;
+using MassTransit;
+using MassTransit.Transports;
 using Microsoft.Extensions.Caching.Distributed;
 using Moq;
 
@@ -16,13 +19,22 @@ public class CartServiceTest
     private readonly Mock<ICacheService> _cacheServiceMock;
     private readonly Mock<IMapper> _mapperMock;
     private readonly CartService _cartService;
+    private readonly Mock<IPublishEndpoint> _publishedMessageMock;
+    private readonly Mock<IDiscountApi> _discountApiMock;
 
     public CartServiceTest()
     {
         _cartRepositoryMock = new Mock<ICartRepository>();
         _cacheServiceMock = new Mock<ICacheService>();
         _mapperMock = new Mock<IMapper>();
-        _cartService = new CartService(_cartRepositoryMock.Object, _cacheServiceMock.Object, _mapperMock.Object);
+        _publishedMessageMock = new Mock<IPublishEndpoint>();
+        _discountApiMock = new Mock<IDiscountApi>();
+
+        _cartService = new CartService(_cartRepositoryMock.Object,
+            _cacheServiceMock.Object,
+            _mapperMock.Object,
+            _publishedMessageMock.Object,
+            _discountApiMock.Object);
     }
 
     [Fact]
@@ -53,7 +65,7 @@ public class CartServiceTest
         // Arrange
         var customerId = Guid.NewGuid();
 
-        _cacheServiceMock.Setup(x => x.GetOrCreateAsync(It.IsAny<string>(), It.IsAny<Func<Task<Cart>>>(), It.IsAny<DistributedCacheEntryOptions>(),null))
+        _cacheServiceMock.Setup(x => x.GetOrCreateAsync(It.IsAny<string>(), It.IsAny<Func<Task<Cart>>>(), It.IsAny<DistributedCacheEntryOptions>(), null))
             .ReturnsAsync((Cart)null);
 
         // Act
@@ -113,12 +125,12 @@ public class CartServiceTest
         // Arrange
         var customerId = Guid.NewGuid();
         var exception = new Exception("Test exception");
-        _cacheServiceMock.Setup(x => x.GetOrCreateAsync(It.IsAny<string>(), It.IsAny<Func<Task<Cart>>>(), It.IsAny<DistributedCacheEntryOptions>(),null))
+        _cacheServiceMock.Setup(x => x.GetOrCreateAsync(It.IsAny<string>(), It.IsAny<Func<Task<Cart>>>(), It.IsAny<DistributedCacheEntryOptions>(), null))
                          .ThrowsAsync(exception);
 
         // Act & Assert
         var ex = await Assert.ThrowsAsync<Exception>(() => _cartService.GetCartAsync(customerId));
         Assert.Equal("Test exception", ex.Message);
-        _cacheServiceMock.Verify(x => x.GetOrCreateAsync(It.IsAny<string>(), It.IsAny<Func<Task<Cart>>>(), It.IsAny<DistributedCacheEntryOptions>(),null), Times.Once);
+        _cacheServiceMock.Verify(x => x.GetOrCreateAsync(It.IsAny<string>(), It.IsAny<Func<Task<Cart>>>(), It.IsAny<DistributedCacheEntryOptions>(), null), Times.Once);
     }
 }
