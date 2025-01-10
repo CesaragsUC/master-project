@@ -1,4 +1,5 @@
 using Basket.Api.Abstractions;
+using Basket.Api.Configurations;
 using Basket.Api.Services;
 using Basket.Domain.Abstractions;
 using Basket.Infrastructure.Configurations;
@@ -15,6 +16,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Register services
+builder.Services.AddInfraConfig(builder.Configuration);
 builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<ICacheService, CacheService>();

@@ -44,20 +44,19 @@ public class CartController : ControllerBase
     [Route("checkout")]
     [ProducesResponseType(typeof(Result<Cart?>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Result<Cart?>), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Checkout(CartDto request)
+    public async Task<IActionResult> Checkout(CartCheckoutDto checkoutDto)
     {
-        //TODO: enviar dados do carrinho para a fila de pedidos
-        return Ok();
+        var response = await _cartService.CheckoutAsync(checkoutDto);
+        return response.Succeeded ? Ok(response) : BadRequest(response);
     }
 
     [HttpPost]
     [Route("discount")]
     [ProducesResponseType(typeof(Result<Cart?>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Result<Cart?>), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Discount(CartDto request)
+    public async Task<IActionResult> Discount(DiscountRequest discountRequest)
     {
-        //TODO: enviar dados  do cupom para a API de descontos e retornar o carrinho com o desconto
-        // testar com Refit
-        return Ok();
+        var discountResult = await _cartService.ApplyDiscountAsync(discountRequest);
+        return discountResult.Succeeded ? Ok(discountResult) : BadRequest(discountResult);
     }
 }
