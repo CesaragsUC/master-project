@@ -1,7 +1,9 @@
 ﻿using Discount.Domain.ValueObjects;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Discount.Domain.Entities;
 
+[ExcludeFromCodeCoverage]
 public class CouponDiscount
 {
     public Guid Id { get; set; }

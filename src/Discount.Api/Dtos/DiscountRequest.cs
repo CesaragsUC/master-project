@@ -1,5 +1,8 @@
-﻿namespace Discount.Api.Dtos;
+﻿using System.Diagnostics.CodeAnalysis;
 
+namespace Discount.Api.Dtos;
+
+[ExcludeFromCodeCoverage]
 public class DiscountRequest
 {
     public string? Code { get; set; }

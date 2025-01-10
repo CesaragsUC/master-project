@@ -17,6 +17,6 @@ public record CouponDiscountDto
     public bool Active { get; set; }
     public int? MaxUse { get; set; }
     public int TotalUse { get; set; }
-    public DateTime CreateAt { get; set; } = DateTime.UtcNow;
+    public DateTime CreateAt { get; set; }
     public DateTime? UpdatedAt { get; set; }
 }

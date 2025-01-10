@@ -1,5 +1,8 @@
-﻿namespace Basket.Api.Dtos;
+﻿using System.Diagnostics.CodeAnalysis;
 
+namespace Basket.Api.Dtos;
+
+[ExcludeFromCodeCoverage]
 public class DiscountResponse
 {
     public Guid Id { get; set; }

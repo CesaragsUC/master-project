@@ -1,7 +1,9 @@
 ﻿using Basket.Api.Dtos;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Basket.Api.Events;
 
+[ExcludeFromCodeCoverage]
 public class BasketCheckoutEvent
 {
     public string? CustomerId { get; set; }
