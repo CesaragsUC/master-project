@@ -1,10 +1,10 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Discount.Api.Dtos;
+namespace Discount.Domain.Dtos;
 
 [ExcludeFromCodeCoverage]
 public class DiscountRequest
 {
     public string? Code { get; set; }
-    public decimal TotalPrice { get; set; }
+    public decimal Total { get; set; }
 }

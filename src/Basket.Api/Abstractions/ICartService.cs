@@ -12,5 +12,5 @@ public interface ICartService
 
     Task<Result<bool>> CheckoutAsync(CartCheckoutDto checkoutDto);
 
-    Task<Result<DiscountResponse>> ApplyDiscountAsync(DiscountRequest discountRequest);
+    Task<Result<CartCheckoutDto>> ApplyDiscountAsync(CartCheckoutDto discountRequest);
 }

@@ -1,10 +1,9 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Discount.Api.Dtos;
-
+namespace Discount.Domain.Dtos;
 
 [ExcludeFromCodeCoverage]
-public record CouponDiscountDeleteDto
+public record CouponDeleteDto
 {
     public Guid Id { get; set; }
 
