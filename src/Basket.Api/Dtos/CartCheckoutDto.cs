@@ -8,7 +8,10 @@ public class CartCheckoutDto
     public string? CustomerId { get; set; }
 
     public string? UserName { get; set; }
+
     public string? Email { get; set; }
+
+    public string? CouponCode { get; set; }
 
     public List<CartItensDto> Items { get; set; } = new();
 

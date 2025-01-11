@@ -6,5 +6,5 @@ namespace Basket.Api.Abstractions;
 public interface IDiscountApi
 {
     [Post("/apply")]
-    Task<ApiResponse<DiscountResponse>> ApplyDiscountAsync(DiscountRequest request);
+    Task<ApiResponse<DiscountResponse>> ApplyDiscountAsync(string couponCode, decimal totalPrice);
 }

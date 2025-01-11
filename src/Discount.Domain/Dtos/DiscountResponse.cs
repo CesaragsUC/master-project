@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Basket.Api.Dtos;
+namespace Discount.Domain.Dtos;
 
 [ExcludeFromCodeCoverage]
 public class DiscountResponse

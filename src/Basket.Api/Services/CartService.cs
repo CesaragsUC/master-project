@@ -85,7 +85,6 @@ public class CartService : ICartService
             key: cacheKey,
             factory: async () =>
             {
-                // Retorna o estado mais recente do carrinho (pode ser o próprio parâmetro)
                 return cart;
             },
              Expiration,
@@ -122,32 +121,18 @@ public class CartService : ICartService
 
     }
 
-    public async Task<Result<DiscountResponse>> ApplyDiscountAsync(DiscountRequest discountRequest)
+    public async Task<Result<CartCheckoutDto>> ApplyDiscountAsync(CartCheckoutDto cartCheckout)
     {
-        var response = await _discountApi.ApplyDiscountAsync(discountRequest);
+        var response = await _discountApi.ApplyDiscountAsync(cartCheckout.CouponCode, cartCheckout.TotalPrice);
 
         if(response.IsSuccessStatusCode)
         {
-            //return await Result<DiscountResponse>.SuccessAsync(new DiscountResponse
-            //{
-            //    Code = response?.Content?.Code,
-            //    Type = response.Content.Type,
-            //    Value = response.Content.Value,
-            //    MinValue = response.Content.MinValue,
-            //});
-
-            //mock
-            return await Result<DiscountResponse>.SuccessAsync(new DiscountResponse
-            {
-                Code = "CASOFT20",
-                Type = 1,
-                Value = 20,
-                MinValue = 100,
-            });
+            cartCheckout.TotalPrice -= response.Content.TotalDiscount;
+            return await Result<CartCheckoutDto>.SuccessAsync(cartCheckout);
         }
         else
         {
-            return await Result<DiscountResponse>.FailureAsync("An error occour while attempt to apply discount.");
+            return await Result<CartCheckoutDto>.FailureAsync("An error occour while attempt to apply discount.");
         }
 
     }
