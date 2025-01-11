@@ -200,7 +200,7 @@ public class CouponService : ICouponService
         {
             if (string.IsNullOrEmpty(code))
             {
-                return await Result<Coupon>.FailureAsync("Invalid code");
+                return await Result<Coupon>.FailureAsync("Invalid coupon code");
             }
 
             var couponEntity = _repository.FindOne(x => x.Code.Equals(code));
