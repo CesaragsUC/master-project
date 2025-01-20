@@ -6,7 +6,6 @@ using System.Text.Json.Serialization;
 namespace Catalog.Services.Filters;
 
 public class ProductFilter
-    : IQueryFilter
 {
 
     [JsonPropertyName("onlyActive")]
@@ -37,16 +36,6 @@ public class ProductFilter
     public string? OrderDirection { get; set; } = "asc";
 
     public int Skip => (Page - 1) * PageSize;
-
-    public SortDefinition<TEntity> GetSortDefinition<TEntity>()
-    {
-        var sortBuilder = Builders<TEntity>.Sort;
-        return OrderDirection?.ToLower() switch
-        {
-            "desc" => sortBuilder.Descending(OrderBy),
-            _ => sortBuilder.Ascending(OrderBy),
-        };
-    }
 
 }
 

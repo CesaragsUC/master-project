@@ -1,15 +1,13 @@
 ﻿using Application.Dtos.Dtos.Produtos;
 using AutoMapper;
-using Catalog.Domain.Abstractions;
 using Catalog.Domain.Models;
 using Catalog.Service.Abstractions;
 using Catalog.Service.Validation;
 using Catalog.Services.Abstractions;
 using Catalog.Services.Filters;
+using EasyMongoNet.Abstractions;
 using FluentValidation;
 using MongoDB.Driver;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq.Expressions;
 
 namespace Catalog.Service.Services;
 
@@ -41,7 +39,7 @@ public class ProductService : IProductService
 
             var product = _mapper.Map<Products>(obj);
 
-            await _repository.InsertAsync(product);
+            await _repository.InsertOneAsync(product);
 
             return new ResponseResult<bool>
             {
@@ -74,11 +72,10 @@ public class ProductService : IProductService
             {
                 Name = p.Name,
                 Price = Convert.ToDecimal(p.Price),
-                Active = Convert.ToBoolean(p.Active),
-                CreatAt = DateTime.Now
+                Active = Convert.ToBoolean(p.Active)
             }).ToList();
 
-            await _repository.InsertMany(produtos);
+            await _repository.InsertManyAsync(produtos);
 
             return new ResponseResult<bool>
             {
@@ -107,48 +104,24 @@ public class ProductService : IProductService
                 return validationResponse;
             }
 
-            var product = _mapper.Map<Products>(obj);
+            var product = await _repository.FindByIdAsync(x=> x.ProductId == obj.ProductId);
 
-            await _repository.UpdateAsync(nameof(obj.ProductId), product);
-
-            return new ResponseResult<bool>
+            if (product == null)
             {
-                Success = true,
-                Message = "Produtos atualizado com sucesso"
-            };
-        }
-        catch (Exception ex)
-        {
-            return new ResponseResult<bool>
-            {
-                Success = false,
-                Errors = new string[] { ex.Message }
-            };
-
-        }
-    }
-
-    // Usage UpdateAsync with Expression
-    [ExcludeFromCodeCoverage]
-    public async Task<ResponseResult<bool>> DemoUpdate2(ProductUpdateDto obj)
-    {
-        try
-        {
-            var validationResponse = await ProdutoValidation(obj, new ProductUpdateValidator());
-
-            if (!validationResponse.Success)
-            {
-                return validationResponse;
+                return new ResponseResult<bool>
+                {
+                    Success = false,
+                    Errors = new string[] { "Produto não encontrado" }
+                };
             }
 
-            // Define a condição para encontrar o produto com o Id especificado
-            Expression<Func<Products, bool>> whereCondition = p => p.ProductId == obj.ProductId;
+            product.ModifiedAt = DateTime.Now;
+            product.Name = obj.Name;
+            product.Price = obj.Price;
+            product.Active = obj.Active;
+            product.ImageUri = obj.ImageUri;
 
-            // Define o campo que deseja atualizar 
-            Expression<Func<Products, decimal?>> fieldToUpdate = p => p.Price;
-
-            // Chama o método UpdateAsync para atualizar o preço do produto
-            await _repository.UpdateAsync(whereCondition, fieldToUpdate, obj.Price);
+            await _repository.UpdateAsync(product);
 
             return new ResponseResult<bool>
             {
@@ -166,6 +139,7 @@ public class ProductService : IProductService
 
         }
     }
+
 
     public async Task<ResponseResult<bool>> Delete(string field, Guid id)
     {
@@ -180,7 +154,7 @@ public class ProductService : IProductService
                 };
             }
 
-            await _repository.Delete(field, id);
+            await _repository.DeleteOneAsync(x=> x.ProductId == id.ToString());
 
             return new ResponseResult<bool>
             {
@@ -203,7 +177,7 @@ public class ProductService : IProductService
     {
         try
         {
-            await _repository.DeleteByName(field, nome);
+            await _repository.DeleteOneAsync(x=> x.Name!.Equals(nome));
 
             return new ResponseResult<bool>
             {
@@ -264,7 +238,7 @@ public class ProductService : IProductService
     {
         try
         {
-            var produto = await _repository.GetById(field, id);
+            var produto = await _repository.FindOneAsync(x=> x.ProductId == id.ToString());
             if (produto == null)
             {
                 return new ResponseResult<ProductDto>
@@ -282,7 +256,7 @@ public class ProductService : IProductService
                     Name = produto.Name,
                     Price = produto.Price,
                     Active = produto.Active,
-                    CreatAt = produto.CreatAt,
+                    CreatAt = produto.CreatedAt,
                     ImageUri = produto.ImageUri
                 },
                 Success = true
@@ -299,13 +273,13 @@ public class ProductService : IProductService
         }
     }
 
-    public async Task<ResponseResult<List<ProductDto>>> GetByName(string field, string nome)
+    public async Task<ResponseResult<List<ProductDto>>> GetByName(string name)
     {
         try
         {
-            var produtos = await _repository.GetByName(field, nome);
+            var produtos = await _repository.FilterBy(x=> x.Name.Contains(name));
 
-            if (produtos.Items is null)
+            if (!produtos.Any())
             {
                 return new ResponseResult<List<ProductDto>>
                 {
@@ -316,9 +290,9 @@ public class ProductService : IProductService
 
             return new ResponseResult<List<ProductDto>>
             {
-                Data = produtos.Items?.Select(p => _mapper.Map<ProductDto>(p)).ToList(),
+                Data = produtos.Select(p => _mapper.Map<ProductDto>(p)).ToList(),
                 Success = true,
-                TotalItems = produtos.Items!.Count!,
+                TotalItems = produtos.ToList().Count!,
             };
         }
         catch (Exception ex)

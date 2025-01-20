@@ -3,6 +3,7 @@ using Domain.Interfaces;
 using MediatR;
 using Product.Domain.Abstractions;
 using Product.Domain.Events;
+using Product.Domain.Exceptions;
 using ResultNet;
 using Serilog;
 
@@ -23,7 +24,7 @@ namespace Product.Domain.Handlers
         {
             try
             {
-                if (request.Id == Guid.Empty) return await Result<bool>.FailureAsync(500,"Invalid Id");
+                if (request.Id == Guid.Empty) return await Result<bool>.FailureAsync(400,"Invalid Id");
 
                 var produto = _repository.FindOne(x => x.Id == request.Id);
                 if (produto == null) return await Result<bool>.FailureAsync(400, $"Product {request.Id} not find"); 
@@ -37,10 +38,10 @@ namespace Product.Domain.Handlers
 
                 return  await Result<bool>.SuccessAsync($"Product {request.Id} deleted successfuly");
             }
-            catch (Exception ex)
+            catch (ProductInvalidException ex)
             {
                 Log.Error(ex, "Error on delete product {Id}", request.Id);
-                throw;
+                throw new ProductInvalidException("erro interno");
             }
 
 

@@ -24,7 +24,7 @@ public class ProductService : IProductService
                 Name = product.Name,
                 Price = product.Price,
                 Active = product.Active,
-                CreatAt = product.CreatAt,
+                CreateAt = product.CreatAt,
                 ImageUri = product.ImageUri
             });
         }

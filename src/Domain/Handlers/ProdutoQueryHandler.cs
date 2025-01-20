@@ -2,6 +2,7 @@
 using Domain.Interfaces;
 using Product.Domain.Models;
 using MediatR;
+using Product.Domain.Exceptions;
 
 namespace Product.Domain.Handlers
 {
@@ -24,9 +25,14 @@ namespace Product.Domain.Handlers
 
         public async Task<Models.Product?> Handle(ProductByIdQuery request, CancellationToken cancellationToken)
         {
+            if (request.Id == Guid.Empty)
+            {
+                throw new ProductNotFoundException("Product Id couldn't empty");
+            }
+
             var produto = _repository.FindOne(x => x.Id == request.Id);
 
-            if (produto == null) return null;
+            if (produto == null) throw new ProductNotFoundException(request.Id); 
 
             return produto;
         }

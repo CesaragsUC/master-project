@@ -15,7 +15,7 @@ namespace Catalog.Api.Extentions
                 Price = produto.Price,
                 ImageUri = produto.ImageUri,
                 Active = produto.Active,
-                CreatAt = produto.CreatAt
+                CreatAt = produto.CreatedAt
             };
         }
 

@@ -2,6 +2,8 @@
 using Catalog.Domain.Models;
 using Catalog.Service.Abstractions;
 using Catalog.Services.Filters;
+using EasyMongoNet.Abstractions;
+using EasyMongoNet.Utils;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using System.Diagnostics.CodeAnalysis;
@@ -12,22 +14,11 @@ namespace Catalog.Infrastructure.Repository;
 [ExcludeFromCodeCoverage]
 public class ProductRepository : IProductRepository
 {
-    private readonly IMongoCollection<Products> _mongoCollection;
+    private readonly IMongoRepository<Products> _repository;
 
-    public ProductRepository(IMongoDbContext dbContext)
+    public ProductRepository(IMongoRepository<Products> repository)
     {
-        _mongoCollection = dbContext.GetCollection<Products>(typeof(Products).Name);
-
-
-        var client = dbContext.Database.Client;
-
-        // Obtenha as configurações do cliente
-        var settings = client.Settings;
-        // Obtenha o nome do banco de dados
-        var databaseName = dbContext.Database.DatabaseNamespace.DatabaseName;
-
-        // Retorne as informações detalhadas da conexão
-        Console.WriteLine($"Host: {settings.Server.Host}, Port: {settings.Server.Port}, Database: {databaseName}");
+        _repository = repository;
 
     }
     public async Task<PagedResult<Products>> GetAll(ProductFilter filter)
@@ -51,22 +42,8 @@ public class ProductRepository : IProductRepository
             filterDefinition &= builder.Eq("Active", filter.OnlyActive.Value);
         }
 
-        var results = await _mongoCollection
-            .Find(filterDefinition)
-            .Sort(filter.GetSortDefinition<Products>())
-            .Skip((filter.Page - 1) * filter.PageSize)
-            .Limit(filter.PageSize)
-            .ToListAsync();
+        var results = await _repository.GetAllAsync(filterDefinition,filter.Page, filter.PageSize,filter.OrderDirection!);
 
-        var totalItems = await _mongoCollection.CountDocumentsAsync(filterDefinition);
-
-        return new PagedResult<Products>
-        {
-            Items = results,
-            TotalCount = (int)totalItems,
-            Page = filter.Page,
-            PageSize = filter.PageSize
-
-        };
+        return results;
     }
 }

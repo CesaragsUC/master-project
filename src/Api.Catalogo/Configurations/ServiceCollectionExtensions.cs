@@ -1,14 +1,12 @@
 ﻿using Application.Dtos.Abstractions;
 using Application.Dtos.Dtos.Response;
 using Azure.Storage.Blobs;
-using Catalog.Domain.Abstractions;
 using Catalog.Infrastructure.Configurations;
-using Catalog.Infrastructure.Context;
 using Catalog.Infrastructure.Repository;
 using Catalog.Service.Abstractions;
 using Catalog.Service.Services;
 using Catalog.Services.Abstractions;
-using Catalog.Services.Filters;
+using EasyMongoNet.Exntesions;
 using Keycloak.AuthServices.Authentication;
 using Keycloak.AuthServices.Authorization;
 using Microsoft.Extensions.Options;
@@ -24,11 +22,8 @@ public static class ServiceCollectionExtensions
 
     public static void AddServices(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddScoped(typeof(IMongoRepository<>), typeof(MongoRepository<>));
         services.AddScoped<IProductRepository, ProductRepository>();
         services.AddScoped<IProductService, ProductService>();
-        services.AddScoped<IMongoDbContext, MongoDbContext>();
-        services.AddScoped<IQueryFilter, ProductFilter>();
         services.AddScoped(typeof(IResult<>), typeof(Result<>));
         services.AddAutoMapper(Assembly.GetExecutingAssembly());
         services.MongoDbService(configuration);
@@ -40,10 +35,11 @@ public static class ServiceCollectionExtensions
         services.AddAzureBlobServices(configuration);
     }
 
+
     public static IServiceCollection MongoDbService(this IServiceCollection services, IConfiguration configuration)
     {
-        services.Configure<MongoDbSettings>(configuration.GetSection(nameof(MongoDbSettings)));
-        services.AddSingleton<MongoDbContext>();
+
+        services.AddEasyMongoNet(configuration);
 
         return services;
     }

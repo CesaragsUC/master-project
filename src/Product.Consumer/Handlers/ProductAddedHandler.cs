@@ -1,7 +1,9 @@
-﻿using Catalog.Domain.Abstractions;
-using Catalog.Domain.Models;
+﻿
+using AutoMapper;
+using EasyMongoNet.Abstractions;
 using MediatR;
 using Messaging.Contracts.Events.Product;
+using Product.Consumer.Models;
 using Serilog;
 
 namespace Product.Consumer.Handlers;
@@ -9,18 +11,22 @@ namespace Product.Consumer.Handlers;
 public class ProductAddedHandler :
     IRequestHandler<ProductAddedEvent, bool>
 {
-    private readonly IMongoRepository<ProductAddedEvent> _repository;
+    private readonly IMongoRepository<Products> _repository;
+    private readonly IMapper _mapper;
 
-    public ProductAddedHandler(IMongoRepository<ProductAddedEvent> repository)
+    public ProductAddedHandler(IMongoRepository<Products> repository, IMapper mapper)
     {
         _repository = repository;
+        _mapper = mapper;
     }
 
     public async Task<bool> Handle(ProductAddedEvent request, CancellationToken cancellationToken)
     {
         try
         {
-            await _repository.InsertAsync(request,nameof(Products));
+            var product = _mapper.Map<Products>(request);
+
+            await _repository.InsertOneAsync(product);
 
             Log.Information("Adicionado produto nome: {Nome} - {Data}", request.Name, DateTime.Now);
 

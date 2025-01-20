@@ -26,7 +26,7 @@ public class ProductAddedConsumer : IConsumer<ProductAddedEvent>
                 Name = context.Message.Name,
                 Active = context.Message.Active,
                 Price = context.Message.Price,
-                CreatAt = DateTime.Now,
+                CreateAt = DateTime.Now,
                 ImageUri = context.Message.ImageUri
             };
 
