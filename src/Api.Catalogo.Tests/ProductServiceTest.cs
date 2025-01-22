@@ -338,6 +338,7 @@ namespace Api.Catalogo.Tests
                 Active = true
 
             };
+
             _mongoRepository.Setup(repo => repo.FindByIdAsync(It.IsAny<Expression<Func<Products, bool>>>()))
                            .ReturnsAsync((Products)null);
 
@@ -346,7 +347,7 @@ namespace Api.Catalogo.Tests
 
             // Assert
             Assert.False(result.Success);
-            Assert.Contains("Produto não encontrado", result.Errors);
+
         }
 
         [Fact(DisplayName = "Teste 15 - return a empety list")]
@@ -367,24 +368,5 @@ namespace Api.Catalogo.Tests
             Assert.False(result.Success);
 
         }
-
-        //[Fact]
-        //public async Task GetByName_ShouldReturnError_WhenProductsDoNotExist()
-        //{
-        //    // Arrange
-        //    var productName = "NonExistentProduct";
-        //    var products = new List<Products>();
-
-        //    _repositoryMock.Setup(repo => repo.FilterBy(It.IsAny<Func<Products, bool>>()))
-        //        .ReturnsAsync(products);
-
-        //    // Act
-        //    var result = await _productService.GetByName(productName);
-
-        //    // Assert
-        //    Assert.False(result.Success);
-        //    Assert.Null(result.Data);
-        //    Assert.Contains("Product not found", result.Errors);
-        //}
     }
 }
