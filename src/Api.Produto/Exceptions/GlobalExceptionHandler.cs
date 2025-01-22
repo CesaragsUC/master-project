@@ -2,9 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Product.Domain.Exceptions;
 using Serilog;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Product.Api.Exceptions;
 
+[ExcludeFromCodeCoverage]
 public class GlobalExceptionHandler() : IExceptionHandler
 {
     public async ValueTask<bool> TryHandleAsync(

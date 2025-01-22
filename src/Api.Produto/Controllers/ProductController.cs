@@ -3,12 +3,14 @@ using Domain.Handlers.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Api.Controllers;
 
 [Authorize]
 [ApiController]
 [Route("api/product")]
+[ExcludeFromCodeCoverage]
 public class ProductController(IMediator _mediator) : ControllerBase
 {
 

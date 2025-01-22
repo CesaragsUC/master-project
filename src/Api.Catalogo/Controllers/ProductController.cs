@@ -11,6 +11,7 @@ namespace Api.Catalogo.Controllers;
 [Authorize]
 [Route("api/catalog")]
 [ApiController]
+[ExcludeFromCodeCoverage]
 public class ProductController(IProductService service) : ControllerBase
 {
 

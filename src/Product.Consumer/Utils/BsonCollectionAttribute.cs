@@ -1,5 +1,8 @@
-﻿namespace Product.Consumer.Utils;
+﻿using System.Diagnostics.CodeAnalysis;
 
+namespace Product.Consumer.Utils;
+
+[ExcludeFromCodeCoverage]
 [AttributeUsage(AttributeTargets.Class, Inherited = false)]
 public class BsonCollectionAttribute : Attribute
 {

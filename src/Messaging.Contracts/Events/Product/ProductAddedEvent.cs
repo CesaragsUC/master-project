@@ -1,7 +1,9 @@
 ﻿using MediatR;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Messaging.Contracts.Events.Product;
 
+[ExcludeFromCodeCoverage]
 public class ProductAddedEvent : IRequest<bool>
 {
     public string? ProductId { get; set; }

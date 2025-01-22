@@ -1,12 +1,12 @@
 ﻿using MassTransit;
 using Messaging.Contracts.Events.Product;
 using Serilog;
-
+using System.Diagnostics.CodeAnalysis;
 using IMediator = MediatR.IMediator;
 
 namespace Product.Consumer.Consumers.Configurations;
 
-
+[ExcludeFromCodeCoverage]
 public class ProductAddedConsumer : IConsumer<ProductAddedEvent>
 {
     private readonly IMediator _mediator;
