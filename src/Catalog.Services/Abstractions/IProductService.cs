@@ -13,6 +13,5 @@ public interface IProductService
     Task<ResponseResult<bool>> InsertMany(List<ProductCreateDto> obj);
     Task<ResponseResult<bool>> Update(ProductUpdateDto obj);
     Task<ResponseResult<bool>> Delete(string field, Guid id);
-    Task<ResponseResult<bool>> DeleteByName(string field, string nome);
 
 }

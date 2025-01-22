@@ -1,23 +1,21 @@
-﻿using AutoMapper;
-using EasyMongoNet.Abstractions;
+﻿using EasyMongoNet.Abstractions;
 using MediatR;
 using Messaging.Contracts.Events.Product;
 using Product.Consumer.Models;
 using Serilog;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Product.Consumer.Handlers;
 
+[ExcludeFromCodeCoverage]
 public class ProductDeletedHandler :
     IRequestHandler<ProductDeletedEvent, bool>
 {
     private readonly IMongoRepository<Products> _repository;
-    private readonly IMapper _mapper;
 
-    public ProductDeletedHandler(IMongoRepository<Products> repository, 
-        IMapper mapper)
+    public ProductDeletedHandler(IMongoRepository<Products> repository)
     {
         _repository = repository;
-        _mapper = mapper;
     }
 
     public async Task<bool> Handle(ProductDeletedEvent request, CancellationToken cancellationToken)

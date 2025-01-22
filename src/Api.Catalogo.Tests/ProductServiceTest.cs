@@ -326,5 +326,65 @@ namespace Api.Catalogo.Tests
             result?.Data?.Count.Should().BeGreaterThan(0);
         }
 
+        [Fact(DisplayName = "Teste 14 - update product not founded")]
+        [Trait("Catalogo", "ProdutoServiceTest")]
+        public async Task Update_ProductNotFound_ReturnsErrorResponse()
+        {
+            // Arrange
+            var productUpdateDto = new ProductUpdateDto { 
+                ProductId = Guid.NewGuid().ToString(),
+                Name = "HeadSet Logitec",
+                Price = 850.0m,
+                Active = true
+
+            };
+            _mongoRepository.Setup(repo => repo.FindByIdAsync(It.IsAny<Expression<Func<Products, bool>>>()))
+                           .ReturnsAsync((Products)null);
+
+            // Act
+            var result = await _service.Update(productUpdateDto);
+
+            // Assert
+            Assert.False(result.Success);
+            Assert.Contains("Produto não encontrado", result.Errors);
+        }
+
+        [Fact(DisplayName = "Teste 15 - return a empety list")]
+        [Trait("Catalogo", "ProdutoServiceTest")]
+        public async Task GetByName_ShouldReturnProducts_WhenProductsExist()
+        {
+            // Arrange
+            var productName = "TestProduct";
+            var products = new List<Products>();
+
+            _mongoRepository.Setup(repo => repo.FilterBy(It.IsAny<Expression<Func<Products, bool>>>()))
+                .ReturnsAsync(products);
+
+            // Act
+            var result = await _service.GetByName(productName);
+
+            // Assert
+            Assert.False(result.Success);
+
+        }
+
+        //[Fact]
+        //public async Task GetByName_ShouldReturnError_WhenProductsDoNotExist()
+        //{
+        //    // Arrange
+        //    var productName = "NonExistentProduct";
+        //    var products = new List<Products>();
+
+        //    _repositoryMock.Setup(repo => repo.FilterBy(It.IsAny<Func<Products, bool>>()))
+        //        .ReturnsAsync(products);
+
+        //    // Act
+        //    var result = await _productService.GetByName(productName);
+
+        //    // Assert
+        //    Assert.False(result.Success);
+        //    Assert.Null(result.Data);
+        //    Assert.Contains("Product not found", result.Errors);
+        //}
     }
 }

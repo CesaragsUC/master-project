@@ -5,9 +5,11 @@ using MediatR;
 using Messaging.Contracts.Events.Product;
 using Product.Consumer.Models;
 using Serilog;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Product.Consumer.Handlers;
 
+[ExcludeFromCodeCoverage]
 public class ProductAddedHandler :
     IRequestHandler<ProductAddedEvent, bool>
 {

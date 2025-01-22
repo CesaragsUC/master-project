@@ -135,19 +135,6 @@ public class ProductService : IProductService
 
     }
 
-    public async Task<ResponseResult<bool>> DeleteByName(string field, string nome)
-    {
-
-        await _repository.DeleteOneAsync(x => x.Name!.Equals(nome));
-
-        return new ResponseResult<bool>
-        {
-            Success = true,
-            Message = "Produto excluido com sucesso"
-        };
-
-    }
-
     public async Task<ResponseResult<List<ProductDto>>> GetAll(ProductFilter filtro)
     {
 
