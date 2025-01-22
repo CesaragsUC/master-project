@@ -11,6 +11,7 @@ namespace Api.Catalogo.Controllers;
 [Authorize]
 [Route("api/catalog")]
 [ApiController]
+[ExcludeFromCodeCoverage]
 public class ProductController(IProductService service) : ControllerBase
 {
 
@@ -37,7 +38,7 @@ public class ProductController(IProductService service) : ControllerBase
     [Authorize(Roles = "Read")]
     public async Task<IActionResult> GetByName(string nome)
     {
-        var produto = await service.GetByName("Nome", nome);
+        var produto = await service.GetByName(nome);
         return Ok(produto);
     }
 

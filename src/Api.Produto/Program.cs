@@ -1,4 +1,5 @@
 using Product.Api.Configuration;
+using Product.Api.Exceptions;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -13,8 +14,14 @@ try
     builder.Services.AddControllers();
     builder.Services.AddEndpointsApiExplorer();
 
+
     builder.Services.AddServices(builder.Configuration);
 
+    builder.Services.AddExceptionHandler<ProductInvalidExceptionHandler>();
+    builder.Services.AddExceptionHandler<ProductNotFoundExceptionHandler>();
+    builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+    builder.Services.AddProblemDetails();
+        
 
     var app = builder.Build();
 
@@ -25,9 +32,13 @@ try
 
     app.UseHttpsRedirection();
 
+    // Should be put before UseAuthorization, UseRouting and MapControllers
+    app.UseExceptionHandler();
+
     app.UseAuthorization();
 
     app.MapControllers();
+
 
     app.Run();
 

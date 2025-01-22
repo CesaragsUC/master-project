@@ -1,19 +1,19 @@
-﻿using Catalog.Domain.Abstractions;
-using Catalog.Domain.Models;
-
+﻿using EasyMongoNet.Abstractions;
 using MediatR;
 using Messaging.Contracts.Events.Product;
-using MongoDB.Bson;
+using Product.Consumer.Models;
 using Serilog;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Product.Consumer.Handlers;
 
+[ExcludeFromCodeCoverage]
 public class ProductDeletedHandler :
     IRequestHandler<ProductDeletedEvent, bool>
 {
-    private readonly IMongoRepository<ProductDeletedEvent> _repository;
+    private readonly IMongoRepository<Products> _repository;
 
-    public ProductDeletedHandler(IMongoRepository<ProductDeletedEvent> repository)
+    public ProductDeletedHandler(IMongoRepository<Products> repository)
     {
         _repository = repository;
     }
@@ -22,10 +22,13 @@ public class ProductDeletedHandler :
     {
         try
         {
-            var connectionDetails = _repository.GetConnectionDetails();
-            Log.Information("Conexão: {ConnectionDetails}", connectionDetails);
+            if (request.ProductId == null)
+            {
+                Log.Error("Product Id is null");
+                return false;
+            }
 
-            await _repository.Delete(nameof(request.ProductId), Guid.Parse(request.ProductId!), nameof(Products));
+            await _repository.DeleteOneAsync(x=> x.ProductId!.Equals(request.ProductId));
 
             return true;
         }

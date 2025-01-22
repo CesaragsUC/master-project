@@ -1,11 +1,14 @@
 ﻿using EasyMongoNet.Models;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using Product.Consumer.Utils;
 
-namespace Catalog.Domain.Models;
+namespace Product.Consumer.Models;
 
+[BsonCollection("Products")]
 public class Products : Document
 {
+
     [BsonElement("ProductId")]
     public string? ProductId { get; set; }
 
@@ -23,3 +26,4 @@ public class Products : Document
     public bool Active { get; set; }
 
 }
+

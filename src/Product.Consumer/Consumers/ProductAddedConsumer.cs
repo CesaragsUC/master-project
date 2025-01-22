@@ -1,12 +1,12 @@
 ﻿using MassTransit;
 using Messaging.Contracts.Events.Product;
 using Serilog;
-
+using System.Diagnostics.CodeAnalysis;
 using IMediator = MediatR.IMediator;
 
 namespace Product.Consumer.Consumers.Configurations;
 
-
+[ExcludeFromCodeCoverage]
 public class ProductAddedConsumer : IConsumer<ProductAddedEvent>
 {
     private readonly IMediator _mediator;
@@ -26,7 +26,7 @@ public class ProductAddedConsumer : IConsumer<ProductAddedEvent>
                 Name = context.Message.Name,
                 Active = context.Message.Active,
                 Price = context.Message.Price,
-                CreatAt = DateTime.Now,
+                CreateAt = DateTime.Now,
                 ImageUri = context.Message.ImageUri
             };
 

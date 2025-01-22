@@ -1,15 +1,13 @@
 ﻿using Application.Dtos.Dtos.Produtos;
 using AutoMapper;
-using Catalog.Domain.Abstractions;
 using Catalog.Domain.Models;
 using Catalog.Service.Abstractions;
 using Catalog.Service.Validation;
 using Catalog.Services.Abstractions;
 using Catalog.Services.Filters;
+using EasyMongoNet.Abstractions;
 using FluentValidation;
 using MongoDB.Driver;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq.Expressions;
 
 namespace Catalog.Service.Services;
 
@@ -30,305 +28,191 @@ public class ProductService : IProductService
 
     public async Task<ResponseResult<bool>> Insert(ProductCreateDto obj)
     {
-        try
+
+        var validationResponse = await ProdutoValidation(obj, new ProductCreateValidator());
+
+        if (!validationResponse.Success)
         {
-            var validationResponse = await ProdutoValidation(obj, new ProductCreateValidator());
-
-            if (!validationResponse.Success)
-            {
-                return validationResponse;
-            }
-
-            var product = _mapper.Map<Products>(obj);
-
-            await _repository.InsertAsync(product);
-
-            return new ResponseResult<bool>
-            {
-                Success = true,
-                Message = "Produto inserido com sucesso"
-            };
+            return validationResponse;
         }
-        catch (Exception ex)
+
+        var product = _mapper.Map<Products>(obj);
+
+        await _repository.InsertOneAsync(product);
+
+        return new ResponseResult<bool>
         {
-            return new ResponseResult<bool>
-            {
-                Success = false,
-                Errors = new string[] { ex.Message }
-            };
-        }
+            Success = true,
+            Message = "Produto inserido com sucesso"
+        };
+
     }
 
     public async Task<ResponseResult<bool>> InsertMany(List<ProductCreateDto> obj)
     {
-        try
+
+        var validationResponse = await ProdutoValidation(obj, new AddProductListDto());
+
+        if (!validationResponse.Success)
         {
-            var validationResponse = await ProdutoValidation(obj, new AddProductListDto());
-
-            if (!validationResponse.Success)
-            {
-                return validationResponse;
-            }
-
-            var produtos = obj.Select(p => new Products
-            {
-                Name = p.Name,
-                Price = Convert.ToDecimal(p.Price),
-                Active = Convert.ToBoolean(p.Active),
-                CreatAt = DateTime.Now
-            }).ToList();
-
-            await _repository.InsertMany(produtos);
-
-            return new ResponseResult<bool>
-            {
-                Success = true,
-                Message = "Produtos inserido com sucesso"
-            };
+            return validationResponse;
         }
-        catch (Exception ex)
+
+        var produtos = obj.Select(p => new Products
         {
-            return new ResponseResult<bool>
-            {
-                Success = false,
-                Errors = new string[] { ex.Message }
-            };
-        }
+            Name = p.Name,
+            Price = Convert.ToDecimal(p.Price),
+            Active = Convert.ToBoolean(p.Active)
+        }).ToList();
+
+        await _repository.InsertManyAsync(produtos);
+
+        return new ResponseResult<bool>
+        {
+            Success = true,
+            Message = "Produtos inserido com sucesso"
+        };
+
     }
 
     public async Task<ResponseResult<bool>> Update(ProductUpdateDto obj)
     {
-        try
+
+        var validationResponse = await ProdutoValidation(obj, new ProductUpdateValidator());
+
+        if (!validationResponse.Success)
         {
-            var validationResponse = await ProdutoValidation(obj, new ProductUpdateValidator());
-
-            if (!validationResponse.Success)
-            {
-                return validationResponse;
-            }
-
-            var product = _mapper.Map<Products>(obj);
-
-            await _repository.UpdateAsync(nameof(obj.ProductId), product);
-
-            return new ResponseResult<bool>
-            {
-                Success = true,
-                Message = "Produtos atualizado com sucesso"
-            };
+            return validationResponse;
         }
-        catch (Exception ex)
+
+        var product = await _repository.FindByIdAsync(x => x.ProductId == obj.ProductId);
+
+        if (product == null)
         {
             return new ResponseResult<bool>
             {
                 Success = false,
-                Errors = new string[] { ex.Message }
+                Errors = new string[] { "Produto não encontrado" }
             };
-
         }
+
+        product.ModifiedAt = DateTime.Now;
+        product.Name = obj.Name;
+        product.Price = obj.Price;
+        product.Active = obj.Active;
+        product.ImageUri = obj.ImageUri;
+
+        await _repository.UpdateAsync(product);
+
+        return new ResponseResult<bool>
+        {
+            Success = true,
+            Message = "Produtos atualizado com sucesso"
+        };
     }
 
-    // Usage UpdateAsync with Expression
-    [ExcludeFromCodeCoverage]
-    public async Task<ResponseResult<bool>> DemoUpdate2(ProductUpdateDto obj)
-    {
-        try
-        {
-            var validationResponse = await ProdutoValidation(obj, new ProductUpdateValidator());
-
-            if (!validationResponse.Success)
-            {
-                return validationResponse;
-            }
-
-            // Define a condição para encontrar o produto com o Id especificado
-            Expression<Func<Products, bool>> whereCondition = p => p.ProductId == obj.ProductId;
-
-            // Define o campo que deseja atualizar 
-            Expression<Func<Products, decimal?>> fieldToUpdate = p => p.Price;
-
-            // Chama o método UpdateAsync para atualizar o preço do produto
-            await _repository.UpdateAsync(whereCondition, fieldToUpdate, obj.Price);
-
-            return new ResponseResult<bool>
-            {
-                Success = true,
-                Message = "Produtos atualizado com sucesso"
-            };
-        }
-        catch (Exception ex)
-        {
-            return new ResponseResult<bool>
-            {
-                Success = false,
-                Errors = new string[] { ex.Message }
-            };
-
-        }
-    }
 
     public async Task<ResponseResult<bool>> Delete(string field, Guid id)
     {
-        try
-        {
-            if (id == Guid.Empty || string.IsNullOrEmpty(field))
-            {
-                return new ResponseResult<bool>
-                {
-                    Success = false,
-                    Errors = new string[] { "Id inválido" }
-                };
-            }
 
-            await _repository.Delete(field, id);
-
-            return new ResponseResult<bool>
-            {
-                Success = true,
-                Message = "Produto excluido com sucesso"
-            };
-        }
-        catch (Exception ex)
+        if (id == Guid.Empty || string.IsNullOrEmpty(field))
         {
             return new ResponseResult<bool>
             {
                 Success = false,
-                Errors = new string[] { ex.Message }
+                Errors = new string[] { "Id inválido" }
             };
         }
 
-    }
+        await _repository.DeleteOneAsync(x => x.ProductId == id.ToString());
 
-    public async Task<ResponseResult<bool>> DeleteByName(string field, string nome)
-    {
-        try
+        return new ResponseResult<bool>
         {
-            await _repository.DeleteByName(field, nome);
+            Success = true,
+            Message = "Produto excluido com sucesso"
+        };
 
-            return new ResponseResult<bool>
-            {
-                Success = true,
-                Message = "Produto excluido com sucesso"
-            };
-        }
-        catch (Exception ex)
-        {
-            return new ResponseResult<bool>
-            {
-                Success = false,
-                Errors = new string[] { ex.Message }
-            };
-        }
+
     }
 
     public async Task<ResponseResult<List<ProductDto>>> GetAll(ProductFilter filtro)
     {
-        try
-        {
-            if (filtro is null)
-            {
-                return new ResponseResult<List<ProductDto>>
-                {
-                    Data = null,
-                    Success = false,
-                    Errors = new string[] { "Invalid filter" }
-                };
-            }
 
-            var produtos = await _produtoRepository.GetAll(filtro);
-
-            return new ResponseResult<List<ProductDto>>
-            {
-                Data = produtos.Items?.Select(p => _mapper.Map<ProductDto>(p)).ToList(),
-                Success = true,
-                TotalItems = produtos.TotalCount,
-                Page = filtro.Page,
-                PageSize = filtro.PageSize,
-                TotalPages = (int)Math.Ceiling((double)produtos.TotalCount / filtro.PageSize)
-            };
-        }
-        catch (Exception ex)
+        if (filtro is null)
         {
             return new ResponseResult<List<ProductDto>>
             {
                 Data = null,
                 Success = false,
-                Errors = new string[] { ex.Message }
+                Errors = new string[] { "Invalid filter" }
             };
         }
+
+        var produtos = await _produtoRepository.GetAll(filtro);
+
+        return new ResponseResult<List<ProductDto>>
+        {
+            Data = produtos.Items?.Select(p => _mapper.Map<ProductDto>(p)).ToList(),
+            Success = true,
+            TotalItems = produtos.TotalCount,
+            Page = filtro.Page,
+            PageSize = filtro.PageSize,
+            TotalPages = (int)Math.Ceiling((double)produtos.TotalCount / filtro.PageSize)
+        };
+
 
     }
 
 
     public async Task<ResponseResult<ProductDto>> GetById(string field, Guid id)
     {
-        try
-        {
-            var produto = await _repository.GetById(field, id);
-            if (produto == null)
-            {
-                return new ResponseResult<ProductDto>
-                {
-                    Success = false,
-                    Errors = new string[] { "Product not found" }
-                };
-            }
-
-            return new ResponseResult<ProductDto>
-            {
-                Data = new ProductDto
-                {
-                    ProductId = produto.ProductId,
-                    Name = produto.Name,
-                    Price = produto.Price,
-                    Active = produto.Active,
-                    CreatAt = produto.CreatAt,
-                    ImageUri = produto.ImageUri
-                },
-                Success = true
-
-            };
-        }
-        catch (Exception ex)
+        var produto = await _repository.FindOneAsync(x => x.ProductId == id.ToString());
+        if (produto == null)
         {
             return new ResponseResult<ProductDto>
             {
                 Success = false,
-                Errors = new string[] { ex.Message }
+                Errors = new string[] { "Product not found" }
             };
         }
+
+        return new ResponseResult<ProductDto>
+        {
+            Data = new ProductDto
+            {
+                ProductId = produto.ProductId,
+                Name = produto.Name,
+                Price = produto.Price,
+                Active = produto.Active,
+                CreatAt = produto.CreatedAt,
+                ImageUri = produto.ImageUri
+            },
+            Success = true
+
+        };
+
     }
 
-    public async Task<ResponseResult<List<ProductDto>>> GetByName(string field, string nome)
+    public async Task<ResponseResult<List<ProductDto>>> GetByName(string name)
     {
-        try
-        {
-            var produtos = await _repository.GetByName(field, nome);
+        var produtos = await _repository.FilterBy(x => x.Name.Contains(name));
 
-            if (produtos.Items is null)
-            {
-                return new ResponseResult<List<ProductDto>>
-                {
-                    Success = false,
-                    Errors = new string[] { "Product not found" }
-                };
-            }
-
-            return new ResponseResult<List<ProductDto>>
-            {
-                Data = produtos.Items?.Select(p => _mapper.Map<ProductDto>(p)).ToList(),
-                Success = true,
-                TotalItems = produtos.Items!.Count!,
-            };
-        }
-        catch (Exception ex)
+        if (!produtos.Any())
         {
             return new ResponseResult<List<ProductDto>>
             {
                 Success = false,
-                Errors = new string[] { ex.Message }
+                Errors = new string[] { "Product not found" }
             };
         }
+
+        return new ResponseResult<List<ProductDto>>
+        {
+            Data = produtos.Select(p => _mapper.Map<ProductDto>(p)).ToList(),
+            Success = true,
+            TotalItems = produtos.ToList().Count!,
+        };
+
 
     }
 

@@ -20,28 +20,28 @@
 		<None Update="appsettings.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
+		<PackageReference Include="AutoMapper" Version="13.0.1" />
+		<PackageReference Include="EasyMongoNet" Version="1.0.0" />
 		<PackageReference Include="MediatR" Version="12.4.1" />
 		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
-		<PackageReference Include="MongoDB.Driver" Version="2.29.0" />
-		<PackageReference Include="MassTransit.RabbitMQ" Version="8.2.5" />
-		<PackageReference Include="MassTransit.Quartz" Version="8.2.5" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
-		<PackageReference Include="MongoDB.Bson" Version="2.29.0" />
+		<PackageReference Include="MongoDB.Driver" Version="3.1.0" />
+		<PackageReference Include="MassTransit.RabbitMQ" Version="8.3.4" />
+		<PackageReference Include="MassTransit.Quartz" Version="8.3.4" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.1" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.1" />
+		<PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.1" />
+		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="9.0.1" />
+		<PackageReference Include="MongoDB.Bson" Version="3.1.0" />
 		<PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
-		<PackageReference Include="Quartz.AspNetCore" Version="3.13.0" />
-		<PackageReference Include="Quartz.Extensions.Hosting" Version="3.13.0" />
-		<PackageReference Include="Quartz.Plugins.TimeZoneConverter" Version="3.13.0" />
-		<PackageReference Include="Quartz.Serialization.Json" Version="3.13.0" />
-		<PackageReference Include="Serilog" Version="4.0.1" />
+		<PackageReference Include="Quartz.AspNetCore" Version="3.13.1" />
+		<PackageReference Include="Quartz.Extensions.Hosting" Version="3.13.1" />
+		<PackageReference Include="Quartz.Plugins.TimeZoneConverter" Version="3.13.1" />
+		<PackageReference Include="Quartz.Serialization.Json" Version="3.13.1" />
+		<PackageReference Include="Serilog" Version="4.2.0" />
 		<PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
 	</ItemGroup>
 	
 	<ItemGroup>
-	  <ProjectReference Include="..\Catalog.Domain\Catalog.Domain.csproj" />
-	  <ProjectReference Include="..\Catalog.Infrastructure\Catalog.Infrastructure.csproj" />
 	  <ProjectReference Include="..\Messaging.Contracts\Messaging.Contracts.csproj" />
 	</ItemGroup>
 </Project>

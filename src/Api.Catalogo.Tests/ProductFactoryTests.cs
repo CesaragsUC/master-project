@@ -14,12 +14,11 @@ public static class ProductFactoryTests
             Faker faker = new Faker("pt_BR");
             produtos.Add(new Products
             {
-                _id = faker.Random.Guid().ToString(),
                 ProductId = faker.Random.Guid().ToString(),
                 Name = faker.Commerce.ProductName(),
                 Price = faker.Random.Decimal(1, 100),
                 Active = faker.Random.Bool(),
-                CreatAt = faker.Date.Past()
+                CreatedAt = faker.Date.Past()
             });
         }
 
@@ -32,12 +31,11 @@ public static class ProductFactoryTests
 
         var produto = new Products
         {
-            _id = faker.Random.Guid().ToString(),
             ProductId = faker.Random.Guid().ToString(),
             Name = faker.Commerce.ProductName(),
             Price = faker.Random.Decimal(1, 100),
             Active = faker.Random.Bool(),
-            CreatAt = faker.Date.Past()
+            CreatedAt = faker.Date.Past()
         };
 
 
