@@ -5,5 +5,13 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
+	
+	<ItemGroup>
+		<PackageReference Include="RepoPgNet" Version="1.2.4" />
+		<PackageReference Include="FluentResultNet" Version="1.1.0" />
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <ProjectReference Include="..\Order.Domain\Order.Domain.csproj" />
+	</ItemGroup>
 </Project>

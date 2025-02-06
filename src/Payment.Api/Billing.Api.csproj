@@ -11,7 +11,10 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Controllers\" />
+    <ProjectReference Include="..\Application.Dtos\Application.Dtos.csproj" />
+    <ProjectReference Include="..\Billing.Application\Billing.Application.csproj" />
+    <ProjectReference Include="..\Payment.Infrastructure\Billing.Infrastructure.csproj" />
+    <ProjectReference Include="..\Payment.Service\Billing.Service.csproj" />
   </ItemGroup>
 
 </Project>

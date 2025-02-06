@@ -1,5 +1,8 @@
+using Infrastructure;
+using Infrastructure.Configurations;
 using Product.Api.Configuration;
 using Product.Api.Exceptions;
+using RepoPgNet;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
@@ -16,12 +19,13 @@ try
 
 
     builder.Services.AddServices(builder.Configuration);
+    builder.Services.AddInfra(builder.Configuration);
 
     builder.Services.AddExceptionHandler<ProductInvalidExceptionHandler>();
     builder.Services.AddExceptionHandler<ProductNotFoundExceptionHandler>();
     builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
     builder.Services.AddProblemDetails();
-        
+    builder.Services.AddRepoPgNet<ProductDbContext>(builder.Configuration);
 
     var app = builder.Build();
 

@@ -1,8 +1,17 @@
-﻿using FluentMigrator.Runner;
+﻿using Azure.Storage.Blobs;
+using EasyMongoNet.Exntesions;
+using FluentMigrator.Runner;
+using Keycloak.AuthServices.Authentication;
+using Keycloak.AuthServices.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Npgsql;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
+using Product.Infrastructure.Configurations.Azure;
+using Product.Infrastructure.RabbitMq;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
@@ -11,10 +20,15 @@ namespace Infrastructure.Configurations;
 [ExcludeFromCodeCoverage]
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection PostgresDbService(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddInfra(this IServiceCollection services,
+    IConfiguration configuration)
     {
-        services.AddDbContextPool<ProductPgDbContext>(opt =>
-                                                      opt.UseNpgsql(configuration.GetConnectionString("DefaultConnection")));
+        services.ConfigureFluentMigration(configuration);
+        services.AddKeycloakServices(configuration);
+        services.AddAzureBlobServices(configuration);
+        services.AddOpenTelemetryServices(configuration);
+        services.MongoDbService(configuration);
+        services.AddMassTransitSetup(configuration);
 
         return services;
     }
@@ -24,7 +38,7 @@ public static class ServiceCollectionExtensions
         var migrationService =  new ServiceCollection().AddFluentMigratorCore()
               .ConfigureRunner(rb => rb
               .AddPostgres15_0()
-              .WithGlobalConnectionString(configuration.GetConnectionString("DefaultConnection"))// Set the connection string
+              .WithGlobalConnectionString(configuration.GetConnectionString("PostgresConnection"))// Set the connection string
               .ScanIn(Assembly.GetExecutingAssembly()).For.Migrations()) // Define the assembly containing the migrations
               .AddLogging(lb => lb.AddFluentMigratorConsole()) // Enable logging to console in the FluentMigrator way
               .BuildServiceProvider(false);
@@ -51,7 +65,7 @@ public static class ServiceCollectionExtensions
 
     private static void EnsureDatabaseExists(IConfiguration configuration)
     {
-        var defaultConnectionString = configuration.GetConnectionString("DefaultConnection");
+        var defaultConnectionString = configuration.GetConnectionString("PostgresConnection");
         var connectionStringWithoutDatabase = RemoveDatabaseFromConnectionString(defaultConnectionString);
 
         using (var connection = new NpgsqlConnection(connectionStringWithoutDatabase))
@@ -81,21 +95,70 @@ public static class ServiceCollectionExtensions
         return builder.ToString();
     }
 
-    private static void RollbackMigration(IMigrationRunner runner, long targetVersion)
+    public static void AddKeycloakServices(this IServiceCollection services, IConfiguration configuration)
     {
-        // Reverte para a versão especificada
-        runner.MigrateDown(targetVersion);
+        var authenticationOptions = configuration
+                    .GetSection(KeycloakAuthenticationOptions.Section)
+                    .Get<KeycloakAuthenticationOptions>();
+
+        var metaDataConfig = configuration.GetSection("Keycloak:MetadataAddress");
+
+        services.AddKeycloakAuthentication(authenticationOptions!, options =>
+        {
+            options.MetadataAddress = metaDataConfig.Value!;
+            options.RequireHttpsMetadata = false;
+        });
+
+
+        var authorizationOptions = configuration
+                                    .GetSection(KeycloakProtectionClientOptions.Section)
+                                    .Get<KeycloakProtectionClientOptions>();
+
+        services.AddKeycloakAuthorization(authorizationOptions!);
     }
 
-    private static void RollbackAllMigrations(IMigrationRunner runner)
+
+    public static void AddAzureBlobServices(this IServiceCollection services, IConfiguration configuration)
     {
-        // Reverte todas as migrações
-        runner.MigrateDown(0);
+        services.Configure<BlobContainers>(configuration.GetSection("BlobContainers"));
+
+        services.AddSingleton(provider =>
+        {
+            var blobContainers = provider.GetRequiredService<IOptions<BlobContainers>>().Value;
+            return new BlobServiceClient(blobContainers.ConnectionStrings);
+        });
+
     }
 
-    private static void RollbackLastMigrations(IMigrationRunner runner, int steps)
+    public static void AddOpenTelemetryServices(this IServiceCollection services, IConfiguration configuration)
     {
-        // Reverte as últimas 'steps' migrações
-        runner.Rollback(steps);
+        var jaegerConfig = configuration.GetSection("OpenTelemetry");
+        var serviceName = jaegerConfig.GetValue<string>("ServiceName");
+        var jaegerHost = jaegerConfig.GetValue<string>("Jaeger:AgentHost");
+        var jaegerPort = jaegerConfig.GetValue<int>("Jaeger:AgentPort");
+
+
+        services.AddOpenTelemetry()
+        .ConfigureResource(resource => resource.AddService(serviceName))
+        .WithTracing(builder =>
+        {
+            builder
+                .AddAspNetCoreInstrumentation()
+                .AddHttpClientInstrumentation()
+                  .AddJaegerExporter(options =>
+                  {
+                      options.AgentHost = jaegerHost;
+                      options.AgentPort = jaegerPort;
+                  });
+        });
+
+    }
+
+    public static IServiceCollection MongoDbService(this IServiceCollection services,
+    IConfiguration configuration)
+    {
+        services.AddEasyMongoNet(configuration);
+
+        return services;
     }
 }

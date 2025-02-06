@@ -1,14 +1,17 @@
-﻿using AutoMapper;
-using Basket.Api.Abstractions;
+﻿using Basket.Api.Abstractions;
 using Basket.Api.Dtos;
-using Basket.Api.Events;
+using Basket.Api.Extensions;
 using Basket.Domain.Abstractions;
 using Basket.Domain.Entities;
-using MassTransit;
+using Message.Broker.RabbitMq;
+using Message.Broker.RabbitMq.Configurations;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Options;
 using ResultNet;
 using Serilog;
+using Shared.Kernel.Utils;
 using System.Diagnostics.CodeAnalysis;
+using System.Text.Json;
 
 namespace Basket.Api.Services;
 
@@ -17,22 +20,22 @@ public class CartService : ICartService
 {
     private readonly ICartRepository _cartRepository;
     private readonly ICacheService _cacheService;
-    private readonly IMapper _mapper;
-    private readonly IPublishEndpoint _publishedMessage;
     private readonly IDiscountApi _discountApi;
+    private readonly RabbitMqConfig _rabbitMqOptions;
 
     public CartService(ICartRepository cartRepository,
         ICacheService cacheService,
-        IMapper mapper,
-        IPublishEndpoint publishedMessage,
-        IDiscountApi discountApi)
+        IDiscountApi discountApi,
+        IOptions<RabbitMqConfig> options)
     {
         _cartRepository = cartRepository;
         _cacheService = cacheService;
-        _mapper = mapper;
-        _publishedMessage = publishedMessage;
         _discountApi = discountApi;
+
+        _rabbitMqOptions = new RabbitMqConfig();
+        _rabbitMqOptions = options.Value;
     }
+
 
     [ExcludeFromCodeCoverage]
     private DistributedCacheEntryOptions Expiration => new()
@@ -77,7 +80,7 @@ public class CartService : ICartService
 
     public async Task<Result<bool>> SaveOrUpdateCartAsync(CartDto cartDto)
     {
-        var cart = _mapper.Map<Cart>(cartDto);
+        var cart = cartDto.ToCart();
 
         var cacheKey = $"cart:{cart.CustomerId}";
 
@@ -95,23 +98,28 @@ public class CartService : ICartService
 
         if (result is not null)
         {
-            return await Result<bool>.SuccessAsync("product saved");
+            return await Result<bool>.SuccessAsync("cart saved");
         }
         else
         {
-            return await Result<bool>.FailureAsync("An error occour while attempt to save product.");
+            return await Result<bool>.
+                FailureAsync("An error occour while attempt to save product.");
         }
     }
 
-    public async Task<Result<bool>> CheckoutAsync(CartCheckoutDto checkoutDto)
+    public async Task<Result<bool>> CheckoutAsync(CartDto checkoutDto)
     {
         try
-        {
-            var checkout = _mapper.Map<BasketCheckoutEvent>(checkoutDto);
+        { 
+            var instance = RabbitMqSingleton.GetInstance(_rabbitMqOptions.Host);
 
-            await _publishedMessage.Publish<BasketCheckoutEvent>(checkout);
+            var orderCreated = checkoutDto.ToCheckoutEvent();
+            orderCreated.PaymentToken = PaymentTokenService.GenerateToken();
 
-            return await Result<bool>.SuccessAsync(true);
+            var messageEndpoint = await instance.Bus.GetSendEndpoint(new Uri($"queue:{_rabbitMqOptions.Prefix}{QueueConfig.OrderCreatedMessage}"));
+            await messageEndpoint.Send(orderCreated);
+
+            return await Result<bool>.SuccessAsync("order sent to queue");
         }
         catch (Exception ex)
         {
@@ -121,18 +129,24 @@ public class CartService : ICartService
 
     }
 
-    public async Task<Result<CartCheckoutDto>> ApplyDiscountAsync(CartCheckoutDto cartCheckout)
+    public async Task<Result<CartDto>> ApplyDiscountAsync(CartDto cartDto)
     {
-        var response = await _discountApi.ApplyDiscountAsync(cartCheckout.CouponCode, cartCheckout.TotalPrice);
 
-        if(response.IsSuccessStatusCode)
+        var response = await _discountApi.
+                            ApplyDiscountAsync(cartDto.CouponCode!,
+                            cartDto.TotalPrice);
+
+       
+
+        if (response.IsSuccessStatusCode && response.Content!.Succeed)
         {
-            cartCheckout.TotalPrice -= response.Content.TotalDiscount;
-            return await Result<CartCheckoutDto>.SuccessAsync(cartCheckout);
+            cartDto.SetDiscount(response.Content!.TotalDiscount);
+            return await Result<CartDto>.SuccessAsync(cartDto);
         }
         else
         {
-            return await Result<CartCheckoutDto>.FailureAsync("An error occour while attempt to apply discount.");
+            var error = JsonSerializer.Deserialize<DiscountResponse>(response.Error.Content);
+            return await Result<CartDto>.FailureAsync(error.Message);
         }
 
     }

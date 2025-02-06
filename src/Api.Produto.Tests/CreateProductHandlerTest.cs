@@ -1,8 +1,9 @@
-using Domain.Handlers.Comands;
 using Domain.Interfaces;
 using Moq;
+using Product.Application.Comands.Product;
+using Product.Application.Handlers.Product;
 using Product.Domain.Abstractions;
-using Product.Domain.Handlers;
+using RepoPgNet;
 
 //https://goatreview-com.cdn.ampproject.org/c/s/goatreview.com/mediatr-quickly-test-handlers-with-unit-tests/amp/
 
@@ -10,7 +11,7 @@ namespace Product.Api.Tests;
 
 public class CreateProductHandlerTest : BaseConfig
 {
-    private readonly Mock<IRepository<Product.Domain.Models.Product>> _repository;
+    private readonly Mock<IPgRepository<Domain.Models.Product>> _repository;
     private readonly Mock<IProductService> _productService;
     private readonly Mock<IBobStorageService> _bobStorageService;
     private readonly CreateProductHandler _handler;
@@ -18,7 +19,7 @@ public class CreateProductHandlerTest : BaseConfig
     {
         InitializeMediatrService();
 
-        _repository = new Mock<IRepository<Product.Domain.Models.Product>>();
+        _repository = new Mock<IPgRepository<Domain.Models.Product>>();
         _productService = new Mock<IProductService>();
         _bobStorageService = new Mock<IBobStorageService>();
         _handler = new CreateProductHandler(_repository.Object, _bobStorageService.Object, _productService.Object);
@@ -42,7 +43,7 @@ public class CreateProductHandlerTest : BaseConfig
         // Act
         Assert.True(result.Succeeded);
 
-        _repository.Verify(r => r.Add(It.IsAny<Product.Domain.Models.Product>()), Times.Once);
+        _repository.Verify(r => r.AddAsync(It.IsAny<Domain.Models.Product>()), Times.Once);
     }
 
     [Fact(DisplayName = "Teste 02 - Com Falha")]
@@ -57,6 +58,6 @@ public class CreateProductHandlerTest : BaseConfig
 
         // Act
         Assert.False(result.Succeeded);
-        _repository.Verify(r => r.Add(It.IsAny<Product.Domain.Models.Product>()), Times.Never);
+        _repository.Verify(r => r.AddAsync(It.IsAny<Domain.Models.Product>()), Times.Never);
     }
 }

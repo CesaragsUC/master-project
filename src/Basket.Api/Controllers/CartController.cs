@@ -44,9 +44,9 @@ public class CartController : ControllerBase
     [Route("checkout")]
     [ProducesResponseType(typeof(Result<Cart?>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Result<Cart?>), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Checkout(CartCheckoutDto checkoutDto)
+    public async Task<IActionResult> Checkout(CartDto cartDto)
     {
-        var response = await _cartService.CheckoutAsync(checkoutDto);
+        var response = await _cartService.CheckoutAsync(cartDto);
         return response.Succeeded ? Ok(response) : BadRequest(response);
     }
 
@@ -54,9 +54,9 @@ public class CartController : ControllerBase
     [Route("discount")]
     [ProducesResponseType(typeof(Result<Cart?>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Result<Cart?>), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Discount(CartCheckoutDto checkoutDto)
+    public async Task<IActionResult> Discount(CartDto cart)
     {
-        var discountResult = await _cartService.ApplyDiscountAsync(checkoutDto);
+        var discountResult = await _cartService.ApplyDiscountAsync(cart);
         return discountResult.Succeeded ? Ok(discountResult) : BadRequest(discountResult);
     }
 }

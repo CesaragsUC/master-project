@@ -1,23 +1,22 @@
 ﻿using Bogus;
-using MassTransit;
-using Messaging.Contracts.Events.Product;
+using Message.Broker.RabbitMq;
+using Microsoft.Extensions.Options;
 using Moq;
+using Product.Application.Services;
 using Product.Domain.Abstractions;
 using Product.Domain.Events;
-using Product.Domain.Models;
-using Product.Services;
 
 namespace Product.Api.Tests;
 
 public class PublishProductAddedEventTest
 {
-    private readonly Mock<IPublishEndpoint> _publish;
+    private readonly Mock<IOptions<RabbitMqConfig>> _rabbitMqOptions;
 
     private readonly IProductService _productService;
     public PublishProductAddedEventTest()
     {
-        _publish = new Mock<IPublishEndpoint>();
-        _productService = new ProductService(_publish.Object);
+        _rabbitMqOptions = new Mock<IOptions<RabbitMqConfig>>();
+        _productService = new ProductService(_rabbitMqOptions.Object);
     }
 
     [Fact(DisplayName = "Teste 1 - Send product created to queue ")]
@@ -35,8 +34,6 @@ public class PublishProductAddedEventTest
             ImageUri = faker.Image.PicsumUrl(),
             CreatAt = DateTime.Now
         };
-
-        _publish.Setup(x => x.Publish<ProductAddedEvent>(It.IsAny<ProductAddedEvent>(), default));
 
         await _productService.PublishProductAddedEvent(productCreated);
 
@@ -58,10 +55,6 @@ public class PublishProductAddedEventTest
             CreatAt = DateTime.Now
         };
 
-        _publish
-       .Setup(x => x.Publish(It.IsAny<ProductAddedEvent>(), default))
-       .ThrowsAsync(new Exception("Error to send saved product to Queue"));
-
         // Act & Assert
         var exception = await Assert.ThrowsAsync<Exception>(() => _productService.PublishProductAddedEvent(productCreated));
         Assert.Equal("Error to send saved product to Queue", exception.Message);
@@ -80,8 +73,6 @@ public class PublishProductAddedEventTest
             ProductId = Guid.NewGuid().ToString()
         };
 
-        _publish.Setup(x => x.Publish<ProductDeletedEvent>(It.IsAny<ProductDeletedEvent>(), default));
-
         await _productService.PublishProductDeletedEvent(productDeleted);
     }
 
@@ -95,11 +86,6 @@ public class PublishProductAddedEventTest
         {
             ProductId = Guid.NewGuid().ToString()
         };
-
-
-        _publish
-        .Setup(x => x.Publish(It.IsAny<ProductDeletedEvent>(), default))
-        .ThrowsAsync(new Exception("Error to send deleted product to Queue"));
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<Exception>(() => _productService.PublishProductDeletedEvent(productDeleted));
@@ -122,8 +108,6 @@ public class PublishProductAddedEventTest
 
         };
 
-        _publish.Setup(x => x.Publish<ProductUpdatedEvent>(It.IsAny<ProductUpdatedEvent>(), default));
-
         await _productService.PublishProductUpdatedEvent(productUpdated);
     }
 
@@ -142,10 +126,6 @@ public class PublishProductAddedEventTest
             ImageUri = faker.Image.PicsumUrl(),
 
         };
-
-        _publish
-        .Setup(x => x.Publish(It.IsAny<ProductUpdatedEvent>(), default))
-        .ThrowsAsync(new Exception("Error to send updated product to Queue"));
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<Exception>(() => _productService.PublishProductUpdatedEvent(productUpdated));

@@ -1,9 +1,9 @@
-﻿using Domain.Handlers.Comands;
-using Domain.Interfaces;
-using MediatR;
+﻿using MediatR;
 using Moq;
+using Product.Application.Comands.Product;
+using Product.Application.Handlers.Product;
 using Product.Domain.Abstractions;
-using Product.Domain.Handlers;
+using RepoPgNet;
 using System.Linq.Expressions;
 
 
@@ -12,7 +12,7 @@ namespace Product.Api.Tests;
 public class DeleteProductHandlerTest : BaseConfig
 {
 
-    private readonly Mock<IRepository<Product.Domain.Models.Product>> _repository;
+    private readonly Mock<IPgRepository<Domain.Models.Product>> _repository;
     private readonly Mock<IMediator> _mediator;
     private readonly Mock<IProductService> _productService;
     private DeleteProductHandler _handler;
@@ -20,7 +20,7 @@ public class DeleteProductHandlerTest : BaseConfig
     {
         InitializeMediatrService();
 
-        _repository = new Mock<IRepository<Product.Domain.Models.Product>>();
+        _repository = new Mock<IPgRepository<Domain.Models.Product>>();
         _mediator = new Mock<IMediator>();
         _productService = new Mock<IProductService>();
 
@@ -36,11 +36,11 @@ public class DeleteProductHandlerTest : BaseConfig
 
         // Configura o callback para o método FindOne
         _repository.Setup(r => r.FindOne(It.IsAny<Expression<Func<Product.Domain.Models.Product, bool>>>(), null))
-                   .Callback<Expression<Func<Product.Domain.Models.Product, bool>>, FindOptions?>((predicate, options) =>
+                   .Callback<Expression<Func<Domain.Models.Product, bool>>, FindOptions?>((predicate, options) =>
                    { })
-                   .Returns<Expression<Func<Product.Domain.Models.Product, bool>>, FindOptions?>((predicate, options) =>
+                   .Returns<Expression<Func<Domain.Models.Product, bool>>, FindOptions?>((predicate, options) =>
                    {
-                       var product = new Product.Domain.Models.Product
+                       var product = new Domain.Models.Product
                        {
                            Id = command.Id,
                            Name = "Produtos Teste",
@@ -53,8 +53,8 @@ public class DeleteProductHandlerTest : BaseConfig
                    });
 
 
-        _repository.Setup(r => r.Delete(It.IsAny<Product.Domain.Models.Product>()))
-           .Callback<Product.Domain.Models.Product>(p =>
+        _repository.Setup(r => r.DeleteAsync(It.IsAny<Domain.Models.Product>()))
+           .Callback<Domain.Models.Product>(p =>
            { })
            .Returns(Task.CompletedTask);
 
@@ -62,8 +62,8 @@ public class DeleteProductHandlerTest : BaseConfig
 
         // Act
         Assert.True(result.Succeeded);
-        _repository.Verify(r => r.FindOne(It.IsAny<Expression<Func<Product.Domain.Models.Product, bool>>>(), null), Times.Once);
-        _repository.Verify(r => r.Delete(It.IsAny<Product.Domain.Models.Product>()), Times.Once);
+        _repository.Verify(r => r.FindOne(It.IsAny<Expression<Func<Domain.Models.Product, bool>>>(), null), Times.Once);
+        _repository.Verify(r => r.DeleteAsync(It.IsAny<Domain.Models.Product>()), Times.Once);
     }
 
     [Fact(DisplayName = "Teste 02 - Deletar com erro")]
@@ -80,6 +80,6 @@ public class DeleteProductHandlerTest : BaseConfig
         // Act
         Assert.False(result.Succeeded);
         _repository.Verify(r => r.FindOne(It.IsAny<Expression<Func<Product.Domain.Models.Product, bool>>>(), null), Times.Never);
-        _repository.Verify(r => r.Delete(It.IsAny<Product.Domain.Models.Product>()), Times.Never);
+        _repository.Verify(r => r.DeleteAsync(It.IsAny<Product.Domain.Models.Product>()), Times.Never);
     }
 }

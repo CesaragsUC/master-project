@@ -1,8 +1,8 @@
 ﻿using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
 using Domain.Interfaces;
-using Infrastructure.Configurations;
 using Microsoft.Extensions.Options;
+using Product.Infrastructure.Configurations.Azure;
 using Serilog;
 
 namespace Infrastructure.Services

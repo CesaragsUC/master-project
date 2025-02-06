@@ -1,6 +1,6 @@
 ﻿using Basket.Domain.Abstractions;
 using Basket.Domain.Entities;
-using MongoRepoNet;
+using EasyMongoNet.Abstractions;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Basket.Infrastructure.Repository;
@@ -17,22 +17,21 @@ public class CartRepository : ICartRepository
 
     public async Task UpsertAsync(Cart cart)
     {
-       await _repository.UpsertAsync(nameof(cart.CustomerId),cart);
+       await _repository.UpsertAsync(x=> x.CustomerId!.Equals(cart.CustomerId), cart);
     }
 
     public async Task DeleteAsync(Guid customerId)
     {
-        await _repository.DeleteAsync("CustomerId", customerId);
+        await _repository.DeleteOneAsync(x=> x.CustomerId!.Equals(customerId.ToString()));
     }
 
     public async Task<Cart?> GetAsync(Guid customerId)
     {
-       var teste = await _repository.GetByIdAsync("CustomerId", customerId);
-        return teste;
+        return await _repository.FindOneAsync(x => x.CustomerId!.Equals(customerId.ToString()));
     }
 
     public async Task UpdateAsync(Cart cart)
     {
-        await _repository.UpdateAsync("CustomerId", cart);
+        await _repository.UpdateAsync(cart);
     }
 }
