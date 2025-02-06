@@ -39,13 +39,13 @@ public class PaymentConsumer : IConsumer<PaymentCreatedEvent>
                 throw new InvalidPaymentTokenException("Invalid payment token");
             }
 
-            bool paymentSuccess = new Random().Next(0, 2) == 1;
+            bool paymentSuccess = Random.Shared.Next(0, 2) == 1;
 
             if (paymentSuccess)
             {
                 var paymentSucceedMessage = new PaymentConfirmedEvent()
                 {
-                    PaymentToken = context.Message.PaymentToken,
+                    PaymentToken = context!.Message.PaymentToken,
                     OrderId = context.Message.OrderId,
                     Amount = context.Message.Amount,
                     PaymentDate = context.Message.PaymentDate,
@@ -60,7 +60,7 @@ public class PaymentConsumer : IConsumer<PaymentCreatedEvent>
 
                 var paymentFailedMessage = new PaymentFailedEvent()
                 {
-                    PaymentToken = context.Message.PaymentToken,
+                    PaymentToken = context!.Message.PaymentToken,
                     OrderId = context.Message.OrderId,
                     Amount = context.Message.Amount,
                     PaymentDate = context.Message.PaymentDate,

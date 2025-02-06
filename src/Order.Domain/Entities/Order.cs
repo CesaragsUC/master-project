@@ -1,10 +1,11 @@
 ﻿
 
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Order.Domain.Entities;
 
-
+[ExcludeFromCodeCoverage]
 public class Order
 {
     [Key]

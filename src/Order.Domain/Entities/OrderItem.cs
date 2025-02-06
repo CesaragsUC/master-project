@@ -1,10 +1,12 @@
 ﻿
 
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace Order.Domain.Entities;
 
+[ExcludeFromCodeCoverage]
 public class OrderItem
 {
     [Key]
