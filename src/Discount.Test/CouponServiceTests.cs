@@ -31,7 +31,7 @@ public class CouponServiceTests
         var discountRequest = new DiscountRequest { Code = null, Total = 0 };
         var result = await _couponService.ApplyDiscount(discountRequest);
         Assert.False(result.Succeed);
-        Assert.Equal("Invalid request", result.Message);
+        Assert.Equal("Code or purchase value can't be null", result.Message);
     }
 
     [Fact(DisplayName = "Test 2  apply discount valid request returns success")]
