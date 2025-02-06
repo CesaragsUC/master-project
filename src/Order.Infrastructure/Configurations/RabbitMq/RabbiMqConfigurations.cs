@@ -1,15 +1,17 @@
 ﻿using MassTransit;
 using Message.Broker.RabbitMq;
-using Message.Broker.RabbitMq.Configurations;
 using Messaging.Contracts.Events.Orders;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Order.Domain.Execeptions;
+using Order.Infrastructure.Configurations.RabbitMq;
 using Order.Infrastructure.Consumers;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Authentication;
 
 namespace Product.Consumer.Configurations;
 
+[ExcludeFromCodeCoverage]
 public static class RabbiMqConfigurations
 {
     public static IServiceCollection AddMassTransitSetup(
@@ -40,7 +42,7 @@ public static class RabbiMqConfigurations
 
 
                 cfg.ConfigureEndpoint<OrderConsumer>(context,
-                    GetRabbitEndpointConfig(nameof(OrderCreatedEvent), $"{rabbitMqOptions.Prefix}{QueueConfig.OrderCreatedMessage}"));
+                    GetRabbitEndpointConfig(nameof(OrderCreatedEvent), $"{rabbitMqOptions.Prefix}{QueueEndPointConfig.OrderCreatedMessage}"));
 
             });
 

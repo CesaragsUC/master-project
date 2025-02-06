@@ -1,8 +1,10 @@
 ﻿using Application.Dtos.Dtos.Payments;
 using Billing.Domain.Entities;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Billing.Service.Extentions;
 
+[ExcludeFromCodeCoverage]
 public static class PaymentExtentions
 {
     public static Payment ToPayment(this PaymentCreatDto payment)

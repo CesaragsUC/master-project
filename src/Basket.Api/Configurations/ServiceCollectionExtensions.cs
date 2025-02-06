@@ -1,15 +1,19 @@
 ﻿using Basket.Api.Abstractions;
+using Basket.Api.RabbitMq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Refit;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Basket.Api.Configurations;
 
+[ExcludeFromCodeCoverage]
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddServices(this IServiceCollection services, IConfiguration configuration)
     {
         AddRefitConfig(services, configuration);
+        services.AddScoped<IQueueService, QueueService>();
         return services;
     }
 

@@ -3,10 +3,11 @@ using MediatR;
 using Messaging.Contracts.Events.Checkout;
 using Messaging.Contracts.Events.Orders;
 using Serilog;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Order.Infrastructure.Consumers;
 
-
+[ExcludeFromCodeCoverage]
 public class OrderConsumer : IConsumer<CheckoutEvent>
 {
     private readonly IMediator _mediator;

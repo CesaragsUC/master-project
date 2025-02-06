@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using Billing.Domain.Execeptions;
+using Billing.Infrastructure.Configurations.RabbitMq;
 using MassTransit;
+using Message.Broker.Abstractions;
 using Message.Broker.RabbitMq;
-using Message.Broker.RabbitMq.Configurations;
 using Messaging.Contracts.Events.Payments;
 using Microsoft.Extensions.Options;
 using Serilog;
@@ -15,14 +17,17 @@ namespace Billing.Infrastructure.Consumers;
 public class PaymentConsumer : IConsumer<PaymentCreatedEvent>
 {
     private readonly IMapper _mapper;
-    private readonly RabbitMqConfig _rabbitMqOptions;
+    private readonly IQueueService _queueService;
+    private readonly IRabbitMqService _rabbitMqService;
 
     public PaymentConsumer(IMapper mapper,
-        IOptions<RabbitMqConfig> options)
+        IOptions<RabbitMqConfig> options,
+        IQueueService queueService,
+        IRabbitMqService rabbitMqService)
     {
         _mapper = mapper;
-        _rabbitMqOptions = options.Value;
-        _rabbitMqOptions.Prefix = "dev.";//arrumar isso depoiis esta vindo null
+        _queueService = queueService;
+        _rabbitMqService = rabbitMqService;
     }
 
     public async Task Consume(ConsumeContext<PaymentCreatedEvent> context)
@@ -34,14 +39,10 @@ public class PaymentConsumer : IConsumer<PaymentCreatedEvent>
                 throw new InvalidPaymentTokenException("Invalid payment token");
             }
 
-            // Simular processamento de pagamento
             bool paymentSuccess = new Random().Next(0, 2) == 1;
 
             if (paymentSuccess)
             {
-                // Enviar para fila de pagamento autorizado payment.success.queue
-                var instance = RabbitMqSingleton.GetInstance(_rabbitMqOptions.Host);
-
                 var paymentSucceedMessage = new PaymentConfirmedEvent()
                 {
                     PaymentToken = context.Message.PaymentToken,
@@ -52,13 +53,10 @@ public class PaymentConsumer : IConsumer<PaymentCreatedEvent>
                     Status = (int)PaymentStatus.Complete
                 };
 
-                var messageEndpoint = await instance.Bus.GetSendEndpoint(new Uri($"queue:{_rabbitMqOptions.Prefix}{QueueConfig.PaymentConfirmedMessage}"));
-                await messageEndpoint.Send(paymentSucceedMessage);
+                await _rabbitMqService.Send(paymentSucceedMessage, _queueService.PaymentConfirmedMessage);
             }
             else
             {
-                // Enviar para fila de pagamento falho payment.failed.queue
-                var instance = RabbitMqSingleton.GetInstance(_rabbitMqOptions.Host);
 
                 var paymentFailedMessage = new PaymentFailedEvent()
                 {
@@ -70,8 +68,7 @@ public class PaymentConsumer : IConsumer<PaymentCreatedEvent>
                     Status = (int)PaymentStatus.Failed
                 };
 
-                var messageEndpoint = await instance.Bus.GetSendEndpoint(new Uri($"queue:{_rabbitMqOptions.Prefix}{QueueConfig.PaymentFailedMessage}"));
-                await messageEndpoint.Send(paymentFailedMessage);
+                await _rabbitMqService.Send(paymentFailedMessage, _queueService.PaymentFailedMessage);
             }
         }
         catch (Exception ex)
@@ -80,12 +77,5 @@ public class PaymentConsumer : IConsumer<PaymentCreatedEvent>
         }
 
         await Task.CompletedTask;
-    }
-}
-
-public class InvalidPaymentTokenException : Exception
-{
-    public InvalidPaymentTokenException(string message) : base(message)
-    {
     }
 }

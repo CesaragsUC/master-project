@@ -1,5 +1,8 @@
-﻿namespace Order.Service.Dto;
+﻿using System.Diagnostics.CodeAnalysis;
 
+namespace Order.Service.Dto;
+
+[ExcludeFromCodeCoverage]
 public sealed record class CreateOrderDto
 {
     public Guid Id { get; set; } 

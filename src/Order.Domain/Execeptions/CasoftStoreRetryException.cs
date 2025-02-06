@@ -1,4 +1,8 @@
-﻿namespace Order.Domain.Execeptions;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Order.Domain.Execeptions;
+
+[ExcludeFromCodeCoverage]
 public class CasoftStoreRetryException : Exception
 {
     public CasoftStoreRetryException()

@@ -1,8 +1,10 @@
 ﻿using FluentValidation;
 using Product.Application.Comands.Product;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Product.Application.Validation;
 
+[ExcludeFromCodeCoverage]
 public class CreateProductCommandValidator : AbstractValidator<CreateProductCommand>
 {
     public CreateProductCommandValidator()

@@ -1,9 +1,8 @@
-﻿using Message.Broker.RabbitMq;
-using Message.Broker.RabbitMq.Configurations;
+﻿using Message.Broker.Abstractions;
 using Messaging.Contracts.Events.Product;
-using Microsoft.Extensions.Options;
 using Product.Domain.Abstractions;
 using Product.Domain.Events;
+using Product.Infrastructure.RabbitMq;
 using Serilog;
 using System.Diagnostics.CodeAnalysis;
 
@@ -12,20 +11,20 @@ namespace Product.Application.Services;
 [ExcludeFromCodeCoverage]
 public class ProductService : IProductService
 {
-    private readonly RabbitMqConfig _rabbitMqOptions;
+    private readonly IQueueService _queueService;
+    private readonly IRabbitMqService _rabbitMqService;
 
-    public ProductService(IOptions<RabbitMqConfig> options)
+    public ProductService(IQueueService queueService,
+        IRabbitMqService rabbitMqService)
     {
-        _rabbitMqOptions = new RabbitMqConfig();
-        _rabbitMqOptions = options.Value;
+        _queueService = queueService;
+        _rabbitMqService = rabbitMqService;
     }
 
     public async Task PublishProductAddedEvent(ProductAddedDomainEvent product)
     {
         try
         {
-            var instance = RabbitMqSingleton.GetInstance(_rabbitMqOptions.Host);
-
             var productCreated = new ProductAddedEvent
             {
                 ProductId = product.ProductId,
@@ -36,8 +35,8 @@ public class ProductService : IProductService
                 ImageUri = product.ImageUri
             };
 
-            var messageEndpoint = await instance.Bus.GetSendEndpoint(new Uri($"queue:{_rabbitMqOptions.Prefix}{QueueConfig.ProductCreatedMessage}"));
-            await messageEndpoint.Send(productCreated);
+            await _rabbitMqService.Send(productCreated, _queueService.ProductCreatedMessage);
+
         }
         catch (Exception ex)
         {
@@ -56,10 +55,7 @@ public class ProductService : IProductService
                 ProductId = product.ProductId,
             };
 
-            var instance = RabbitMqSingleton.GetInstance(_rabbitMqOptions.Host);
-
-            var messageEndpoint = await instance.Bus.GetSendEndpoint(new Uri($"queue:{_rabbitMqOptions.Prefix}{QueueConfig.ProductDeletedMessage}"));
-            await messageEndpoint.Send(productDeleted);
+            await _rabbitMqService.Send(productDeleted, _queueService.ProductDeletedMessage);
         }
         catch (Exception ex)
         {
@@ -81,10 +77,7 @@ public class ProductService : IProductService
                 ImageUri = product.ImageUri
             };
 
-            var instance = RabbitMqSingleton.GetInstance(_rabbitMqOptions.Host);
-
-            var messageEndpoint = await instance.Bus.GetSendEndpoint(new Uri($"queue:{_rabbitMqOptions.Prefix}{QueueConfig.ProductUpdatedMessage}"));
-            await messageEndpoint.Send(productUpdated);
+            await _rabbitMqService.Send(productUpdated, _queueService.ProductUpdatedMessage);
         }
         catch (Exception ex)
         {

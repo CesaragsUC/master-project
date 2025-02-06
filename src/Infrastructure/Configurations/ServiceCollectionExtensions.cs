@@ -3,6 +3,7 @@ using EasyMongoNet.Exntesions;
 using FluentMigrator.Runner;
 using Keycloak.AuthServices.Authentication;
 using Keycloak.AuthServices.Authorization;
+using Message.Broker.Configurations;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,6 +30,7 @@ public static class ServiceCollectionExtensions
         services.AddOpenTelemetryServices(configuration);
         services.MongoDbService(configuration);
         services.AddMassTransitSetup(configuration);
+        services.AddMassTransitFactory(configuration);
 
         return services;
     }

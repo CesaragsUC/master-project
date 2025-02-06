@@ -1,4 +1,8 @@
-﻿namespace Billing.Consumer.Execeptions;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Billing.Consumer.Execeptions;
+
+[ExcludeFromCodeCoverage]
 public class CasoftStoreRetryException : Exception
 {
     public CasoftStoreRetryException()

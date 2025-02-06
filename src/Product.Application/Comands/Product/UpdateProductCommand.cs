@@ -1,10 +1,12 @@
 ﻿using MediatR;
 using ResultNet;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
 namespace Product.Application.Comands.Product;
 
+[ExcludeFromCodeCoverage]
 public class UpdateProductCommand : IRequest<Result<bool>>
 {
     [JsonPropertyName("id")]

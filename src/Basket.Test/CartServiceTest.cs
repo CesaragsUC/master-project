@@ -1,16 +1,14 @@
 ﻿using Basket.Api.Abstractions;
 using Basket.Api.Dtos;
+using Basket.Api.RabbitMq;
 using Basket.Api.Services;
 using Basket.Domain.Abstractions;
 using Basket.Domain.Entities;
-using Message.Broker.RabbitMq;
+using Message.Broker.Abstractions;
 using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Options;
 using Moq;
 
-
 namespace Basket.Test;
-
 
 public class CartServiceTest
 {
@@ -18,20 +16,24 @@ public class CartServiceTest
     private readonly Mock<ICacheService> _cacheServiceMock;
     private readonly CartService _cartService;
     private readonly Mock<IDiscountApi> _discountApiMock;
-    private readonly Mock<IOptions<RabbitMqConfig>> _rabbitMqConfigMock;
+    private readonly Mock<IQueueService> _queueServiceMock;
+    private readonly Mock<IRabbitMqService> _rabbitmqServiceMock;
 
     public CartServiceTest()
     {
         _cartRepositoryMock = new Mock<ICartRepository>();
         _cacheServiceMock = new Mock<ICacheService>();
         _discountApiMock = new Mock<IDiscountApi>();
-        _rabbitMqConfigMock = new Mock<IOptions<RabbitMqConfig>>();
+        _queueServiceMock = new Mock<IQueueService>();
+        _rabbitmqServiceMock = new Mock<IRabbitMqService>();
 
         _cartService = new CartService(_cartRepositoryMock.Object,
             _cacheServiceMock.Object,
             _discountApiMock.Object,
-            _rabbitMqConfigMock.Object);
+            _queueServiceMock.Object,
+            _rabbitmqServiceMock.Object);
     }
+
 
     [Fact]
     [Trait("Basket.Services", "Cache Redis")]

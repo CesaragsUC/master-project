@@ -1,7 +1,9 @@
 ﻿using Message.Broker.RabbitMq;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Basket.Api.Configurations;
 
+[ExcludeFromCodeCoverage]
 public static class RabbiMqConfigurations
 {
     public static IServiceCollection AddMassTransitSetup(

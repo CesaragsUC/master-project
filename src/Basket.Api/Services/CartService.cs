@@ -1,10 +1,11 @@
 ﻿using Basket.Api.Abstractions;
 using Basket.Api.Dtos;
 using Basket.Api.Extensions;
+using Basket.Api.RabbitMq;
 using Basket.Domain.Abstractions;
 using Basket.Domain.Entities;
+using Message.Broker.Abstractions;
 using Message.Broker.RabbitMq;
-using Message.Broker.RabbitMq.Configurations;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Options;
 using ResultNet;
@@ -21,19 +22,20 @@ public class CartService : ICartService
     private readonly ICartRepository _cartRepository;
     private readonly ICacheService _cacheService;
     private readonly IDiscountApi _discountApi;
-    private readonly RabbitMqConfig _rabbitMqOptions;
+    private readonly IQueueService _queueService;
+    private readonly IRabbitMqService _rabbitMqService;
 
     public CartService(ICartRepository cartRepository,
         ICacheService cacheService,
         IDiscountApi discountApi,
-        IOptions<RabbitMqConfig> options)
+        IQueueService queueService,
+        IRabbitMqService rabbitMqService)
     {
         _cartRepository = cartRepository;
         _cacheService = cacheService;
         _discountApi = discountApi;
-
-        _rabbitMqOptions = new RabbitMqConfig();
-        _rabbitMqOptions = options.Value;
+        _queueService = queueService;
+        _rabbitMqService = rabbitMqService;
     }
 
 
@@ -111,13 +113,10 @@ public class CartService : ICartService
     {
         try
         { 
-            var instance = RabbitMqSingleton.GetInstance(_rabbitMqOptions.Host);
-
             var orderCreated = checkoutDto.ToCheckoutEvent();
             orderCreated.PaymentToken = PaymentTokenService.GenerateToken();
 
-            var messageEndpoint = await instance.Bus.GetSendEndpoint(new Uri($"queue:{_rabbitMqOptions.Prefix}{QueueConfig.OrderCreatedMessage}"));
-            await messageEndpoint.Send(orderCreated);
+            await _rabbitMqService.Send(orderCreated, _queueService.OrderCreatedMessage);
 
             return await Result<bool>.SuccessAsync("order sent to queue");
         }

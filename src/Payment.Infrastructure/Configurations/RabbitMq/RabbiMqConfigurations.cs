@@ -1,8 +1,9 @@
 ﻿using Billing.Consumer.Execeptions;
+using Billing.Infrastructure.Configurations.RabbitMq;
 using Billing.Infrastructure.Consumers;
 using MassTransit;
+using Message.Broker.Configurations;
 using Message.Broker.RabbitMq;
-using Message.Broker.RabbitMq.Configurations;
 using Messaging.Contracts.Events.Payments;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,7 +20,7 @@ public static class RabbiMqConfigurations
     {
 
         services.AddMassTransitSetup(configuration);
-
+        services.AddMassTransitFactory(configuration);
         return services;
     }
 
@@ -31,7 +32,6 @@ public static class RabbiMqConfigurations
 
         var rabbitMqOptions = new RabbitMqConfig();
         configuration.GetSection("RabbitMqTransportOptions").Bind(rabbitMqOptions);
-       // rabbitMqOptions.Prefix = "dev."; //arrumar isso depois esta vindo null
 
         services.AddMassTransit(x =>
         {
@@ -52,13 +52,13 @@ public static class RabbiMqConfigurations
 
 
                 cfg.ConfigureEndpoint<PaymentConsumer>(context,
-                    GetRabbitEndpointConfig(nameof(PaymentCreatedEvent), $"{rabbitMqOptions.Prefix}{QueueConfig.PaymentCreatedMessage}"));
+                    GetRabbitEndpointConfig(nameof(PaymentCreatedEvent), $"{rabbitMqOptions.Prefix}{QueueEndPointConfig.PaymentCreatedMessage}"));
 
                 cfg.ConfigureEndpoint<PaymentFailedConsumer>(context,
-                    GetRabbitEndpointConfig(nameof(PaymentFailedEvent), $"{rabbitMqOptions.Prefix}{QueueConfig.PaymentFailedMessage}"));
+                    GetRabbitEndpointConfig(nameof(PaymentFailedEvent), $"{rabbitMqOptions.Prefix}{QueueEndPointConfig.PaymentFailedMessage}"));
 
                 cfg.ConfigureEndpoint<PaymentConfirmedConsumer>(context,
-                     GetRabbitEndpointConfig(nameof(PaymentConfirmedEvent), $"{rabbitMqOptions.Prefix}{QueueConfig.PaymentConfirmedMessage}"));
+                     GetRabbitEndpointConfig(nameof(PaymentConfirmedEvent), $"{rabbitMqOptions.Prefix}{QueueEndPointConfig.PaymentConfirmedMessage}"));
 
             });
 

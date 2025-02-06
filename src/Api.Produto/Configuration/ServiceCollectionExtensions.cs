@@ -4,6 +4,7 @@ using Microsoft.OpenApi.Models;
 using Product.Application.Configurations;
 using Product.Application.Services;
 using Product.Domain.Abstractions;
+using Product.Infrastructure.RabbitMq;
 using ResultNet;
 
 namespace Product.Api.Configuration;
@@ -17,6 +18,7 @@ public static class ServiceCollectionExtensions
         services.AddProductServices(configuration);
         services.AddSwaggerServices();
         services.AddApplicationServices(configuration);
+        services.AddScoped<IQueueService, QueueService>();
 
     }
 

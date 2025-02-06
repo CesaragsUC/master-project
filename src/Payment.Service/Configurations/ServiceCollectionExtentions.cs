@@ -4,10 +4,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Refit;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace Billing.Service.Configurations;
 
+[ExcludeFromCodeCoverage]
 public static class ServiceCollectionExtentions
 {
     public static void AddRefitConfig(this IServiceCollection services, IConfiguration configuration)

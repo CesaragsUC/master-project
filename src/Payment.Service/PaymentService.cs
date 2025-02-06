@@ -1,13 +1,11 @@
 ﻿using Application.Dtos.Dtos.Payments;
 using AutoMapper;
 using Billing.Domain.Entities;
+using Billing.Infrastructure.Configurations.RabbitMq;
 using Billing.Service.Abstractions;
 using Billing.Service.Extentions;
-using MassTransit;
-using Message.Broker.RabbitMq;
-using Message.Broker.RabbitMq.Configurations;
+using Message.Broker.Abstractions;
 using Messaging.Contracts.Events.Payments;
-using Microsoft.Extensions.Options;
 using RepoPgNet;
 using ResultNet;
 using Shared.Kernel.Core.Enuns;
@@ -21,18 +19,21 @@ public class PaymentService : IPaymentService
 {
     private readonly IMapper _mapper;
     private readonly IPgRepository<Order> _repository;
-    private readonly RabbitMqConfig _rabbitMqOptions;
+    private readonly IQueueService _queueService;
     private readonly IOderApi _oderApi;
+    private readonly IRabbitMqService _rabbitMqService;
 
     public PaymentService(IMapper mapper,
         IPgRepository<Order> repository,
-        IOptions<RabbitMqConfig> options,
-        IOderApi oderApi)
+       IQueueService queueService,
+        IOderApi oderApi,
+        IRabbitMqService rabbitMqService)
     {
         _mapper = mapper;
         _repository = repository;
-        _rabbitMqOptions = options.Value;
+        _queueService = queueService;
         _oderApi = oderApi;
+        _rabbitMqService = rabbitMqService;
     }
 
 
@@ -71,10 +72,7 @@ public class PaymentService : IPaymentService
             }
         };
 
-        var instance = RabbitMqSingleton.GetInstance(_rabbitMqOptions.Host);
-
-        var messageEndpoint = await instance.Bus.GetSendEndpoint(new Uri($"queue:{_rabbitMqOptions.Prefix}{QueueConfig.PaymentCreatedMessage}"));
-        await messageEndpoint.Send(paymentCreated);
+        await _rabbitMqService.Send(paymentCreated, _queueService.PaymentCreatedMessage);
 
         return await Result<bool>.SuccessAsync("Payment created");
     }

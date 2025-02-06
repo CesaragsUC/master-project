@@ -1,10 +1,10 @@
 ﻿using MassTransit;
 using Message.Broker.RabbitMq;
-using Message.Broker.RabbitMq.Configurations;
 using Messaging.Contracts.Events.Product;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Product.Domain.Exceptions;
+using Product.Infrastructure.Configurations.RabbitMq;
 using Product.Infrastructure.Consumers;
 using System.Diagnostics.CodeAnalysis;
 using System.Security.Authentication;
@@ -45,13 +45,13 @@ public static class RabbiMqConfigurations
 
 
                 cfg.ConfigureEndpoint<ProductAddedConsumer>(context,
-                    GetRabbitEndpointConfig(nameof(ProductAddedEvent), $"{rabbitMqOptions.Prefix}{QueueConfig.ProductCreatedMessage}"));
+                    GetRabbitEndpointConfig(nameof(ProductAddedEvent), $"{rabbitMqOptions.Prefix}{QueueEndPointConfig.ProductCreatedMessage}"));
 
                 cfg.ConfigureEndpoint<ProdutctDeletedConsumer>(context,
-                    GetRabbitEndpointConfig(nameof(ProductDeletedEvent), $"{rabbitMqOptions.Prefix}{QueueConfig.ProductDeletedMessage}"));
+                    GetRabbitEndpointConfig(nameof(ProductDeletedEvent), $"{rabbitMqOptions.Prefix}{QueueEndPointConfig.ProductDeletedMessage}"));
 
                 cfg.ConfigureEndpoint<ProdutctUpdatedConsumer>(context,
-                    GetRabbitEndpointConfig(nameof(ProductUpdatedEvent), $"{rabbitMqOptions.Prefix}{QueueConfig.ProductUpdatedMessage}"));
+                    GetRabbitEndpointConfig(nameof(ProductUpdatedEvent), $"{rabbitMqOptions.Prefix}{QueueEndPointConfig.ProductUpdatedMessage}"));
 
             });
 

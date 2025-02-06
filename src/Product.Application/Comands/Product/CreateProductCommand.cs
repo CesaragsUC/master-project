@@ -2,9 +2,11 @@
 using MediatR;
 using System.ComponentModel.DataAnnotations;
 using ResultNet;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Product.Application.Comands.Product;
 
+[ExcludeFromCodeCoverage]
 public class CreateProductCommand : IRequest<Result<bool>>
 {
     public string? Name { get; set; }

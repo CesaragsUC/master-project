@@ -22,10 +22,6 @@ public class PaymentConfirmedEventHandler :
     {
         try
         {
-            //var order = _mapper.Map<Models.Order>(request);
-
-
-            //Log.Information("Order created: {Id} - {Date}", order.Id, DateTime.Now);
 
             return true;
         }

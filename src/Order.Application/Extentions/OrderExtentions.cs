@@ -1,8 +1,10 @@
 ﻿using Messaging.Contracts.Events.Orders;
 using Order.Domain.Entities;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Order.Application.Extentions;
 
+[ExcludeFromCodeCoverage]
 public static class OrderExtentions
 {
     public static Domain.Entities.Order ToOrder(this OrderCreatedEvent orderCreatedEvent)

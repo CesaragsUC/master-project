@@ -1,6 +1,7 @@
 using Billing.Api.Configurations;
 using Billing.Infrastructure;
 using Billing.Infrastructure.Configurations;
+using Billing.Infrastructure.Configurations.RabbitMq;
 using Billing.Infrastructure.RabbitMq;
 using Billing.Service;
 using Billing.Service.Configurations;
