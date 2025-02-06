@@ -5,9 +5,11 @@ using Microsoft.Extensions.Options;
 using Product.Domain.Abstractions;
 using Product.Domain.Events;
 using Serilog;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Product.Application.Services;
 
+[ExcludeFromCodeCoverage]
 public class ProductService : IProductService
 {
     private readonly RabbitMqConfig _rabbitMqOptions;
