@@ -3,9 +3,11 @@ using Basket.Domain.Entities;
 using Messaging.Contracts.Events.Checkout;
 using Shared.Kernel.Core.Enuns;
 using Shared.Kernel.Utils;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Basket.Api.Extensions;
 
+[ExcludeFromCodeCoverage]
 public static class CartExtenstions
 {
     public static Cart ToCart(this CartDto cartDto)

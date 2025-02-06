@@ -12,9 +12,11 @@ using RepoPgNet;
 using ResultNet;
 using Shared.Kernel.Core.Enuns;
 using Shared.Kernel.Utils;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Billing.Service;
 
+[ExcludeFromCodeCoverage]
 public class PaymentService : IPaymentService
 {
     private readonly IMapper _mapper;

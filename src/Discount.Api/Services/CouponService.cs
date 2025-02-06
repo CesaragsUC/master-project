@@ -4,14 +4,14 @@ using Discount.Domain.Abstractions;
 using Discount.Domain.Dtos;
 using Discount.Domain.Entities;
 using Discount.Domain.ValueObjects;
-using Microsoft.AspNetCore.Http.HttpResults;
 using RepoPgNet;
 using ResultNet;
 using Serilog;
-using static Azure.Core.HttpHeader;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Discount.Api.Services;
 
+[ExcludeFromCodeCoverage]
 public class CouponService : ICouponService
 {
     private readonly IPgRepository<Coupon> _repository;

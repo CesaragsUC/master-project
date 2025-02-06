@@ -1,5 +1,8 @@
-﻿namespace Messaging.Contracts.Events.Payments;
+﻿using System.Diagnostics.CodeAnalysis;
 
+namespace Messaging.Contracts.Events.Payments;
+
+[ExcludeFromCodeCoverage]
 public class PaymentCreatedEvent
 {
     public Guid OrderId { get; set; }

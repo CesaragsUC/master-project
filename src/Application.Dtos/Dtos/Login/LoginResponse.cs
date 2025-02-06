@@ -1,5 +1,8 @@
-﻿namespace Application.Dtos.Dtos.Login;
+﻿using System.Diagnostics.CodeAnalysis;
 
+namespace Application.Dtos.Dtos.Login;
+
+[ExcludeFromCodeCoverage]
 public record LoginResponse
 {
     public string? AccessToken { get; set; }

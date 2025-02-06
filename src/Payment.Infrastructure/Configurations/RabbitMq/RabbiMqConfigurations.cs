@@ -6,10 +6,12 @@ using Message.Broker.RabbitMq.Configurations;
 using Messaging.Contracts.Events.Payments;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Authentication;
 
 namespace Billing.Infrastructure.RabbitMq;
 
+[ExcludeFromCodeCoverage]
 public static class RabbiMqConfigurations
 {
 

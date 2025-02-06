@@ -2,9 +2,11 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Product.Application.Utils;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Product.Application.MongoEntities;
 
+[ExcludeFromCodeCoverage]
 [BsonCollection("Products")]
 public class Products : Document
 {

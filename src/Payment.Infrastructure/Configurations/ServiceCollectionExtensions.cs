@@ -1,5 +1,4 @@
 ﻿using FluentMigrator.Runner;
-using Message.Broker.RabbitMq;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;

@@ -1,8 +1,10 @@
 ﻿using Amazon.Runtime.Internal;
 using MediatR;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Messaging.Contracts.Events.Orders;
 
+[ExcludeFromCodeCoverage]
 public class OrderCreatedEvent : IRequest<bool>
 {
     public Guid CustomerId { get; set; }

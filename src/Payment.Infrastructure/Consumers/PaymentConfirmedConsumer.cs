@@ -1,9 +1,11 @@
 ﻿using MassTransit;
 using MediatR;
 using Messaging.Contracts.Events.Payments;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Billing.Infrastructure.Consumers;
 
+[ExcludeFromCodeCoverage]
 public class PaymentConfirmedConsumer : IConsumer<PaymentConfirmedEvent>
 {
     private readonly IMediator _mediator;

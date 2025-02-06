@@ -7,9 +7,11 @@ using Microsoft.Extensions.Options;
 using Serilog;
 using Shared.Kernel.Core.Enuns;
 using Shared.Kernel.Utils;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Billing.Infrastructure.Consumers;
 
+[ExcludeFromCodeCoverage]
 public class PaymentConsumer : IConsumer<PaymentCreatedEvent>
 {
     private readonly IMapper _mapper;

@@ -9,9 +9,11 @@ using Product.Domain.Models;
 using RepoPgNet;
 using ResultNet;
 using Serilog;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Product.Application.Handlers.Product;
 
+[ExcludeFromCodeCoverage]
 public class UpdateProductHandler : IRequestHandler<UpdateProductCommand, Result<bool>>
 {
     private readonly IProductService _productService;

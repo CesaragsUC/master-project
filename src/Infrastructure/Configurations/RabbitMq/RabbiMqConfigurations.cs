@@ -6,10 +6,12 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Product.Domain.Exceptions;
 using Product.Infrastructure.Consumers;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Authentication;
 
 namespace Product.Infrastructure.RabbitMq;
 
+[ExcludeFromCodeCoverage]
 public static class RabbiMqConfigurations
 {
     public static IServiceCollection AddMassTransitSetup(

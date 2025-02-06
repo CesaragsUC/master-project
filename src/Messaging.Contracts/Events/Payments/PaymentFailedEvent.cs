@@ -1,7 +1,9 @@
 ﻿using MediatR;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Messaging.Contracts.Events.Payments;
 
+[ExcludeFromCodeCoverage]
 public class PaymentFailedEvent : IRequest<bool>
 {
     public Guid OrderId { get; set; }

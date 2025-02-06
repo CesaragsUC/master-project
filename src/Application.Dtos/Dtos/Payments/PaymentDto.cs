@@ -1,5 +1,8 @@
-﻿namespace Application.Dtos.Dtos.Payments;
+﻿using System.Diagnostics.CodeAnalysis;
 
+namespace Application.Dtos.Dtos.Payments;
+
+[ExcludeFromCodeCoverage]
 public class PaymentDto 
 {
 

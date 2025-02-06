@@ -1,5 +1,8 @@
-﻿namespace Messaging.Contracts.Events.Orders;
+﻿using System.Diagnostics.CodeAnalysis;
 
+namespace Messaging.Contracts.Events.Orders;
+
+[ExcludeFromCodeCoverage]
 public class OrderItemDto
 {
 

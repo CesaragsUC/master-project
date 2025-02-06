@@ -1,7 +1,9 @@
 ﻿using MassTransit;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Message.Broker.RabbitMq;
 
+[ExcludeFromCodeCoverage]
 public class RabbitMqSingleton
 {
     private RabbitMqSingleton() { }

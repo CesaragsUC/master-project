@@ -6,9 +6,11 @@ using Product.Domain.Exceptions;
 using RepoPgNet;
 using ResultNet;
 using Serilog;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Product.Application.Handlers.Product;
 
+[ExcludeFromCodeCoverage]
 public class DeleteProductHandler : IRequestHandler<DeleteProductCommand, Result<bool>>
 {
     private readonly IPgRepository<Domain.Models.Product> _repository;

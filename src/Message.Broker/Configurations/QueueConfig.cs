@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Message.Broker.RabbitMq.Configurations;
 
+[ExcludeFromCodeCoverage]
 public static class QueueConfig
 {
     public static string PaymentCreatedMessage => $"casoft.payment.created.v1";

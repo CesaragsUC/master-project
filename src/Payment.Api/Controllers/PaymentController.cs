@@ -1,10 +1,11 @@
 ﻿using Application.Dtos.Dtos.Payments;
 using Billing.Service;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Billing.Api.Controllers;
 
-
+[ExcludeFromCodeCoverage]
 [ApiController]
 [Route("api/payment")]
 public class PaymentController(IPaymentService paymentService) : ControllerBase

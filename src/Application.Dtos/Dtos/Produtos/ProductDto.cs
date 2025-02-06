@@ -1,5 +1,8 @@
-﻿namespace Application.Dtos.Dtos.Produtos;
+﻿using System.Diagnostics.CodeAnalysis;
 
+namespace Application.Dtos.Dtos.Produtos;
+
+[ExcludeFromCodeCoverage]
 public record ProductDto
 {
     public string? ProductId { get; set; }

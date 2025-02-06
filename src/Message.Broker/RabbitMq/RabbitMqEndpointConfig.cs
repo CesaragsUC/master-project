@@ -1,8 +1,11 @@
-﻿namespace Message.Broker.RabbitMq;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Message.Broker.RabbitMq;
 
 /// <summary>
 /// RabbitMq Endpoint Configuration
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class RabbitMqEndpointConfig
 {
     public string? QueueName { get; set; }
