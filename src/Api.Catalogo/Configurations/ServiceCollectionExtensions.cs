@@ -1,11 +1,10 @@
 ﻿using Application.Dtos.Abstractions;
 using Application.Dtos.Dtos.Response;
 using Azure.Storage.Blobs;
+using Catalog.Application.Abstractions;
+using Catalog.Application.Services;
 using Catalog.Infrastructure.Configurations;
 using Catalog.Infrastructure.Repository;
-using Catalog.Service.Abstractions;
-using Catalog.Service.Services;
-using Catalog.Services.Abstractions;
 using EasyMongoNet.Exntesions;
 using Keycloak.AuthServices.Authentication;
 using Keycloak.AuthServices.Authorization;

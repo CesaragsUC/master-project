@@ -1,8 +1,8 @@
-using Order.Api.Configurations;
-using Order.Application.Abstractions;
-using Order.Application.Service;
-using Order.Infrastructure;
-using Order.Infrastructure.Configurations;
+using Billing.Api.Configurations;
+using Billing.Application.Service;
+using Billing.Infrastructure;
+using Billing.Infrastructure.Configurations;
+using Billing.Infrastructure.RabbitMq;
 using RepoPgNet;
 using System.Reflection;
 
@@ -11,15 +11,16 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddRepoPgNet<OrderDbContext>(builder.Configuration);
 builder.Services.ConfigureFluentMigration(builder.Configuration);
-builder.Services.AddScoped<IOrderService,OrderService>();
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
-builder.Services.AddServices();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddRepoPgNet<BillingContext>(builder.Configuration);
+builder.Services.AddServices(builder.Configuration);
 builder.Services.AddInfra(builder.Configuration);
+
 
 var app = builder.Build();
 

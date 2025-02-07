@@ -114,7 +114,7 @@ public class CartService : ICartService
             var orderCreated = checkoutDto.ToCheckoutEvent();
             orderCreated.PaymentToken = PaymentTokenService.GenerateToken();
 
-            await _rabbitMqService.Send(orderCreated, _queueService.OrderCreatedMessage);
+            await _rabbitMqService.Send(orderCreated, _queueService.OrderCheckoutEventMessage);
 
             return await Result<bool>.SuccessAsync("order sent to queue");
         }

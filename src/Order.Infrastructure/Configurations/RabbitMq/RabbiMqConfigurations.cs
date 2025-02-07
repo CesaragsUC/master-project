@@ -13,7 +13,7 @@ public static class RabbiMqConfigurations
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddMassTransitSetupConfig(configuration, typeof(OrderConsumer));
+        services.AddMassTransitSetupConfig(configuration, typeof(OrderCheckoutConsumer));
 
         return services;
     }

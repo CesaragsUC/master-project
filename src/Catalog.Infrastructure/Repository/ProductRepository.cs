@@ -1,7 +1,6 @@
-﻿using Catalog.Domain.Abstractions;
+﻿using Catalog.Application.Abstractions;
+using Catalog.Application.Filters;
 using Catalog.Domain.Models;
-using Catalog.Service.Abstractions;
-using Catalog.Services.Filters;
 using EasyMongoNet.Abstractions;
 using EasyMongoNet.Utils;
 using MongoDB.Bson;

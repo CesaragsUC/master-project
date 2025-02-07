@@ -13,6 +13,6 @@ public class QueueService : IQueueService
         _rabbitMqOptions = options.Value;
     }
 
-    public Uri OrderCreatedMessage => new Uri($"queue:{_rabbitMqOptions.Prefix}.casoft.order.created.v1");
+    public Uri OrderCheckoutEventMessage => new Uri($"queue:{_rabbitMqOptions.Prefix}.casoft.ordercheckout.event.v1");
     public Uri OrderDeletedMessage => new Uri($"queue:{_rabbitMqOptions.Prefix}.casoft.order.deleted.v1");
 }

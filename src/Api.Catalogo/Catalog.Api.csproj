@@ -33,9 +33,9 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\Application.Dtos\Application.Dtos.csproj" />
+	  <ProjectReference Include="..\Catalog.Application\Catalog.Application.csproj" />
 	  <ProjectReference Include="..\Catalog.Domain\Catalog.Domain.csproj" />
 	  <ProjectReference Include="..\Catalog.Infrastructure\Catalog.Infrastructure.csproj" />
-	  <ProjectReference Include="..\Catalog.Services\Catalog.Service.csproj" />
 	</ItemGroup>
 
 </Project>
