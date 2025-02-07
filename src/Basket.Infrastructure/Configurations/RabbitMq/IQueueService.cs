@@ -1,4 +1,4 @@
-﻿namespace Basket.Api.RabbitMq;
+﻿namespace Basket.Infrastructure.RabbitMq;
 
 public interface IQueueService
 {

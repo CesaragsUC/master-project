@@ -1,13 +1,11 @@
 ﻿using Basket.Api.Abstractions;
 using Basket.Api.Dtos;
 using Basket.Api.Extensions;
-using Basket.Api.RabbitMq;
 using Basket.Domain.Abstractions;
 using Basket.Domain.Entities;
+using Basket.Infrastructure.RabbitMq;
 using Message.Broker.Abstractions;
-using Message.Broker.RabbitMq;
 using Microsoft.Extensions.Caching.Distributed;
-using Microsoft.Extensions.Options;
 using ResultNet;
 using Serilog;
 using Shared.Kernel.Utils;

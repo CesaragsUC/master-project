@@ -29,8 +29,7 @@ public static class ServiceCollectionExtensions
         services.AddAzureBlobServices(configuration);
         services.AddOpenTelemetryServices(configuration);
         services.MongoDbService(configuration);
-        services.AddMassTransitSetup(configuration);
-        services.AddMassTransitFactory(configuration);
+        services.AddMessageBrokerSetup(configuration);
 
         return services;
     }

@@ -15,7 +15,7 @@ public static class ServiceCollectionExtensions
     public static void AddInfra(this IServiceCollection services, IConfiguration configuration)
     {
         services.ConfigureFluentMigration(configuration);
-        services.AddMassTransitSetup(configuration);
+        services.AddMessageBrokerSetup(configuration);
     }
     public static ServiceProvider ConfigureFluentMigration(this IServiceCollection services, IConfiguration configuration)
     {

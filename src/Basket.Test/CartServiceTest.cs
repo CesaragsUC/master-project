@@ -1,9 +1,9 @@
 ﻿using Basket.Api.Abstractions;
 using Basket.Api.Dtos;
-using Basket.Api.RabbitMq;
 using Basket.Api.Services;
 using Basket.Domain.Abstractions;
 using Basket.Domain.Entities;
+using Basket.Infrastructure.RabbitMq;
 using Message.Broker.Abstractions;
 using Microsoft.Extensions.Caching.Distributed;
 using Moq;

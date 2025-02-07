@@ -14,9 +14,9 @@ public class QueueService : IQueueService
         _rabbitMqOptions = options.Value;
     }
 
-    public Uri ProductCreatedMessage => new Uri($"queue:{_rabbitMqOptions.Prefix}.casoft.product.created.v1");
+    public Uri ProductCreatedMessage => new Uri($"queue:{_rabbitMqOptions.Prefix}.casoft.productadded.event.v1");
 
-    public Uri ProductUpdatedMessage => new Uri($"queue:{_rabbitMqOptions.Prefix}.casoft.product.updated.v1");
+    public Uri ProductUpdatedMessage => new Uri($"queue:{_rabbitMqOptions.Prefix}.casoft.produtctupdated.event.v1");
 
-    public Uri ProductDeletedMessage => new Uri($"queue:{_rabbitMqOptions.Prefix}.casoft.product.deleted.v1");
+    public Uri ProductDeletedMessage => new Uri($"queue:{_rabbitMqOptions.Prefix}.casoft.produtctdeleted.event.v1");
 }

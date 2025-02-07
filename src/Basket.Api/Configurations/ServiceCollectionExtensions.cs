@@ -1,5 +1,5 @@
 ﻿using Basket.Api.Abstractions;
-using Basket.Api.RabbitMq;
+using Basket.Infrastructure.RabbitMq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using Refit;

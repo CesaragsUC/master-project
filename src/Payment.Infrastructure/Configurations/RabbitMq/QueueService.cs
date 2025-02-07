@@ -14,7 +14,7 @@ public class QueueService : IQueueService
         _rabbitMqOptions = options.Value;
     }
 
-    public Uri PaymentCreatedMessage => new Uri($"queue:{_rabbitMqOptions.Prefix}.casoft.payment.created.v1");
-    public Uri PaymentConfirmedMessage => new Uri($"queue:{_rabbitMqOptions.Prefix}.casoft.payment.confirmed.v1");
-    public Uri PaymentFailedMessage => new Uri($"queue:{_rabbitMqOptions.Prefix}.casoft.payment.failed.v1");
+    public Uri PaymentCreatedMessage => new Uri($"queue:{_rabbitMqOptions.Prefix}.casoft.payment.event.v1");
+    public Uri PaymentConfirmedMessage => new Uri($"queue:{_rabbitMqOptions.Prefix}.casoft.paymentconfirmed.event.v1");
+    public Uri PaymentFailedMessage => new Uri($"queue:{_rabbitMqOptions.Prefix}.casoft.paymentfailed.event.v1");
 }

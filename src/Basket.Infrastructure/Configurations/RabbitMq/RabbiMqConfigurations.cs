@@ -1,10 +1,9 @@
 ﻿using Message.Broker.Configurations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Product.Infrastructure.Consumers;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Product.Infrastructure.RabbitMq;
+namespace Basket.Infrastructure.Configurations;
 
 [ExcludeFromCodeCoverage]
 public static class RabbiMqConfigurations
@@ -14,10 +13,7 @@ public static class RabbiMqConfigurations
         IConfiguration configuration)
     {
 
-        services.AddMassTransitSetupConfig(configuration,
-        typeof(ProductAddedConsumer),
-        typeof(ProdutctDeletedConsumer),
-        typeof(ProdutctUpdatedConsumer));
+        services.AddMassTransitSetupConfig(configuration);
 
         return services;
     }
