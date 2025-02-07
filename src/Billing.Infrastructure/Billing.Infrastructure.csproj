@@ -1,13 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
-	
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
 	<ItemGroup>
-		<PackageReference Include="MassTransit.RabbitMQ" Version="8.3.4" />
 		<PackageReference Include="MediatR" Version="12.4.1" />
 		<PackageReference Include="AutoMapper" Version="13.0.1" />
 		<PackageReference Include="Azure.Storage.Blobs" Version="12.22.2" />
@@ -29,12 +28,13 @@
 		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.Design" Version="1.1.0" />
 		<PackageReference Include="RepoPgNet" Version="1.2.4" />
 	</ItemGroup>
-	
+
 	<ItemGroup>
+	  <ProjectReference Include="..\Application.Dtos\Application.Dtos.csproj" />
+	  <ProjectReference Include="..\Billing.Domain\Billing.Domain.csproj" />
 	  <ProjectReference Include="..\Message.Broker\Message.Broker.csproj" />
 	  <ProjectReference Include="..\Messaging.Contracts\Messaging.Contracts.csproj" />
-	  <ProjectReference Include="..\Order.Application\Order.Application.csproj" />
-	  <ProjectReference Include="..\Order.Domain\Order.Domain.csproj" />
 	</ItemGroup>
+
 
 </Project>

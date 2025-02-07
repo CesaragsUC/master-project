@@ -2,6 +2,6 @@
 
 public interface IQueueService
 {
-    Uri OrderCreatedMessage { get; }
+    Uri OrderCheckoutEventMessage { get; }
     Uri OrderDeletedMessage { get; }
 }

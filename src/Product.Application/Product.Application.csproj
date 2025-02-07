@@ -31,8 +31,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\Domain\Product.Domain.csproj" />
-	  <ProjectReference Include="..\Infrastructure\Product.Infrastructure.csproj" />
 	  <ProjectReference Include="..\Message.Broker\Message.Broker.csproj" />
+	  <ProjectReference Include="..\Messaging.Contracts\Messaging.Contracts.csproj" />
+	  <ProjectReference Include="..\Product.Domain\Product.Domain.csproj" />
+	  <ProjectReference Include="..\Product.Infrastructure\Product.Infrastructure.csproj" />
 	</ItemGroup>
 </Project>

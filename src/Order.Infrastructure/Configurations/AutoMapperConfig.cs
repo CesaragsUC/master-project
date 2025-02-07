@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using Order.Service.Dto;
+using Order.Application.Dto;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Order.Infrastructure.Configurations;
