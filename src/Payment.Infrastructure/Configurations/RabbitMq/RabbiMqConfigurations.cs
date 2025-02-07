@@ -13,7 +13,7 @@ public static class RabbiMqConfigurations
     public static IServiceCollection AddInfra(this IServiceCollection services, IConfiguration configuration)
     {
 
-        services.AddMassTransitSetupConfig(configuration,
+        services.AddMassTransitSetup(configuration,
             typeof(PaymentConsumer),
             typeof(PaymentConfirmedConsumer),
             typeof(PaymentFailedConsumer));

@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using Order.Service;
-using Order.Service.Dto;
+using Order.Application.Dto;
+using Order.Application.Service;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Order.Api.Controllers;

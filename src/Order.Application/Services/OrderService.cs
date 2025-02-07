@@ -2,7 +2,7 @@
 using ResultNet;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Order.Service;
+namespace Order.Application.Service;
 
 [ExcludeFromCodeCoverage]
 public class OrderService(IPgRepository<Domain.Entities.Order> repository) : IOrderService

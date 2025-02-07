@@ -1,6 +1,6 @@
 ﻿using ResultNet;
 
-namespace Order.Service;
+namespace Order.Application.Service;
 
 public interface IOrderService
 {

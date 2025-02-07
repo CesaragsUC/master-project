@@ -1,7 +1,7 @@
 using Order.Api.Configurations;
+using Order.Application.Service;
 using Order.Infrastructure;
 using Order.Infrastructure.Configurations;
-using Order.Service;
 using RepoPgNet;
 using System.Reflection;
 

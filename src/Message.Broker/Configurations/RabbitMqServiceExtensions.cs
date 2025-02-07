@@ -13,7 +13,7 @@ namespace Message.Broker.Configurations;
 public static class RabbitMqServiceExtensions
 {
 
-    public static IServiceCollection AddMassTransitSetupConfig(
+    public static IServiceCollection AddMassTransitSetup(
         this IServiceCollection services,
         IConfiguration configuration,
         params Type[] consumerAssemblies)

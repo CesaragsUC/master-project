@@ -14,7 +14,7 @@ public static class RabbiMqConfigurations
         IConfiguration configuration)
     {
 
-        services.AddMassTransitSetupConfig(configuration,
+        services.AddMassTransitSetup(configuration,
         typeof(ProductAddedConsumer),
         typeof(ProdutctDeletedConsumer),
         typeof(ProdutctUpdatedConsumer));

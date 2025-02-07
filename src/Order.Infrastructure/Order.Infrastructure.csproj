@@ -33,8 +33,8 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\Message.Broker\Message.Broker.csproj" />
 	  <ProjectReference Include="..\Messaging.Contracts\Messaging.Contracts.csproj" />
+	  <ProjectReference Include="..\Order.Application\Order.Application.csproj" />
 	  <ProjectReference Include="..\Order.Domain\Order.Domain.csproj" />
-	  <ProjectReference Include="..\Order.Service\Order.Service.csproj" />
 	</ItemGroup>
 
 </Project>

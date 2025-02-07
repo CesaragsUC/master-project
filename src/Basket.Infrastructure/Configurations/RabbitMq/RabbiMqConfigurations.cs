@@ -13,7 +13,7 @@ public static class RabbiMqConfigurations
         IConfiguration configuration)
     {
 
-        services.AddMassTransitSetupConfig(configuration);
+        services.AddMassTransitSetup(configuration);
 
         return services;
     }

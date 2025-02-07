@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Order.Service.Dto;
+namespace Order.Application.Dto;
 
 [ExcludeFromCodeCoverage]
 public sealed record class OrderDto
