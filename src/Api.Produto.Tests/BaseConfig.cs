@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using Product.Domain.Handlers;
+using Product.Application.Handlers.Product;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Product.Api.Tests;

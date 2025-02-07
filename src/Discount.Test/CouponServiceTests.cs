@@ -30,8 +30,8 @@ public class CouponServiceTests
     {
         var discountRequest = new DiscountRequest { Code = null, Total = 0 };
         var result = await _couponService.ApplyDiscount(discountRequest);
-        Assert.False(result.Succeeded);
-        Assert.Equal("Invalid request", result.Messages.FirstOrDefault());
+        Assert.False(result.Succeed);
+        Assert.Equal("Code or purchase value can't be null", result.Message);
     }
 
     [Fact(DisplayName = "Test 2  apply discount valid request returns success")]
@@ -44,8 +44,8 @@ public class CouponServiceTests
         _repositoryMock.Setup(r => r.FindOne(It.IsAny<Expression<Func<Coupon, bool>>>(), It.IsAny<FindOptions?>())).Returns(coupon);
         var result = await _couponService.ApplyDiscount(discountRequest);
 
-        Assert.True(result.Succeeded);
-        Assert.Equal(10, result.Data.TotalDiscount);
+        Assert.True(result.Succeed);
+        Assert.Equal(10, result.TotalDiscount);
     }
 
     [Fact(DisplayName = "Test 3 create coupon valid coupon returns success")]
@@ -129,8 +129,8 @@ public class CouponServiceTests
 
         var result = await _couponService.ApplyDiscount(discountRequest);
 
-        Assert.False(result.Succeeded);
-        Assert.Equal("Coupon Expired or is not valid", result.Messages.FirstOrDefault());
+        Assert.False(result.Succeed);
+        Assert.Equal("Coupon Expired or is not valid", result.Message);
     }
 
     [Fact(DisplayName = "Test 9 - Apply discount with a coupon type value should return success")]
@@ -144,7 +144,7 @@ public class CouponServiceTests
 
         var result = await _couponService.ApplyDiscount(discountRequest);
 
-        Assert.True(result.Succeeded);
+        Assert.True(result.Succeed);
     }
 
     [Fact(DisplayName = "Test 10 - Try apply discount but not purchase value is less than coupon min value should failure")]
@@ -158,7 +158,7 @@ public class CouponServiceTests
 
         var result = await _couponService.ApplyDiscount(discountRequest);
 
-        Assert.False(result.Succeeded);
+        Assert.False(result.Succeed);
     }
 
     [Fact(DisplayName = "Test 11 - Invalid coupon code should failure")]
@@ -170,8 +170,8 @@ public class CouponServiceTests
         _repositoryMock.Setup(x => x.FindOne(It.IsAny<Expression<Func<Coupon, bool>>>(), It.IsAny<FindOptions?>())).Returns((Coupon)null);
         var result = await _couponService.ApplyDiscount(discountRequest);
 
-        Assert.False(result.Succeeded);
-        Assert.Equal("Invalid Coupon", result.Messages.FirstOrDefault());
+        Assert.False(result.Succeed);
+        Assert.Equal("Invalid Coupon", result.Message);
     }
 
 

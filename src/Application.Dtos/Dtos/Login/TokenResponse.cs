@@ -1,10 +1,12 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 
 namespace Application.Dtos.Dtos.Login;
 
 /// <summary>
 /// this class is used to bind keycloak response
 /// </summary>
+[ExcludeFromCodeCoverage]
 public record TokenResponse
 {
     [JsonPropertyName("access_token")]

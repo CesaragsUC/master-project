@@ -1,7 +1,9 @@
 ﻿using Microsoft.Extensions.Configuration;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Application.Dtos.Settings;
 
+[ExcludeFromCodeCoverage]
 public class KeycloakSettings
 {
     [ConfigurationKeyName("realm")]
@@ -32,11 +34,14 @@ public class KeycloakSettings
     public PolicyEnforcer? PolicyEnforcer { get; set; }
 }
 
+[ExcludeFromCodeCoverage]
 public class Credentials
 {
     [ConfigurationKeyName("secret")]
     public string? Secret { get; set; }
 }
+
+[ExcludeFromCodeCoverage]
 public class PolicyEnforcer
 {
     [ConfigurationKeyName("credentials")]

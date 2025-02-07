@@ -1,8 +1,8 @@
-﻿using Domain.Handlers.Queries;
-using Domain.Interfaces;
-using MediatR;
+﻿using MediatR;
 using Moq;
-using Product.Domain.Handlers;
+using Product.Application.Handlers.Product;
+using Product.Application.Queries.Product;
+using RepoPgNet;
 using System.Linq.Expressions;
 
 namespace Product.Api.Tests;
@@ -10,14 +10,14 @@ namespace Product.Api.Tests;
 public class ProductQueryHandlerTest : BaseConfig
 {
 
-    private readonly Mock<IRepository<Product.Domain.Models.Product>> _repository;
+    private readonly Mock<IPgRepository<Domain.Models.Product>> _repository;
     private readonly Mock<IMediator> _mediator;
     private ProdutoQueryHandler _handler;
     public ProductQueryHandlerTest()
     {
         InitializeMediatrService();
 
-        _repository = new Mock<IRepository<Product.Domain.Models.Product>>();
+        _repository = new Mock<IPgRepository<Domain.Models.Product>>();
         _mediator = new Mock<IMediator>();
         _handler = new ProdutoQueryHandler(_repository.Object);
     }
@@ -47,12 +47,12 @@ public class ProductQueryHandlerTest : BaseConfig
     {
         var command = new ProductByIdQuery { Id = Guid.NewGuid() };
 
-        _repository.Setup(r => r.FindOne(It.IsAny<Expression<Func<Product.Domain.Models.Product, bool>>>(), null))
-                   .Callback<Expression<Func<Product.Domain.Models.Product, bool>>, FindOptions?>((predicate, options) =>
+        _repository.Setup(r => r.FindOne(It.IsAny<Expression<Func<Domain.Models.Product, bool>>>(), null))
+                   .Callback<Expression<Func<Domain.Models.Product, bool>>, FindOptions?>((predicate, options) =>
                    { })
-                   .Returns<Expression<Func<Product.Domain.Models.Product, bool>>, FindOptions?>((predicate, options) =>
+                   .Returns<Expression<Func<Domain.Models.Product, bool>>, FindOptions?>((predicate, options) =>
                    {
-                       var product = new Product.Domain.Models.Product
+                       var product = new Domain.Models.Product
                        {
                            Id = command.Id,
                            Name = "Produtos Teste",
@@ -69,7 +69,5 @@ public class ProductQueryHandlerTest : BaseConfig
         // Act
         Assert.NotNull(result);
     }
-
-
 
 }

@@ -1,7 +1,6 @@
 using Api.Catalogo.Mapping;
 using Application.Dtos.Dtos.Produtos;
 using AutoMapper;
-using Catalog.Domain.Abstractions;
 using Catalog.Domain.Models;
 using Catalog.Service.Abstractions;
 using Catalog.Service.Services;

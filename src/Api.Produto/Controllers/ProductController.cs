@@ -1,8 +1,8 @@
-﻿using Domain.Handlers.Comands;
-using Domain.Handlers.Queries;
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Product.Application.Comands.Product;
+using Product.Application.Queries.Product;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Api.Controllers;
@@ -20,7 +20,6 @@ public class ProductController(IMediator _mediator) : ControllerBase
     public async Task<IActionResult> Get([FromQuery] ProductQuery produto)
     {
         var result = await _mediator.Send(produto);
-
         return Ok(result);
     }
 
@@ -51,7 +50,7 @@ public class ProductController(IMediator _mediator) : ControllerBase
     {
         var result = await _mediator.Send(produto);
 
-        return result.Succeeded ?  Ok(result) : BadRequest(result);
+        return result.Succeeded ? Ok(result) : BadRequest(result);
     }
 
     [HttpDelete]
@@ -61,7 +60,7 @@ public class ProductController(IMediator _mediator) : ControllerBase
     {
         var result = await _mediator.Send(new DeleteProductCommand(id));
 
-        return result.Succeeded ?  Ok(result) : BadRequest(result);
+        return result.Succeeded ? Ok(result) : BadRequest(result);
     }
 
 }

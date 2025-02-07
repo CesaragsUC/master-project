@@ -1,13 +1,33 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="Facade\" />
-  </ItemGroup>
+	<ItemGroup>
+		<Folder Include="Facade\" />
+
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="AutoMapper" Version="13.0.1" />
+		<PackageReference Include="FluentResultNet" Version="1.1.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.3.0" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+		<PackageReference Include="Refit.HttpClientFactory" Version="8.0.0" />
+		<PackageReference Include="Refit.Newtonsoft.Json" Version="8.0.0" />
+		<PackageReference Include="RepoPgNet" Version="1.2.4" />
+		<PackageReference Include="MassTransit.RabbitMQ" Version="8.3.4" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Application.Dtos\Application.Dtos.csproj" />
+		<ProjectReference Include="..\Message.Broker\Message.Broker.csproj" />
+		<ProjectReference Include="..\Messaging.Contracts\Messaging.Contracts.csproj" />
+		<ProjectReference Include="..\Payment.Domain\Billing.Domain.csproj" />
+		<ProjectReference Include="..\Payment.Infrastructure\Billing.Infrastructure.csproj" />
+	</ItemGroup>
 
 </Project>

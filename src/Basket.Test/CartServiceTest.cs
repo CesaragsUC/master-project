@@ -1,41 +1,39 @@
-﻿using AutoMapper;
-using Basket.Api.Abstractions;
+﻿using Basket.Api.Abstractions;
 using Basket.Api.Dtos;
 using Basket.Api.Services;
 using Basket.Domain.Abstractions;
 using Basket.Domain.Entities;
-using MassTransit;
-using MassTransit.Transports;
+using Basket.Infrastructure.RabbitMq;
+using Message.Broker.Abstractions;
 using Microsoft.Extensions.Caching.Distributed;
 using Moq;
 
-
 namespace Basket.Test;
-
 
 public class CartServiceTest
 {
     private readonly Mock<ICartRepository> _cartRepositoryMock;
     private readonly Mock<ICacheService> _cacheServiceMock;
-    private readonly Mock<IMapper> _mapperMock;
     private readonly CartService _cartService;
-    private readonly Mock<IPublishEndpoint> _publishedMessageMock;
     private readonly Mock<IDiscountApi> _discountApiMock;
+    private readonly Mock<IQueueService> _queueServiceMock;
+    private readonly Mock<IRabbitMqService> _rabbitmqServiceMock;
 
     public CartServiceTest()
     {
         _cartRepositoryMock = new Mock<ICartRepository>();
         _cacheServiceMock = new Mock<ICacheService>();
-        _mapperMock = new Mock<IMapper>();
-        _publishedMessageMock = new Mock<IPublishEndpoint>();
         _discountApiMock = new Mock<IDiscountApi>();
+        _queueServiceMock = new Mock<IQueueService>();
+        _rabbitmqServiceMock = new Mock<IRabbitMqService>();
 
         _cartService = new CartService(_cartRepositoryMock.Object,
             _cacheServiceMock.Object,
-            _mapperMock.Object,
-            _publishedMessageMock.Object,
-            _discountApiMock.Object);
+            _discountApiMock.Object,
+            _queueServiceMock.Object,
+            _rabbitmqServiceMock.Object);
     }
+
 
     [Fact]
     [Trait("Basket.Services", "Cache Redis")]
@@ -44,7 +42,7 @@ public class CartServiceTest
         // Arrange
         var customerId = Guid.NewGuid();
 
-        var cart = new Cart { CustomerId = customerId.ToString() };
+        var cart = new Cart { CustomerId = customerId };
 
         _cacheServiceMock.Setup(x => x.GetOrCreateAsync(It.IsAny<string>(), It.IsAny<Func<Task<Cart>>>(), It.IsAny<DistributedCacheEntryOptions>(), null))
             .ReturnsAsync(cart);
@@ -81,11 +79,11 @@ public class CartServiceTest
     public async Task SaveOrUpdateCartAsync_ShouldReturnSuccess_WhenCartIsSaved()
     {
         // Arrange
-        var cartDto = new CartDto { CustomerId = Guid.NewGuid().ToString() };
+        var cartDto = new CartDto { CustomerId = Guid.NewGuid() };
 
         var cart = new Cart { CustomerId = cartDto.CustomerId };
 
-        _mapperMock.Setup(x => x.Map<Cart>(cartDto)).Returns(cart);
+        //_mapperMock.Setup(x => x.Map<Cart>(cartDto)).Returns(cart);
 
         _cacheServiceMock.Setup(x => x.GetOrCreateAsync(It.IsAny<string>(), It.IsAny<Func<Task<Cart>>>(), It.IsAny<DistributedCacheEntryOptions>(), It.IsAny<Func<Cart, Task>>()))
             .ReturnsAsync(cart);
@@ -102,11 +100,11 @@ public class CartServiceTest
     public async Task SaveOrUpdateCartAsync_ShouldReturnFailure_WhenCartIsNotSaved()
     {
         // Arrange
-        var cartDto = new CartDto { CustomerId = Guid.NewGuid().ToString() };
+        var cartDto = new CartDto { CustomerId = Guid.NewGuid() };
 
         var cart = new Cart { CustomerId = cartDto.CustomerId };
 
-        _mapperMock.Setup(x => x.Map<Cart>(cartDto)).Returns(cart);
+        //_mapperMock.Setup(x => x.Map<Cart>(cartDto)).Returns(cart);
 
         _cacheServiceMock.Setup(x => x.GetOrCreateAsync(It.IsAny<string>(), It.IsAny<Func<Task<Cart>>>(), It.IsAny<DistributedCacheEntryOptions>(), It.IsAny<Func<Cart, Task>>()))
             .ReturnsAsync((Cart)null);

@@ -46,7 +46,7 @@ public class DiscountController(ICouponService couponService) : ControllerBase
 
         var result = await couponService.ApplyDiscount(discountRequest);
 
-        return result.Succeeded ? Ok(result.Data) : BadRequest(result);
+        return result.Succeed ? Ok(result) : BadRequest(result);
     }
 
     [HttpPost]

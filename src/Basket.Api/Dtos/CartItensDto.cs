@@ -1,13 +1,17 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿//using System.Diagnostics.CodeAnalysis;
 
-namespace Basket.Api.Dtos;
+//namespace Basket.Api.Dtos;
 
-[ExcludeFromCodeCoverage]
-public record CartItensDto
-{
-    public string? ProductId { get; init; }
-    public string? ProductName { get; init; }
-    public int Quantity { get; init; }
-    public decimal UnitPrice { get; init; }
-    public decimal TotalPrice => Quantity * UnitPrice;
-}
+//[ExcludeFromCodeCoverage]
+//public record CartItensDto
+//{
+//    public Guid ProductId { get; set; }
+
+//    public string? ProductName { get; set; }
+
+//    public int Quantity { get; set; }
+
+//    public decimal UnitPrice { get; set; }
+
+//    public decimal TotalPrice => Quantity * UnitPrice;
+//}

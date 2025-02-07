@@ -1,10 +1,10 @@
 ﻿using Application.Dtos.Abstractions;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Diagnostics.CodeAnalysis;
 
 
 namespace Application.Dtos.Dtos.Response;
 
-
+[ExcludeFromCodeCoverage]
 public class Result<T> : IResult<T>
 {
     public List<string>? Messages { get; set; } = new List<string>();

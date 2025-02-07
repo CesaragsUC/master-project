@@ -10,7 +10,7 @@ public interface ICartService
 
     Task<Result<bool>> SaveOrUpdateCartAsync(CartDto cartDto);
 
-    Task<Result<bool>> CheckoutAsync(CartCheckoutDto checkoutDto);
+    Task<Result<bool>> CheckoutAsync(CartDto checkoutDto);
 
-    Task<Result<CartCheckoutDto>> ApplyDiscountAsync(CartCheckoutDto discountRequest);
+    Task<Result<CartDto>> ApplyDiscountAsync(CartDto discountRequest);
 }

@@ -1,8 +1,9 @@
-﻿using Domain.Handlers.Comands;
-using Domain.Interfaces;
+﻿using Domain.Interfaces;
 using Moq;
+using Product.Application.Comands.Product;
+using Product.Application.Handlers.Product;
 using Product.Domain.Abstractions;
-using Product.Domain.Handlers;
+using RepoPgNet;
 using System.Linq.Expressions;
 
 
@@ -11,7 +12,7 @@ namespace Product.Api.Tests;
 public class AtualizarProdutoHandlerTest : BaseConfig
 {
 
-    private readonly Mock<IRepository<Domain.Models.Product>> _repository;
+    private readonly Mock<IPgRepository<Domain.Models.Product>> _repository;
     private readonly Mock<IBobStorageService> _bobStorageService;
     private readonly Mock<IProductService> _productService;
     private readonly UpdateProductHandler _handler;
@@ -21,7 +22,7 @@ public class AtualizarProdutoHandlerTest : BaseConfig
 
         _productService = new Mock<IProductService>();
         _bobStorageService = new Mock<IBobStorageService>();
-        _repository = new Mock<IRepository<Domain.Models.Product>>();
+        _repository = new Mock<IPgRepository<Domain.Models.Product>>();
 
         _handler = new UpdateProductHandler(_repository.Object, _bobStorageService.Object, _productService.Object);
     }
@@ -58,7 +59,7 @@ public class AtualizarProdutoHandlerTest : BaseConfig
                    });
 
 
-        _repository.Setup(r => r.Update(It.IsAny<Domain.Models.Product>()))
+        _repository.Setup(r => r.UpdateAsync(It.IsAny<Domain.Models.Product>()))
            .Callback<Domain.Models.Product>(p =>
            { })
            .Returns(Task.CompletedTask);
@@ -69,7 +70,7 @@ public class AtualizarProdutoHandlerTest : BaseConfig
         Assert.True(result.Succeeded);
 
         _repository.Verify(r => r.FindOne(It.IsAny<Expression<Func<Domain.Models.Product, bool>>>(), null), Times.Once);
-        _repository.Verify(r => r.Update(It.IsAny<Domain.Models.Product>()), Times.Once);
+        _repository.Verify(r => r.UpdateAsync(It.IsAny<Domain.Models.Product>()), Times.Once);
     }
 
     [Fact(DisplayName = "Teste 02 - Atualizar erro")]
@@ -106,7 +107,7 @@ public class AtualizarProdutoHandlerTest : BaseConfig
                    });
 
 
-        _repository.Setup(r => r.Update(It.IsAny<Domain.Models.Product>()))
+        _repository.Setup(r => r.UpdateAsync(It.IsAny<Domain.Models.Product>()))
            .Callback<Domain.Models.Product>(p =>
            { })
            .Returns(Task.CompletedTask);
@@ -115,6 +116,6 @@ public class AtualizarProdutoHandlerTest : BaseConfig
 
         // Act
         Assert.False(result.Succeeded);
-        _repository.Verify(r => r.Update(It.IsAny<Domain.Models.Product>()), Times.Never);
+        _repository.Verify(r => r.UpdateAsync(It.IsAny<Domain.Models.Product>()), Times.Never);
     }
 }

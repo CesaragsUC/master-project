@@ -7,10 +7,11 @@ using Discount.Domain.ValueObjects;
 using RepoPgNet;
 using ResultNet;
 using Serilog;
-using static Azure.Core.HttpHeader;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Discount.Api.Services;
 
+[ExcludeFromCodeCoverage]
 public class CouponService : ICouponService
 {
     private readonly IPgRepository<Coupon> _repository;
@@ -23,11 +24,15 @@ public class CouponService : ICouponService
         _mapper = mapper;
     }
 
-    public async Task<Result<DiscountResponse>> ApplyDiscount(DiscountRequest discountRequest)
+    public async Task<DiscountResponse> ApplyDiscount(DiscountRequest discountRequest)
     {
         if(discountRequest.Code is null || discountRequest.Total <= 0)
         {
-            return await Result<DiscountResponse>.FailureAsync("Invalid request");
+            return new DiscountResponse 
+            { 
+                Message = "Code or purchase value can't be null",
+                Succeed = false
+            };
         }
 
         var coupon = _repository.FindOne(x => x.Code == discountRequest.Code);
@@ -38,7 +43,11 @@ public class CouponService : ICouponService
         {
             if (! await IsValidCoupon(coupon))
             {
-                return await Result<DiscountResponse>.FailureAsync("Coupon Expired or is not valid");
+                return new DiscountResponse
+                {
+                    Message = "Coupon Expired or is not valid",
+                    Succeed = false
+                };
             }
 
             if (discountRequest.Total >= coupon.MinValue)
@@ -56,16 +65,25 @@ public class CouponService : ICouponService
 
                 await IncreaseCouponUse(coupon);
 
-                return await Result<DiscountResponse>.SuccessAsync(orderDiscount);
+                orderDiscount.Succeed = true;
+                return orderDiscount;
             }
             else
             {
-                return await Result<DiscountResponse>.FailureAsync($"The purchase value must be at least {coupon.MinValue:C} to use this coupon");
+                return new DiscountResponse
+                {
+                    Message = "$The purchase value must be at least {coupon.MinValue:C} to use this coupon",
+                    Succeed = false
+                };
             }
         }
         else
         {
-            return await Result<DiscountResponse>.FailureAsync($"Invalid Coupon");
+            return new DiscountResponse
+            {
+                Message = "Invalid Coupon",
+                Succeed = false
+            };
         }
 
     }
