@@ -12,7 +12,7 @@ jobs:
     name: Build and analyze 🔧
     runs-on: ubuntu-latest
     steps:
-      - name: Getting code project ⏳
+      - name: Getting project code ⏳
         uses: actions/checkout@v4
       - name: Setup JDK
         uses: actions/setup-java@v4
@@ -31,7 +31,7 @@ jobs:
       - name: Installing SonarQube ⏳
         run: dotnet tool install --global dotnet-sonarscanner   
 
-      - name: Build and Analyse 🛠️
+      - name: Build and Analysis  🛠️
         run: |
           dotnet sonarscanner begin /o:"cesaragsuc" /k:"CesaragsUC_master-project" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
           dotnet build --configuration Release
@@ -44,7 +44,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}   
         with:
-          scanMetadataReportFile: ./src/.sonarqube/out/.sonar/report-task.txt
+          scanMetadataReportFile: ./.sonarqube/out/.sonar/report-task.txt
 
       - name: "SonarQube Quality Gate Status:"
         run: echo "The Quality Gate status is ${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}"
