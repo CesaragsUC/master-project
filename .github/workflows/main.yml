@@ -33,7 +33,7 @@ jobs:
 
       - name: Build and Analyse 🛠️
         run: |
-          dotnet sonarscanner begin /o:"casoftsolutions" /k:"CesaragsUC_master-project" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
+          dotnet sonarscanner begin /o:"cesaragsuc" /k:"CesaragsUC_master-project" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
           dotnet build --configuration Release
           dotnet-coverage collect 'dotnet test' -f xml -o 'coverage.xml'
           dotnet sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
