@@ -31,6 +31,9 @@ public class CreateTablePayment : Migration
                 .WithColumn("Method").AsInt32().NotNullable()
                 .WithColumn("Status").AsInt32().NotNullable()
                 .WithColumn("PaymentDate").AsDateTimeOffset().NotNullable()
+                .WithColumn("CreatedDate").AsDateTimeOffset().NotNullable()
+                .WithColumn("UpdatedDate").AsDateTimeOffset().Nullable()
+                .WithColumn("IsDeleted").AsBoolean().Nullable()
                 .WithColumn("TransactionId").AsString().NotNullable();
         }
 

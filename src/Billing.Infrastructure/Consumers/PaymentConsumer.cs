@@ -39,9 +39,9 @@ public class PaymentConsumer : IConsumer<PaymentCreatedEvent>
                 throw new InvalidPaymentTokenException("Invalid payment token");
             }
 
-            bool paymentSuccess = Random.Shared.Next(0, 2) == 1;
+            bool paymentResult = Random.Shared.Next(0, 2) == 1;
 
-            if (paymentSuccess)
+            if (paymentResult)
             {
                 var paymentSucceedMessage = new PaymentConfirmedEvent()
                 {

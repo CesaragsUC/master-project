@@ -1,5 +1,6 @@
-﻿using Application.Dtos.Dtos.Login;
-using Application.Dtos.Dtos.Response;
+﻿using Auth.Api.Dtos.Login;
+using ResultNet;
+using Shared.Kernel.Models;
 
 namespace Auth.Api.Abstractions;
 

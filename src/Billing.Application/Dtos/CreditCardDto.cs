@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Application.Dtos.Dtos.Payments;
+namespace Billing.Application.Dtos;
 
 [ExcludeFromCodeCoverage]
 public class CreditCardDto

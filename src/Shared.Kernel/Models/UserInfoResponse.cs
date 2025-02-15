@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
-namespace Application.Dtos.Dtos.Login;
+namespace Shared.Kernel.Models;
 
 /// <summary>
 /// this class is used to bind with keycloak response

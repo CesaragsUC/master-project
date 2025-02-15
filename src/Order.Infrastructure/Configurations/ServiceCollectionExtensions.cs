@@ -1,4 +1,6 @@
 ﻿using FluentMigrator.Runner;
+using HybridRepoNet.Configurations;
+using HybridRepoNet.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +18,7 @@ public static class ServiceCollectionExtensions
     {
         services.ConfigureFluentMigration(configuration);
         services.AddMessageBrokerSetup(configuration);
+        services.AddHybridRepoNet<OrderDbContext>(configuration,DbType.PostgreSQL);
     }
     public static ServiceProvider ConfigureFluentMigration(this IServiceCollection services, IConfiguration configuration)
     {

@@ -1,4 +1,4 @@
-﻿using Application.Dtos.Dtos.Produtos;
+﻿using Catalog.Application.Dtos;
 using Catalog.Domain.Models;
 
 namespace Catalog.Api.Extentions

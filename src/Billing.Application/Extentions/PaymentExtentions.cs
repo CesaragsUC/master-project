@@ -1,4 +1,4 @@
-﻿using Application.Dtos.Dtos.Payments;
+﻿using Billing.Application.Dtos;
 using Billing.Domain.Entities;
 using System.Diagnostics.CodeAnalysis;
 

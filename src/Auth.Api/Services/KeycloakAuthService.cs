@@ -1,10 +1,9 @@
-﻿using Application.Dtos.Dtos.Login;
-using Application.Dtos.Dtos.Response;
-using Application.Dtos.Settings;
-using Auth.Api.Abstractions;
+﻿using Auth.Api.Abstractions;
+using Auth.Api.Dtos.Login;
 using Microsoft.Extensions.Options;
-using Newtonsoft.Json.Linq;
+using ResultNet;
 using Serilog;
+using Shared.Kernel.Models;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.IdentityModel.Tokens.Jwt;

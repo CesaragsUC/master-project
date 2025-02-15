@@ -1,10 +1,10 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 using System.Text.Json.Serialization;
 
-namespace Application.Dtos.Dtos.Login;
+namespace Auth.Api.Dtos.Login;
 
 [ExcludeFromCodeCoverage]
-public class RealmAccess
+public class ResourceAccess
 {
     [JsonPropertyName("roles")]
     public List<string> Roles { get; set; }

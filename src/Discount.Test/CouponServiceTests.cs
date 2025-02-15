@@ -5,20 +5,22 @@ using Discount.Api.Services;
 using Discount.Domain.Dtos;
 using Discount.Domain.Entities;
 using Discount.Domain.ValueObjects;
+using Discount.Infrastructure;
+using HybridRepoNet.Abstractions;
+using HybridRepoNet.Repository;
 using Moq;
-using RepoPgNet;
 using System.Linq.Expressions;
 using Xunit;
 
 public class CouponServiceTests
 {
-    private readonly Mock<IPgRepository<Coupon>> _repositoryMock;
+    private readonly Mock<IUnitOfWork<CouponsDbContext>> _repositoryMock;
     private readonly Mock<IMapper> _mapperMock;
     private readonly CouponService _couponService;
 
     public CouponServiceTests()
     {
-        _repositoryMock = new Mock<IPgRepository<Coupon>>();
+        _repositoryMock = new Mock<IUnitOfWork<CouponsDbContext>>();
         _mapperMock = new Mock<IMapper>();
         _couponService = new CouponService(_repositoryMock.Object, _mapperMock.Object);
     }
@@ -41,7 +43,7 @@ public class CouponServiceTests
         var discountRequest = new DiscountRequest { Code = "TEST", Total = 100 };
         var coupon = new Coupon { Code = "TEST", MinValue = 50, Type = (int)DiscountType.Percentage, Value = 10, Active = true, EndDate = DateTime.UtcNow.AddDays(1), TotalUse = 0, MaxUse = 5 };
 
-        _repositoryMock.Setup(r => r.FindOne(It.IsAny<Expression<Func<Coupon, bool>>>(), It.IsAny<FindOptions?>())).Returns(coupon);
+        _repositoryMock.Setup(r => r.Repository<Coupon>().FindOne(It.IsAny<Expression<Func<Coupon, bool>>>(), It.IsAny<FindOptions?>())).Returns(coupon);
         var result = await _couponService.ApplyDiscount(discountRequest);
 
         Assert.True(result.Succeed);
@@ -56,6 +58,7 @@ public class CouponServiceTests
         var coupon = new Coupon { Code = "CASOFT20", MinValue = 50, Type = (int)DiscountType.Percentage, Value = 10, Active = true, StartDate = DateTime.Now, EndDate = DateTime.UtcNow.AddDays(1), MaxUse = 5 };
 
         _mapperMock.Setup(m => m.Map<Coupon>(couponCreateDto)).Returns(coupon);
+        _repositoryMock.Setup(r => r.Repository<Coupon>().AddAsync(It.IsAny<Coupon>())).Returns(Task.CompletedTask);
         var result = await _couponService.CreateCoupon(couponCreateDto);
 
         Assert.True(result.Succeeded);
@@ -69,7 +72,7 @@ public class CouponServiceTests
         var couponUpdateDto = new CouponUpdateDto { Id = Guid.NewGuid(), Code = "CASOFT20", MinValue = 20, Type = DiscountType.Percentage, Value = 10, Active = true, StartDate = DateTime.Now, EndDate = DateTime.UtcNow.AddDays(1), MaxUse = 5 };
         var coupon = new Coupon { Id = couponUpdateDto.Id, Code = "CASOFT30", MinValue = 50, Type = (int)DiscountType.Percentage, Value = 10, Active = true, EndDate = DateTime.UtcNow.AddDays(1), MaxUse = 5 };
 
-        _repositoryMock.Setup(r => r.FindOne(It.IsAny<Expression<Func<Coupon, bool>>>(), It.IsAny<FindOptions?>())).Returns(coupon);
+        _repositoryMock.Setup(r => r.Repository<Coupon>().FindOne(It.IsAny<Expression<Func<Coupon, bool>>>(), It.IsAny<FindOptions?>())).Returns(coupon);
         var result = await _couponService.UpdateCoupon(couponUpdateDto);
 
         Assert.True(result.Succeeded);
@@ -82,7 +85,7 @@ public class CouponServiceTests
     {
         var coupon = new Coupon { Id = Guid.NewGuid(), Code = "TEST" };
 
-        _repositoryMock.Setup(r => r.FindOne(It.IsAny<Expression<Func<Coupon, bool>>>(), It.IsAny<FindOptions?>())).Returns(coupon);
+        _repositoryMock.Setup(r => r.Repository<Coupon>().FindOne(It.IsAny<Expression<Func<Coupon, bool>>>(), It.IsAny<FindOptions?>())).Returns(coupon);
 
         var result = await _couponService.DeleteCoupon(coupon.Id);
 
@@ -96,7 +99,7 @@ public class CouponServiceTests
     {
         var coupons = new List<Coupon> { new Coupon { Code = "TEST" } };
 
-        _repositoryMock.Setup(r => r.GetAllEntities(It.IsAny<FindOptions?>())).Returns(coupons.AsQueryable());
+        _repositoryMock.Setup(r => r.Repository<Coupon>().GetAllAsync()).ReturnsAsync(coupons.ToList());
 
         var result = await _couponService.GetAll();
 
@@ -111,7 +114,7 @@ public class CouponServiceTests
     {
         var coupon = new Coupon { Code = "TEST" };
 
-        _repositoryMock.Setup(r => r.FindOne(It.IsAny<Expression<Func<Coupon, bool>>>(), It.IsAny<FindOptions?>())).Returns(coupon);
+        _repositoryMock.Setup(r => r.Repository<Coupon>().FindOne(It.IsAny<Expression<Func<Coupon, bool>>>(), It.IsAny<FindOptions?>())).Returns(coupon);
         var result = await _couponService.GetCouponByCode("TEST");
 
         Assert.True(result.Succeeded);
@@ -125,7 +128,7 @@ public class CouponServiceTests
         var discountRequest = new DiscountRequest { Code = "CODE001", Total = 100 };
         var coupon = new Coupon { Code = "CODE001", MinValue = 50, Type = (int)DiscountType.Percentage, Value = 10, Active = true, EndDate = DateTime.UtcNow.AddDays(1), TotalUse = 10, MaxUse = 5 };
 
-        _repositoryMock.Setup(r => r.FindOne(It.IsAny<Expression<Func<Coupon, bool>>>(), It.IsAny<FindOptions?>())).Returns(coupon);
+        _repositoryMock.Setup(r => r.Repository<Coupon>().FindOne(It.IsAny<Expression<Func<Coupon, bool>>>(), It.IsAny<FindOptions?>())).Returns(coupon);
 
         var result = await _couponService.ApplyDiscount(discountRequest);
 
@@ -140,7 +143,7 @@ public class CouponServiceTests
         var discountRequest = new DiscountRequest { Code = "CODE001", Total = 100 };
         var coupon = new Coupon { Code = "CODE001", MinValue = 50, Type = (int)DiscountType.Value, Value = 10, Active = true, EndDate = DateTime.UtcNow.AddDays(1), TotalUse = 1, MaxUse = 5 };
 
-        _repositoryMock.Setup(r => r.FindOne(It.IsAny<Expression<Func<Coupon, bool>>>(), It.IsAny<FindOptions?>())).Returns(coupon);
+        _repositoryMock.Setup(r => r.Repository<Coupon>().FindOne(It.IsAny<Expression<Func<Coupon, bool>>>(), It.IsAny<FindOptions?>())).Returns(coupon);
 
         var result = await _couponService.ApplyDiscount(discountRequest);
 
@@ -154,7 +157,7 @@ public class CouponServiceTests
         var discountRequest = new DiscountRequest { Code = "CODE001", Total = 100 };
         var coupon = new Coupon { Code = "CODE001", MinValue = 500, Type = (int)DiscountType.Value, Value = 10, Active = true, EndDate = DateTime.UtcNow.AddDays(1), TotalUse = 1, MaxUse = 5 };
 
-        _repositoryMock.Setup(r => r.FindOne(It.IsAny<Expression<Func<Coupon, bool>>>(), It.IsAny<FindOptions?>())).Returns(coupon);
+        _repositoryMock.Setup(r => r.Repository<Coupon>().FindOne(It.IsAny<Expression<Func<Coupon, bool>>>(), It.IsAny<FindOptions?>())).Returns(coupon);
 
         var result = await _couponService.ApplyDiscount(discountRequest);
 
@@ -167,7 +170,7 @@ public class CouponServiceTests
     {
         var discountRequest = new DiscountRequest { Code = "CODE001", Total = 100 };
 
-        _repositoryMock.Setup(x => x.FindOne(It.IsAny<Expression<Func<Coupon, bool>>>(), It.IsAny<FindOptions?>())).Returns((Coupon)null);
+        _repositoryMock.Setup(x => x.Repository<Coupon>().FindOne(It.IsAny<Expression<Func<Coupon, bool>>>(), It.IsAny<FindOptions?>())).Returns((Coupon)null);
         var result = await _couponService.ApplyDiscount(discountRequest);
 
         Assert.False(result.Succeed);
@@ -236,7 +239,7 @@ public class CouponServiceTests
         var couponUpdateDto = new CouponUpdateDto { Id = Guid.NewGuid(), Code = "CASOFT", MinValue = 20, Type = DiscountType.Percentage, Value = 10, Active = true, StartDate = DateTime.Now, EndDate = DateTime.UtcNow.AddDays(1), MaxUse = 5 };
         var coupon = new Coupon { Id = couponUpdateDto.Id, Code = "CASOFT30", MinValue = 50, Type = (int)DiscountType.Percentage, Value = 10, Active = true, EndDate = DateTime.UtcNow.AddDays(1), MaxUse = 5 };
 
-        _repositoryMock.Setup(r => r.FindOne(It.IsAny<Expression<Func<Coupon, bool>>>(), It.IsAny<FindOptions?>())).Returns(coupon);
+        _repositoryMock.Setup(r => r.Repository<Coupon>().FindOne(It.IsAny<Expression<Func<Coupon, bool>>>(), It.IsAny<FindOptions?>())).Returns(coupon);
         var result = await _couponService.UpdateCoupon(couponUpdateDto);
 
         // Assert
@@ -252,7 +255,7 @@ public class CouponServiceTests
         var couponUpdateDto = new CouponUpdateDto { Id = Guid.NewGuid(), Code = "CASOFT30", MinValue = 20, Type = DiscountType.Percentage, Value = 10, Active = true, StartDate = DateTime.Now, EndDate = DateTime.UtcNow.AddDays(1), MaxUse = 5 };
         var coupon = new Coupon { Id = couponUpdateDto.Id, Code = "CASOFT30", MinValue = 50, Type = (int)DiscountType.Percentage, Value = 10, Active = true, StartDate = DateTime.Now, EndDate = DateTime.UtcNow.AddDays(1), MaxUse = 5 };
 
-        _repositoryMock.Setup(r => r.FindOne(It.IsAny<Expression<Func<Coupon, bool>>>(), It.IsAny<FindOptions?>())).Throws(new Exception("Error to updated coupon"));
+        _repositoryMock.Setup(r => r.Repository<Coupon>().FindOne(It.IsAny<Expression<Func<Coupon, bool>>>(), It.IsAny<FindOptions?>())).Throws(new Exception("Error to updated coupon"));
 
         var result = await Assert.ThrowsAsync<Exception>(async () =>
         {
@@ -270,7 +273,7 @@ public class CouponServiceTests
         var couponUpdateDto = new CouponUpdateDto { Id = Guid.NewGuid(), Code = "CASOFT30", MinValue = 20, Type = DiscountType.Percentage, Value = 10, Active = true, StartDate = DateTime.Now, EndDate = DateTime.UtcNow.AddDays(1), MaxUse = 5 };
         var coupon = new Coupon { Id = couponUpdateDto.Id, Code = "CASOFT30", MinValue = 50, Type = (int)DiscountType.Percentage, Value = 10, Active = true, StartDate = DateTime.Now, EndDate = DateTime.UtcNow.AddDays(1), MaxUse = 5 };
 
-        _repositoryMock.Setup(r => r.FindOne(It.IsAny<Expression<Func<Coupon, bool>>>(), It.IsAny<FindOptions?>())).Returns((Coupon)null);
+        _repositoryMock.Setup(r => r.Repository<Coupon>().FindOne(It.IsAny<Expression<Func<Coupon, bool>>>(), It.IsAny<FindOptions?>())).Returns((Coupon)null);
 
         var result = await _couponService.UpdateCoupon(couponUpdateDto);
 
@@ -286,7 +289,7 @@ public class CouponServiceTests
     {
         var coupon = new Coupon { Id = Guid.NewGuid(), Code = "CASOFT30", MinValue = 50, Type = (int)DiscountType.Percentage, Value = 10, Active = true, StartDate = DateTime.Now, EndDate = DateTime.UtcNow.AddDays(1), MaxUse = 5 };
 
-        _repositoryMock.Setup(r => r.FindOne(It.IsAny<Expression<Func<Coupon, bool>>>(), It.IsAny<FindOptions?>())).Returns((Coupon)null);
+        _repositoryMock.Setup(r => r.Repository<Coupon>().FindOne(It.IsAny<Expression<Func<Coupon, bool>>>(), It.IsAny<FindOptions?>())).Returns((Coupon)null);
 
         var result = await _couponService.DeleteCoupon(Guid.NewGuid());
 
@@ -300,7 +303,7 @@ public class CouponServiceTests
     [Trait("Discount.Service", "Apply Discount")]
     public async Task DeleteNotCoupon_ShouldException()
     {
-        _repositoryMock.Setup(r => r.FindOne(It.IsAny<Expression<Func<Coupon, bool>>>(), It.IsAny<FindOptions?>()))
+        _repositoryMock.Setup(r => r.Repository<Coupon>().FindOne(It.IsAny<Expression<Func<Coupon, bool>>>(), It.IsAny<FindOptions?>()))
             .Throws(new Exception("Error to delete coupon"));
 
         // Assert
@@ -330,11 +333,10 @@ public class CouponServiceTests
     [Trait("Discount.Service", "Apply Discount")]
     public async Task GetAllException_NullList()
     {
-        var coupons = new List<Coupon>
-        {}.AsQueryable();
+        var coupons = new List<Coupon>();
 
-        _repositoryMock.Setup(r => r.GetAllEntities(It.IsAny<FindOptions?>()))
-            .Returns(coupons);
+        _repositoryMock.Setup(r => r.Repository<Coupon>().GetAllAsync())
+            .ReturnsAsync(coupons);
 
         var result = await _couponService.GetAll();
 
@@ -346,7 +348,7 @@ public class CouponServiceTests
     public async Task GetAllException()
     {
         
-        _repositoryMock.Setup(r => r.GetAllEntities(It.IsAny<FindOptions?>())).Throws(new Exception("Error to retrive coupons"));
+        _repositoryMock.Setup(r => r.Repository<Coupon>().GetAllAsync()).Throws(new Exception("Error to retrive coupons"));
 
         // Assert
         var result = await Assert.ThrowsAsync<Exception>(async () =>
@@ -373,7 +375,7 @@ public class CouponServiceTests
     public async Task GetCouponByCode_NotFounded()
     {
 
-        _repositoryMock.Setup(r => r.FindOne(It.IsAny<Expression<Func<Coupon, bool>>>(), It.IsAny<FindOptions?>())).Returns((Coupon)null);
+        _repositoryMock.Setup(r => r.Repository<Coupon>().FindOne(It.IsAny<Expression<Func<Coupon, bool>>>(), It.IsAny<FindOptions?>())).Returns((Coupon)null);
 
         // Assert
 
@@ -388,7 +390,7 @@ public class CouponServiceTests
     public async Task GetCouponByCode_Exception()
     {
 
-        _repositoryMock.Setup(r => r.FindOne(It.IsAny<Expression<Func<Coupon, bool>>>(), It.IsAny<FindOptions?>())).Throws(new Exception("Error to retrive coupon data"));
+        _repositoryMock.Setup(r => r.Repository<Coupon>().FindOne(It.IsAny<Expression<Func<Coupon, bool>>>(), It.IsAny<FindOptions?>())).Throws(new Exception("Error to retrive coupon data"));
         // Assert
         var result = await Assert.ThrowsAsync<Exception>(async () =>
         {

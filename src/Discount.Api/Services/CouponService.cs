@@ -4,7 +4,8 @@ using Discount.Domain.Abstractions;
 using Discount.Domain.Dtos;
 using Discount.Domain.Entities;
 using Discount.Domain.ValueObjects;
-using RepoPgNet;
+using Discount.Infrastructure;
+using HybridRepoNet.Abstractions;
 using ResultNet;
 using Serilog;
 using System.Diagnostics.CodeAnalysis;
@@ -14,13 +15,13 @@ namespace Discount.Api.Services;
 [ExcludeFromCodeCoverage]
 public class CouponService : ICouponService
 {
-    private readonly IPgRepository<Coupon> _repository;
+    private readonly IUnitOfWork<CouponsDbContext> _unitOfWork;
 
     private readonly IMapper _mapper;
 
-    public CouponService(IPgRepository<Coupon> repository, IMapper mapper)
+    public CouponService(IUnitOfWork<CouponsDbContext> unitOfWork, IMapper mapper)
     {
-        _repository = repository;
+        _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
 
@@ -35,13 +36,13 @@ public class CouponService : ICouponService
             };
         }
 
-        var coupon = _repository.FindOne(x => x.Code == discountRequest.Code);
+        var coupon = _unitOfWork.Repository<Coupon>().FindOne(x => x.Code == discountRequest.Code);
 
         var orderDiscount = new DiscountResponse();
 
         if (coupon is not null)
         {
-            if (! await IsValidCoupon(coupon))
+            if (!IsValidCoupon(coupon))
             {
                 return new DiscountResponse
                 {
@@ -104,7 +105,8 @@ public class CouponService : ICouponService
 
             var couponEntity = _mapper.Map<Coupon>(coupon);
 
-            await _repository.AddAsync(couponEntity);
+            await _unitOfWork.Repository<Coupon>().AddAsync(couponEntity);
+            await _unitOfWork.Commit();
 
             return await Result<bool>.SuccessAsync("Coupon created successfully");
         }
@@ -130,7 +132,7 @@ public class CouponService : ICouponService
 
             }
 
-            var couponEntity = _repository.FindOne(x => x.Id == coupon.Id);
+            var couponEntity = _unitOfWork.Repository<Coupon>().FindOne(x => x.Id == coupon.Id);
 
             if (couponEntity is not null)
             {
@@ -143,7 +145,8 @@ public class CouponService : ICouponService
                 couponEntity.Value = coupon.Value;
                 couponEntity.MaxUse = coupon.MaxUse;
 
-                await _repository.UpdateAsync(couponEntity);
+                _unitOfWork.Repository<Coupon>().UpdateAsync(couponEntity);
+                await _unitOfWork.Commit();
 
                 return await Result<bool>.SuccessAsync("Coupon updated successfully");
             }
@@ -169,11 +172,13 @@ public class CouponService : ICouponService
                 return await Result<bool>.FailureAsync("Invalid id");
             }
 
-            var couponEntity = _repository.FindOne(x => x.Id == id);
+            var couponEntity = _unitOfWork.Repository<Coupon>().FindOne(x => x.Id == id);
 
             if (couponEntity is not null)
             {
-                await _repository.DeleteAsync(couponEntity);
+                _unitOfWork.Repository<Coupon>().DeleteAsync(couponEntity);
+                await _unitOfWork.Commit();
+
                 return await Result<bool>.SuccessAsync("Coupon deleted successfully");
             }
             else
@@ -193,7 +198,7 @@ public class CouponService : ICouponService
     {
         try
         {
-            var couponList = _repository.GetAllEntities();
+            var couponList = await  _unitOfWork.Repository<Coupon>().GetAllAsync();
 
             if (couponList.Any())
             {
@@ -221,11 +226,10 @@ public class CouponService : ICouponService
                 return await Result<Coupon>.FailureAsync("Invalid coupon code");
             }
 
-            var couponEntity = _repository.FindOne(x => x.Code.Equals(code));
+            var couponEntity = _unitOfWork.Repository<Coupon>().FindOne(x => x.Code.Equals(code));
 
             if (couponEntity is not null)
             {
-                await _repository.DeleteAsync(couponEntity);
                 return await Result<Coupon>.SuccessAsync(couponEntity);
             }
             else
@@ -244,10 +248,11 @@ public class CouponService : ICouponService
     private async Task IncreaseCouponUse(Coupon coupon)
     {
         coupon.TotalUse++;
-        await _repository.UpdateAsync(coupon);
+        _unitOfWork.Repository<Coupon>().UpdateAsync(coupon);
+        await _unitOfWork.Commit();
     }
 
-    private async Task<bool> IsValidCoupon(Coupon coupon)
+    private static bool IsValidCoupon(Coupon coupon)
     {
         if (coupon.EndDate < DateTime.UtcNow 
             || !coupon.Active 

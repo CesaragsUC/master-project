@@ -1,5 +1,5 @@
-﻿using Application.Dtos.Dtos.Login;
-using Auth.Api.Abstractions;
+﻿using Auth.Api.Abstractions;
+using Auth.Api.Dtos.Login;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Auth.Api.Controllers;

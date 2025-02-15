@@ -1,9 +1,7 @@
 using Billing.Api.Configurations;
 using Billing.Application.Service;
-using Billing.Infrastructure;
 using Billing.Infrastructure.Configurations;
 using Billing.Infrastructure.RabbitMq;
-using RepoPgNet;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,7 +15,6 @@ builder.Services.AddSwaggerGen();
 builder.Services.ConfigureFluentMigration(builder.Configuration);
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 builder.Services.AddScoped<IPaymentService, PaymentService>();
-builder.Services.AddRepoPgNet<BillingContext>(builder.Configuration);
 builder.Services.AddServices(builder.Configuration);
 builder.Services.AddInfra(builder.Configuration);
 

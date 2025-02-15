@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Application.Dtos.Dtos.Produtos;
-
+namespace Catalog.Application.Dtos;
 [ExcludeFromCodeCoverage]
 public record ProductDto
 {

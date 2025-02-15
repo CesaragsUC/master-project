@@ -1,6 +1,6 @@
-﻿using Application.Dtos.Dtos.Produtos;
-using Bogus;
+﻿using Bogus;
 using Catalog.Application.Abstractions;
+using Catalog.Application.Dtos;
 using Catalog.Application.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

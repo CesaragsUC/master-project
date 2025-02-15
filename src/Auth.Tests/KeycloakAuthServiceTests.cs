@@ -1,26 +1,20 @@
-using Application.Dtos.Dtos.Login;
-using Application.Dtos.Settings;
 using Auth.Api.Services;
 using Microsoft.Extensions.Options;
 using Moq;
 using Moq.Protected;
+using Shared.Kernel.Models;
 using System.Net;
-using System.Net.Http;
 using System.Text.Json;
 
 namespace Auth.Tests
 {
     public class KeycloakAuthServiceTests
     {
-        private readonly Mock<HttpClient> _httpClientMock;
         private readonly Mock<IOptions<KeycloakSettings>> _keyCloakOptionsMock;
-        private readonly KeycloakAuthService _keycloakAuthService;
 
         public KeycloakAuthServiceTests()
         {
-            _httpClientMock = new Mock<HttpClient>();
             _keyCloakOptionsMock = new Mock<IOptions<KeycloakSettings>>();
-            _keycloakAuthService = new KeycloakAuthService(_httpClientMock.Object, _keyCloakOptionsMock.Object);
         }
 
 

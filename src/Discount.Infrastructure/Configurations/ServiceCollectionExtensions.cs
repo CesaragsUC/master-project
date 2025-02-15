@@ -1,4 +1,6 @@
 ﻿using FluentMigrator.Runner;
+using HybridRepoNet.Configurations;
+using HybridRepoNet.Helpers;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,11 +15,8 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection PostgresDbService(this IServiceCollection services, IConfiguration configuration)
     {
-        //var connectionString = configuration.GetConnectionString("PostgresConnection");
+        services.AddHybridRepoNet<CouponsDbContext>(configuration, DbType.PostgreSQL);
 
-        //services.AddDbContextPool<CouponsDbContext>(opt =>
-        //                                              opt.UseNpgsql(configuration.GetConnectionString("PostgresConnection")));
-        
         services.ConfigureFluentMigration(configuration);
 
         return services;

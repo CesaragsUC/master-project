@@ -1,12 +1,13 @@
-﻿using ResultNet;
+﻿using Order.Application.Dto;
+using ResultNet;
 
 namespace Order.Application.Abstractions;
 
 public interface IOrderService
 {
-    Task<Result<bool>> Add(Domain.Entities.Order order);
-    Task<Result<bool>> Update(Domain.Entities.Order order);
+    Task<Result<bool>> Add(CreateOrderDto orderDto);
+    Task<Result<bool>> Update(UpdateOrderDto orderDto);
     Task<Result<bool>> Delete(Guid id);
-    Task<Result<Domain.Entities.Order>> Get(Guid id);
-    Task<Result<IEnumerable<Domain.Entities.Order>>> List();
+    Task<Result<OrderDto>> Get(Guid id);
+    Task<Result<IEnumerable<OrderDto>>> List();
 }

@@ -2,7 +2,7 @@
 using Order.Application.Dto;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Order.Infrastructure.Configurations;
+namespace Order.Api.Configurations;
 
 [ExcludeFromCodeCoverage]
 public class AutoMapperConfig : Profile
@@ -12,6 +12,5 @@ public class AutoMapperConfig : Profile
         CreateMap<OrderDto, Domain.Entities.Order>().ReverseMap();
         CreateMap<CreateOrderDto, Domain.Entities.Order>().ReverseMap();
         CreateMap<OrderItemDto, Domain.Entities.OrderItem>().ReverseMap();
-
     }
 }

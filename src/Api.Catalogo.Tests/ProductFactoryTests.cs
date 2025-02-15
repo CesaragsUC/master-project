@@ -1,5 +1,5 @@
-﻿using Application.Dtos.Dtos.Produtos;
-using Bogus;
+﻿using Bogus;
+using Catalog.Application.Dtos;
 using Catalog.Domain.Models;
 namespace Catalogo.Api.Tests;
 

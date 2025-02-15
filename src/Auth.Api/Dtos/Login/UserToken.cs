@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Application.Dtos.Dtos.Login;
+namespace Auth.Api.Dtos.Login;
 
 [ExcludeFromCodeCoverage]
 public record UserToken

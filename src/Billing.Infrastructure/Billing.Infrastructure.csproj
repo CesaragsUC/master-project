@@ -24,13 +24,12 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.8" />
+		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.3" />
 		<PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.Design" Version="1.1.0" />
-		<PackageReference Include="RepoPgNet" Version="1.2.4" />
+		<PackageReference Include="HybridRepoNet" Version="3.0.3" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\Application.Dtos\Application.Dtos.csproj" />
 	  <ProjectReference Include="..\Billing.Domain\Billing.Domain.csproj" />
 	  <ProjectReference Include="..\Message.Broker\Message.Broker.csproj" />
 	  <ProjectReference Include="..\Messaging.Contracts\Messaging.Contracts.csproj" />

@@ -1,9 +1,10 @@
-﻿using Api.Gateway.Services;
-using Application.Dtos.Settings;
+﻿using Api.Gateway.Dtos;
+using Api.Gateway.Services;
 using Ocelot.Cache.CacheManager;
 using Ocelot.DependencyInjection;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using Shared.Kernel.Models;
 
 
 namespace Api.Gateway.Configuration;

@@ -1,5 +1,5 @@
-﻿using Application.Dtos.Dtos.Payments;
-using AutoMapper;
+﻿using AutoMapper;
+using Billing.Application.Dtos;
 using Billing.Domain.Entities;
 using System.Diagnostics.CodeAnalysis;
 

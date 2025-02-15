@@ -7,6 +7,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Abstractions\**" />
+	  <Content Remove="Abstractions\**" />
+	  <EmbeddedResource Remove="Abstractions\**" />
+	  <None Remove="Abstractions\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="AutoMapper" Version="13.0.1" />
 		<PackageReference Include="FluentResultNet" Version="1.1.0" />
 		<PackageReference Include="FluentValidation" Version="11.10.0" />
@@ -22,10 +29,6 @@
 	<ItemGroup>
 		<ProjectReference Include="..\Discount.Domain\Discount.Domain.csproj" />
 		<ProjectReference Include="..\Discount.Infrastructure\Discount.Infrastructure.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Folder Include="Abstractions\" />
 	</ItemGroup>
 
 </Project>
