@@ -1,10 +1,10 @@
 ﻿namespace Api.Gateway.Services;
 
 using Api.Gateway.Dto;
-using Application.Dtos.Dtos.Login;
-using Application.Dtos.Settings;
+using Api.Gateway.Dtos;
 using Microsoft.Extensions.Options;
 using Serilog;
+using Shared.Kernel.Models;
 using System.Net.Http;
 using System.Net.Http.Json; // para usar JsonContent
 using System.Text.Json;

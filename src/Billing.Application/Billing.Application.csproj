@@ -8,7 +8,7 @@
 	<ItemGroup>
 		<PackageReference Include="FluentResultNet" Version="1.1.0" />
 		<PackageReference Include="AutoMapper" Version="13.0.1" />
-		<PackageReference Include="RepoPgNet" Version="1.2.4" />
+		<PackageReference Include="HybridRepoNet" Version="3.0.5" />
 		<PackageReference Include="MediatR" Version="12.4.1" />
 		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
 		<PackageReference Include="MongoDB.Driver" Version="3.1.0" />
@@ -30,7 +30,6 @@
 		<PackageReference Include="Refit.Newtonsoft.Json" Version="8.0.0" />
 	</ItemGroup>
 	<ItemGroup>
-	  <ProjectReference Include="..\Application.Dtos\Application.Dtos.csproj" />
 	  <ProjectReference Include="..\Billing.Domain\Billing.Domain.csproj" />
 	  <ProjectReference Include="..\Billing.Infrastructure\Billing.Infrastructure.csproj" />
 	  <ProjectReference Include="..\Messaging.Contracts\Messaging.Contracts.csproj" />

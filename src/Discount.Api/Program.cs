@@ -1,8 +1,6 @@
 using Discount.Api.Services;
 using Discount.Domain.Abstractions;
-using Discount.Infrastructure;
 using Discount.Infrastructure.Configurations;
-using RepoPgNet;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,7 +12,6 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddRepoPgNet<CouponsDbContext>(builder.Configuration);
 builder.Services.PostgresDbService(builder.Configuration);
 
 builder.Services.AddScoped<ICouponService, CouponService>();

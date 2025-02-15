@@ -1,4 +1,4 @@
-﻿using Application.Dtos.Dtos.Payments;
+﻿using Billing.Application.Dtos;
 using Billing.Application.Service;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics.CodeAnalysis;
@@ -15,7 +15,7 @@ public class PaymentController(IPaymentService paymentService) : ControllerBase
     public async Task<IActionResult> ProcessPayment(PaymentCreatDto paymentDto)
     {
         var result = await paymentService.CreatePaymentAsync(paymentDto);
-        return result.Succeeded ? Ok() : BadRequest(result);
+        return result.Succeeded ? Ok(result) : BadRequest(result);
     }
 
     [HttpGet]
@@ -23,16 +23,16 @@ public class PaymentController(IPaymentService paymentService) : ControllerBase
     public async Task<IActionResult> ListAsync()
     {
         var result = await paymentService.GetAllPaymentAsync();
-        return result.Succeeded ? Ok() : BadRequest(result);
+        return result.Succeeded ? Ok(result) : BadRequest(result);
     }
 
 
     [HttpGet]
-    [Route("delete/{transactionId}")]
+    [Route("{transactionId}")]
     public async Task<IActionResult> GetByIdAsync(string transactionId)
     {
         var result = await paymentService.GetPaymentAsync(transactionId);
-        return result.Succeeded ? Ok() : BadRequest(result);
+        return result.Succeeded ? Ok(result) : BadRequest(result);
     }
 
     [HttpDelete]
@@ -40,6 +40,6 @@ public class PaymentController(IPaymentService paymentService) : ControllerBase
     public async Task<IActionResult> DeleteAsync(string transactionId)
     {
         var result = await paymentService.DeletePaymentAsync(transactionId);
-        return result.Succeeded ? Ok() : BadRequest(result);
+        return result.Succeeded ? Ok(result) : BadRequest(result);
     }
 }

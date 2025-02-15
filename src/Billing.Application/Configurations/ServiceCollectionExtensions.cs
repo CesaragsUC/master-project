@@ -35,4 +35,5 @@ public static class ServiceCollectionExtensions
         }).ConfigureHttpClient(c => c.BaseAddress = new Uri(baseDiscountUri!));
 
     }
+
 }

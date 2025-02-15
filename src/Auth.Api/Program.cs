@@ -1,13 +1,13 @@
-using Application.Dtos.Abstractions;
-using Application.Dtos.Dtos.Response;
-using Application.Dtos.Settings;
 using Auth.Api.Abstractions;
 using Auth.Api.Services;
 using Keycloak.AuthServices.Authentication;
 using Keycloak.AuthServices.Authorization;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using Prometheus;
+using ResultNet;
 using Serilog;
+using Shared.Kernel.Models;
 using System.Security.Claims;
 
 Log.Logger = new LoggerConfiguration()
@@ -61,6 +61,7 @@ builder.Services.AddOpenTelemetry()
               });
     });
 
+builder.Services.UseHttpClientMetrics();
 
 builder.Services.AddKeycloakWebApiAuthentication(builder.Configuration, KeycloakAuthenticationOptions.Section);
 
@@ -85,12 +86,14 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseMetricServer();
+app.UseHttpMetrics();
+
 app.MapGet("users/me", (ClaimsPrincipal claimsPrincipal) =>
 {
     return claimsPrincipal.Claims.ToDictionary(c => c.Type, c => c.Value);
 }).RequireAuthorization();
 
 app.MapControllers();
-
 
 app.Run();

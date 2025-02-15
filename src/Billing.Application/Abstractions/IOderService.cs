@@ -1,4 +1,4 @@
-﻿using Billing.Domain.Entities;
+﻿using Billing.Application.Dtos;
 using Refit;
 using ResultNet;
 
@@ -7,5 +7,5 @@ namespace Billing.Application.Abstractions;
 public interface IOderApi
 {
     [Get("/{id}")]
-    Task<ApiResponse<Result<Order>>> GetOrderAsync(Guid id);
+    Task<ApiResponse<Result<OrderDto>>> GetOrderAsync(Guid id);
 }

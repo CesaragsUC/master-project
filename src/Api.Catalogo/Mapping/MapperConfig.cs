@@ -1,5 +1,5 @@
-﻿using Application.Dtos.Dtos.Produtos;
-using AutoMapper;
+﻿using AutoMapper;
+using Catalog.Application.Dtos;
 using Catalog.Domain.Models;
 
 namespace Api.Catalogo.Mapping

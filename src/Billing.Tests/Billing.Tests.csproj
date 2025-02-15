@@ -10,6 +10,7 @@
   </PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="AutoMapper" Version="13.0.1" />
 		<PackageReference Include="Bogus" Version="35.6.1" />
 		<PackageReference Include="coverlet.collector" Version="6.0.0" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.1" />
@@ -18,6 +19,11 @@
 		<PackageReference Include="xunit" Version="2.5.3" />
 		<PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
 		<PackageReference Include="MediatR" Version="12.4.1" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Billing.Application\Billing.Application.csproj" />
+	  <ProjectReference Include="..\Billing.Domain\Billing.Domain.csproj" />
 	</ItemGroup>
   <ItemGroup>
     <Using Include="Xunit" />

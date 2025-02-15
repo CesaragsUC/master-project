@@ -1,4 +1,6 @@
 ﻿using Billing.Infrastructure.Consumers;
+using HybridRepoNet.Configurations;
+using HybridRepoNet.Helpers;
 using Message.Broker.Configurations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,6 +19,8 @@ public static class RabbiMqConfigurations
             typeof(PaymentConsumer),
             typeof(PaymentConfirmedConsumer),
             typeof(PaymentFailedConsumer));
+
+        services.AddHybridRepoNet<BillingContext>(configuration, DbType.PostgreSQL);
 
         return services;
     }

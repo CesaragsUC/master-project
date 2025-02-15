@@ -1,6 +1,6 @@
-﻿using Application.Dtos.Dtos.Produtos;
-using AutoMapper;
+﻿using AutoMapper;
 using Catalog.Application.Abstractions;
+using Catalog.Application.Dtos;
 using Catalog.Application.Filters;
 using Catalog.Application.Validation;
 using Catalog.Domain.Models;

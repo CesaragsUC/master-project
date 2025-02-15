@@ -20,6 +20,11 @@
 		<PackageReference Include="MediatR" Version="12.4.1" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\Order.Application\Order.Application.csproj" />
+	  <ProjectReference Include="..\Order.Infrastructure\Order.Infrastructure.csproj" />
+	</ItemGroup>
+
   <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>

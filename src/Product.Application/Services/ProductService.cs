@@ -4,11 +4,9 @@ using Product.Domain.Abstractions;
 using Product.Domain.Events;
 using Product.Infrastructure.RabbitMq;
 using Serilog;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Product.Application.Services;
 
-[ExcludeFromCodeCoverage]
 public class ProductService : IProductService
 {
     private readonly IQueueService _queueService;

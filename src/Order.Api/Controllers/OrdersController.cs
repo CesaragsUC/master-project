@@ -31,8 +31,7 @@ public class OrdersController(IOrderService orderService, IMapper mapper) : Cont
     [Route("add")]
     public async Task<IActionResult> Add(CreateOrderDto model)
     {
-        var order = mapper.Map<Domain.Entities.Order>(model);
-        var result = await orderService.Add(order);
+        var result = await orderService.Add(model);
         return result.Succeeded ? Ok(result) : BadRequest(result);
     }
 
@@ -40,8 +39,7 @@ public class OrdersController(IOrderService orderService, IMapper mapper) : Cont
     [Route("update")]
     public async Task<IActionResult> Update(UpdateOrderDto model)
     {
-        var order = mapper.Map<Domain.Entities.Order>(model);
-        var result = await orderService.Update(order);
+        var result = await orderService.Update(model);
         return result.Succeeded ? Ok(result) : BadRequest(result);
     }
 

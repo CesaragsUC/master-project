@@ -33,7 +33,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Application.Dtos\Application.Dtos.csproj" />
 		<ProjectReference Include="..\Basket.Domain\Basket.Domain.csproj" />
 		<ProjectReference Include="..\Basket.Infrastructure\Basket.Infrastructure.csproj" />
 		<ProjectReference Include="..\Message.Broker\Message.Broker.csproj" />

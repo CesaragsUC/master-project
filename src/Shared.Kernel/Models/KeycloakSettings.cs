@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Application.Dtos.Settings;
+namespace Shared.Kernel.Models;
 
 [ExcludeFromCodeCoverage]
 public class KeycloakSettings

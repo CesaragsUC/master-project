@@ -1,7 +1,8 @@
-﻿using MediatR;
+﻿using HybridRepoNet.Abstractions;
+using MediatR;
 using Messaging.Contracts.Events.Orders;
 using Order.Application.Extentions;
-using RepoPgNet;
+using Order.Infrastructure;
 using Serilog;
 using System.Diagnostics.CodeAnalysis;
 
@@ -11,13 +12,12 @@ namespace Order.Application.Handlers.Events;
 public class OrderCreatedEventHandler :
     IRequestHandler<OrderCreatedEvent, bool>
 {
-    private readonly IPgRepository<Domain.Entities.Order> _repository;
+    private readonly IUnitOfWork<OrderDbContext> _unitOfWork;
 
-    public OrderCreatedEventHandler(IPgRepository<Domain.Entities.Order> repository)
+    public OrderCreatedEventHandler(IUnitOfWork<OrderDbContext> unitOfWork)
     {
-        _repository = repository;
+        _unitOfWork = unitOfWork;
     }
-
 
     public async Task<bool> Handle(OrderCreatedEvent request, CancellationToken cancellationToken)
     {
@@ -25,7 +25,8 @@ public class OrderCreatedEventHandler :
         {
             var order = request.ToOrder();
 
-            await _repository.AddAsync(order);
+            await _unitOfWork.Repository<Domain.Entities.Order>().AddAsync(order);
+            await _unitOfWork.Commit();
 
             Log.Information("Order created: {Id} - {Date}", order.Id, DateTime.Now);
 

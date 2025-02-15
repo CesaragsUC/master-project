@@ -1,18 +1,14 @@
-﻿
+﻿using System.Diagnostics.CodeAnalysis;
 
-using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
-
-namespace Order.Domain.Entities;
+namespace Billing.Application.Dtos;
 
 [ExcludeFromCodeCoverage]
-public class Order
+public sealed record class OrderDto
 {
-    [Key]
-    public Guid Id { get; set; } =  Guid.NewGuid(); 
+    public Guid Id { get; set; }
     public DateTime CreatedAt { get; set; }
     public Guid CustomerId { get; set; }
-    public IEnumerable<OrderItem>? Items { get; set; }
+    public IEnumerable<OrderItemDto>? Items { get; set; }
     public decimal TotalAmount { get; set; }
     public int Status { get; set; }
     public string? Name { get; set; }

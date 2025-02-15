@@ -1,7 +1,7 @@
 using Api.Gateway.Configuration;
 using Api.Gateway.Dto;
+using Api.Gateway.Dtos;
 using Api.Gateway.Services;
-using Application.Dtos.Settings;
 using Microsoft.OpenApi.Models;
 using Ocelot.Middleware;
 using Serilog;

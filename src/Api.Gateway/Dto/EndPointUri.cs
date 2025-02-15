@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Application.Dtos.Settings;
+namespace Api.Gateway.Dtos;
 
 [ExcludeFromCodeCoverage]
 public class EndPointUri

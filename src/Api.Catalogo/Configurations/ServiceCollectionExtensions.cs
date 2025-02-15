@@ -1,6 +1,4 @@
-﻿using Application.Dtos.Abstractions;
-using Application.Dtos.Dtos.Response;
-using Azure.Storage.Blobs;
+﻿using Azure.Storage.Blobs;
 using Catalog.Application.Abstractions;
 using Catalog.Application.Services;
 using Catalog.Infrastructure.Configurations;
@@ -12,6 +10,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using ResultNet;
 using System.Reflection;
 
 namespace Catalogo.Api.Configurations;
