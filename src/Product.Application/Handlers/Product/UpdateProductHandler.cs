@@ -1,12 +1,13 @@
 ﻿using Domain.Interfaces;
 using FluentValidation;
+using HybridRepoNet.Abstractions;
+using Infrastructure;
 using MediatR;
 using Product.Application.Comands.Product;
 using Product.Application.Validation;
 using Product.Domain.Abstractions;
 using Product.Domain.Events;
 using Product.Domain.Models;
-using RepoPgNet;
 using ResultNet;
 using Serilog;
 using System.Diagnostics.CodeAnalysis;
@@ -17,17 +18,17 @@ namespace Product.Application.Handlers.Product;
 public class UpdateProductHandler : IRequestHandler<UpdateProductCommand, Result<bool>>
 {
     private readonly IProductService _productService;
-    private readonly IPgRepository<Domain.Models.Product> _repository;
+    private readonly IUnitOfWork<ProductDbContext> _unitOfWork;
     private readonly IBobStorageService _bobStorageService;
 
-    public UpdateProductHandler
-        (IPgRepository<Domain.Models.Product> repository,
+    public UpdateProductHandler(
         IBobStorageService bobStorageService,
-        IProductService productService)
+        IProductService productService,
+        IUnitOfWork<ProductDbContext> unitOfWork)
     {
-        _repository = repository;
         _bobStorageService = bobStorageService;
         _productService = productService;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Result<bool>> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
@@ -38,21 +39,22 @@ public class UpdateProductHandler : IRequestHandler<UpdateProductCommand, Result
 
             if (!validationResponse.Success)
             {
-                return  await Result<bool>.FailureAsync(400, validationResponse?.Errors?.ToList()); 
+                return await Result<bool>.FailureAsync(400, validationResponse?.Errors?.ToList());
             }
 
-            var produto = _repository.FindOne(x => x.Id == request.Id);
+            var produto = _unitOfWork.Repository<Domain.Models.Product>().FindOne(x => x.Id == request.Id);
 
-            if (produto == null) return await Result<bool>.FailureAsync(400, $"Product {request.Id} not find"); 
+            if (produto == null) return await Result<bool>.FailureAsync(400, $"Product {request.Id} not find");
 
             produto.Name = request.Name;
             produto.Price = request.Price;
             produto.Active = request.Active;
 
-            if(!string.IsNullOrEmpty(request.ImageBase64))
+            if (!string.IsNullOrEmpty(request.ImageBase64))
                 produto.ImageUri = await UploadImage(request.ImageBase64, produto.ImageUri);
 
-            await _repository.UpdateAsync(produto);
+            _unitOfWork.Repository<Domain.Models.Product>().Update(produto);
+            await _unitOfWork.Commit();
 
             await _productService.PublishProductUpdatedEvent(new ProductUpdatedDomainEvent
             {
@@ -68,10 +70,10 @@ public class UpdateProductHandler : IRequestHandler<UpdateProductCommand, Result
         catch (Exception ex)
         {
             Log.Error(ex, "Fail to updated product");
-            return  await Result<bool>.FailureAsync(400, ex.Message); 
+            return await Result<bool>.FailureAsync(400, ex.Message);
         }
     }
-    private async Task<string> UploadImage(string? base64Image,string? oldBlobName)
+    private async Task<string> UploadImage(string? base64Image, string? oldBlobName)
     {
         if (!string.IsNullOrEmpty(base64Image))
             return await _bobStorageService.UploadBase64ImageToBlobAsync(base64Image, Guid.NewGuid().ToString(), oldBlobName);

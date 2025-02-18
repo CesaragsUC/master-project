@@ -2,6 +2,7 @@ using Auth.Api.Abstractions;
 using Auth.Api.Services;
 using Keycloak.AuthServices.Authentication;
 using Keycloak.AuthServices.Authorization;
+using Microsoft.Extensions.Configuration;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Prometheus;
@@ -26,29 +27,15 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IAuthKeyCloakService, KeycloakAuthService>();
 builder.Services.AddScoped(typeof(IResult<>), typeof(Result<>));
 
-builder.Services.AddOpenTelemetry()
-  .ConfigureResource(resource => resource.AddService("Auth.Api"))
-  .WithTracing(builder =>
-  {
-      builder
-          .AddAspNetCoreInstrumentation()
-          .AddHttpClientInstrumentation()
-            .AddJaegerExporter(options =>
-            {
-                options.AgentHost = "localhost";
-                options.AgentPort = 6831;
-            });
-  });
+//https://medium.com/@jwag/grafana-with-logging-and-metrics-from-a-dotnet-api-cbaa06d359aa
+//https://github.com/sgbj/dotnet-monitoring
+//https://github.com/jaaywags/grafana-dotnet-demo
 
-
-var jaegerConfig = builder.Configuration.GetSection("OpenTelemetry");
-var serviceName = jaegerConfig.GetValue<string>("ServiceName");
-var jaegerHost = jaegerConfig.GetValue<string>("Jaeger:AgentHost");
-var jaegerPort = jaegerConfig.GetValue<int>("Jaeger:AgentPort");
-
+var openTelemetryOptions = new OpenTelemetryOptions();
+builder.Configuration.GetSection("OpenTelemetryOptions").Bind(openTelemetryOptions);
 
 builder.Services.AddOpenTelemetry()
-    .ConfigureResource(resource => resource.AddService(serviceName))
+    .ConfigureResource(resource => resource.AddService(openTelemetryOptions.AppName))
     .WithTracing(builder =>
     {
         builder
@@ -56,8 +43,8 @@ builder.Services.AddOpenTelemetry()
             .AddHttpClientInstrumentation()
               .AddJaegerExporter(options =>
               {
-                  options.AgentHost = jaegerHost;
-                  options.AgentPort = jaegerPort;
+                  options.AgentHost = openTelemetryOptions.Jaeger.AgentHost;
+                  options.AgentPort = openTelemetryOptions.Jaeger.AgentPort;
               });
     });
 

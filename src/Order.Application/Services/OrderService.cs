@@ -46,7 +46,7 @@ public class OrderService : IOrderService
                 return await Result<bool>.FailureAsync("Order not found");
             }
 
-            _unitOfWork.Repository<Domain.Entities.Order>().SoftDeleteAsync(entity);
+            _unitOfWork.Repository<Domain.Entities.Order>().SoftDelete(entity);
             await _unitOfWork.Commit();
 
             return await Result<bool>.SuccessAsync(true);
@@ -117,7 +117,7 @@ public class OrderService : IOrderService
             order.Items = orderDto?.Items?.Select(x => x.ToOrderItem(order.Id));
             order.Status = orderDto!.Status;
 
-            _unitOfWork.Repository<Domain.Entities.Order>().UpdateAsync(order);
+            _unitOfWork.Repository<Domain.Entities.Order>().Update(order);
 
             return await Result<bool>.SuccessAsync(true);
         }

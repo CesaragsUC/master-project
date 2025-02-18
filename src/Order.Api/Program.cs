@@ -1,9 +1,7 @@
 using Order.Api.Configurations;
 using Order.Application.Abstractions;
 using Order.Application.Service;
-using Order.Infrastructure;
 using Order.Infrastructure.Configurations;
-using RepoPgNet;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,7 +12,6 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddRepoPgNet<OrderDbContext>(builder.Configuration);
 builder.Services.ConfigureFluentMigration(builder.Configuration);
 builder.Services.AddScoped<IOrderService,OrderService>();
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());

@@ -17,4 +17,5 @@ public class QueueService : IQueueService
     public Uri PaymentCreatedMessage => new Uri($"queue:{_rabbitMqOptions.Prefix}.casoft.payment.event.v1");
     public Uri PaymentConfirmedMessage => new Uri($"queue:{_rabbitMqOptions.Prefix}.casoft.paymentconfirmed.event.v1");
     public Uri PaymentFailedMessage => new Uri($"queue:{_rabbitMqOptions.Prefix}.casoft.paymentfailed.event.v1");
+    public Uri OrderUpdateMessage => new Uri($"queue:{_rabbitMqOptions.Prefix}.casoft.orderupdate.event.v1");
 }

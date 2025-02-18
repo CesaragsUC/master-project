@@ -1,16 +1,13 @@
 ﻿
 
-using System.ComponentModel.DataAnnotations;
+using HybridRepoNet;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Order.Domain.Entities;
 
 [ExcludeFromCodeCoverage]
-public class Order
+public class Order : BaseEntity
 {
-    [Key]
-    public Guid Id { get; set; } =  Guid.NewGuid(); 
-    public DateTime CreatedAt { get; set; }
     public Guid CustomerId { get; set; }
     public IEnumerable<OrderItem>? Items { get; set; }
     public decimal TotalAmount { get; set; }

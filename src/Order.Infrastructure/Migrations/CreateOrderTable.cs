@@ -20,8 +20,10 @@ public class CreateOrderTable : Migration
             .WithColumn("Name").AsString().NotNullable()
             .WithColumn("TotalAmount").AsDecimal().NotNullable()
             .WithColumn("Status").AsInt32().NotNullable()
-            .WithColumn("CreatedAt").AsDateTimeOffset().NotNullable() // "timestamp with time zone"
-            .WithColumn("PaymentToken").AsAnsiString().NotNullable(); 
+            .WithColumn("CreatedDate").AsDateTimeOffset().NotNullable()
+            .WithColumn("UpdatedDate").AsDateTimeOffset().Nullable()
+            .WithColumn("IsDeleted").AsBoolean().Nullable()
+            .WithColumn("PaymentToken").AsAnsiString().NotNullable();
         }
         Console.WriteLine("Table Orders created.");
     }

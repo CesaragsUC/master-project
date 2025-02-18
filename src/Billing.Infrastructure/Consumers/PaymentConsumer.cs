@@ -50,7 +50,7 @@ public class PaymentConsumer : IConsumer<PaymentCreatedEvent>
                     Amount = context.Message.Amount,
                     PaymentDate = context.Message.PaymentDate,
                     PaymentMethod = context.Message.PaymentMethod,
-                    Status = (int)PaymentStatus.Complete
+                    Status = (int)PaymentStatus.Completed
                 };
 
                 await _rabbitMqService.Send(paymentSucceedMessage, _queueService.PaymentConfirmedMessage);

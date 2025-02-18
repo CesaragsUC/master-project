@@ -12,7 +12,7 @@ public static class OrderExtentions
     {
         var order = new  Domain.Entities.Order
         {
-            CreatedAt = DateTime.Now,
+            CreatedDate = DateTime.Now,
             CustomerId = orderCreatedEvent.CustomerId,
             Status = (int)OrderStatus.Created,
             Name = orderCreatedEvent.UserName,
@@ -30,7 +30,7 @@ public static class OrderExtentions
     {
         var order = new Domain.Entities.Order
         {
-            CreatedAt = DateTime.Now,
+            CreatedDate = DateTime.Now,
             CustomerId = orderDto.CustomerId,
             Status = (int)OrderStatus.Created,
             Name = orderDto.Name,
@@ -48,7 +48,7 @@ public static class OrderExtentions
     {
         var order = new Domain.Entities.Order
         {
-            CreatedAt = DateTime.Now,
+            CreatedDate = DateTime.Now,
             CustomerId = dto.CustomerId,
             Status = (int)OrderStatus.Created,
             Name = dto.Name,
@@ -111,7 +111,7 @@ public static class OrderExtentions
         var orderDto = new OrderDto
         {
             Id = order.Id,
-            CreatedAt = order.CreatedAt,
+            CreatedAt = order.CreatedDate,
             CustomerId = order.CustomerId,
             TotalAmount = order.TotalAmount,
             Status = order.Status,
