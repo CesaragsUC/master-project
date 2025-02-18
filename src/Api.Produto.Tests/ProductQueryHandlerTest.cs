@@ -32,15 +32,23 @@ public class ProductQueryHandlerTest : BaseConfig
 
         _unitOfWork.Setup(r => r.Repository<Domain.Models.Product>().GetAllAsync()).ReturnsAsync(() =>
         {
-            return new List<Domain.Models.Product>();
+            return new List<Domain.Models.Product>
+            {
+                new Domain.Models.Product
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Produtos 01",
+                    Price = 10.5m,
+                    Active = true,
+                    CreatAt = DateTime.Now
+                }
+            };
         });
-
 
         var result = await _handler.Handle(command, CancellationToken.None);
 
         // Act
         Assert.True(result.Any());
-        Assert.True(result.Count() > 0, "A lista não possui mais do que 1 item.");
 
     }
 

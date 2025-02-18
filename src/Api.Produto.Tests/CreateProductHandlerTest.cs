@@ -1,5 +1,6 @@
 using Domain.Interfaces;
 using HybridRepoNet.Abstractions;
+using HybridRepoNet.Repository;
 using Infrastructure;
 using Moq;
 using Product.Application.Comands.Product;
@@ -38,6 +39,8 @@ public class CreateProductHandlerTest : BaseConfig
             Price = 10.5m,
             Active = true
         };
+
+        _unitOfWork.Setup(r => r.Repository<Domain.Models.Product>().AddAsync(It.IsAny<Domain.Models.Product>())).Returns(Task.CompletedTask);
 
         var result = await _handler.Handle(command, CancellationToken.None);
 
