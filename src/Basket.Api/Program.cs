@@ -2,10 +2,8 @@ using Basket.Api.Abstractions;
 using Basket.Api.Configurations;
 using Basket.Api.Services;
 using Basket.Domain.Abstractions;
-using Basket.Infrastructure;
 using Basket.Infrastructure.Configurations;
 using Basket.Infrastructure.Repository;
-using RepoPgNet;
 using StackExchange.Redis;
 using System.Reflection;
 

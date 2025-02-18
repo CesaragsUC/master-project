@@ -1,12 +1,13 @@
 ﻿using Domain.Interfaces;
 using FluentValidation;
+using HybridRepoNet.Abstractions;
+using Infrastructure;
 using MediatR;
 using Product.Application.Comands.Product;
 using Product.Application.Validation;
 using Product.Domain.Abstractions;
 using Product.Domain.Events;
 using Product.Domain.Models;
-using RepoPgNet;
 using ResultNet;
 using Serilog;
 using System.Diagnostics.CodeAnalysis;
@@ -16,17 +17,18 @@ namespace Product.Application.Handlers.Product;
 [ExcludeFromCodeCoverage]
 public class CreateProductHandler : IRequestHandler<CreateProductCommand, Result<bool>>
 {
-    private readonly IPgRepository<Domain.Models.Product> _repository;
+    private readonly  IUnitOfWork<ProductDbContext> _unitOfWork;
     private readonly IBobStorageService _bobStorageService;
     private readonly IProductService _productService;
 
-    public CreateProductHandler(IPgRepository<Domain.Models.Product> repository,
+    public CreateProductHandler(
         IBobStorageService bobStorageService,
-        IProductService productService)
+        IProductService productService,
+        IUnitOfWork<ProductDbContext> unitOfWork)
     {
-        _repository = repository;
         _bobStorageService = bobStorageService;
         _productService = productService;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<Result<bool>> Handle(CreateProductCommand request, CancellationToken cancellationToken)
@@ -50,7 +52,8 @@ public class CreateProductHandler : IRequestHandler<CreateProductCommand, Result
 
             };
 
-            await _repository.AddAsync(produto);
+            await _unitOfWork.Repository<Domain.Models.Product>().AddAsync(produto);
+            await _unitOfWork.Commit();
 
             await _productService.PublishProductAddedEvent(new ProductAddedDomainEvent
             {

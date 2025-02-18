@@ -7,6 +7,7 @@
   </PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="HybridRepoNet" Version="3.0.6" />
 		<PackageReference Include="AutoMapper" Version="13.0.1" />
 		<PackageReference Include="EasyMongoNet" Version="1.1.1" />
 		<PackageReference Include="MassTransit" Version="8.3.6" />

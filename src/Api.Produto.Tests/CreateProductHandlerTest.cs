@@ -1,9 +1,11 @@
 using Domain.Interfaces;
+using HybridRepoNet.Abstractions;
+using HybridRepoNet.Repository;
+using Infrastructure;
 using Moq;
 using Product.Application.Comands.Product;
 using Product.Application.Handlers.Product;
 using Product.Domain.Abstractions;
-using RepoPgNet;
 
 //https://goatreview-com.cdn.ampproject.org/c/s/goatreview.com/mediatr-quickly-test-handlers-with-unit-tests/amp/
 
@@ -11,7 +13,7 @@ namespace Product.Api.Tests;
 
 public class CreateProductHandlerTest : BaseConfig
 {
-    private readonly Mock<IPgRepository<Domain.Models.Product>> _repository;
+    private readonly Mock<IUnitOfWork<ProductDbContext>> _unitOfWork;
     private readonly Mock<IProductService> _productService;
     private readonly Mock<IBobStorageService> _bobStorageService;
     private readonly CreateProductHandler _handler;
@@ -19,10 +21,10 @@ public class CreateProductHandlerTest : BaseConfig
     {
         InitializeMediatrService();
 
-        _repository = new Mock<IPgRepository<Domain.Models.Product>>();
+        _unitOfWork = new Mock<IUnitOfWork<ProductDbContext>>();
         _productService = new Mock<IProductService>();
         _bobStorageService = new Mock<IBobStorageService>();
-        _handler = new CreateProductHandler(_repository.Object, _bobStorageService.Object, _productService.Object);
+        _handler = new CreateProductHandler(_bobStorageService.Object, _productService.Object, _unitOfWork.Object);
     }
 
     [Fact(DisplayName = "Teste 01 - Com sucesso")]
@@ -38,12 +40,14 @@ public class CreateProductHandlerTest : BaseConfig
             Active = true
         };
 
+        _unitOfWork.Setup(r => r.Repository<Domain.Models.Product>().AddAsync(It.IsAny<Domain.Models.Product>())).Returns(Task.CompletedTask);
+
         var result = await _handler.Handle(command, CancellationToken.None);
 
         // Act
         Assert.True(result.Succeeded);
 
-        _repository.Verify(r => r.AddAsync(It.IsAny<Domain.Models.Product>()), Times.Once);
+        _unitOfWork.Verify(r => r.Repository<Domain.Models.Product>().AddAsync(It.IsAny<Domain.Models.Product>()), Times.Once);
     }
 
     [Fact(DisplayName = "Teste 02 - Com Falha")]
@@ -58,6 +62,6 @@ public class CreateProductHandlerTest : BaseConfig
 
         // Act
         Assert.False(result.Succeeded);
-        _repository.Verify(r => r.AddAsync(It.IsAny<Domain.Models.Product>()), Times.Never);
+        _unitOfWork.Verify(r => r.Repository<Domain.Models.Product>().AddAsync(It.IsAny<Domain.Models.Product>()), Times.Never);
     }
 }

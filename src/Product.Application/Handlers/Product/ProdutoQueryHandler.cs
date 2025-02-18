@@ -1,27 +1,28 @@
-﻿using MediatR;
+﻿using HybridRepoNet.Abstractions;
+using Infrastructure;
+using MediatR;
 using Product.Application.Queries.Product;
 using Product.Domain.Exceptions;
-using RepoPgNet;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Product.Application.Handlers.Product;
 
 [ExcludeFromCodeCoverage]
 public class ProdutoQueryHandler : 
-    IRequestHandler<ProductQuery, List<Domain.Models.Product>>,
+    IRequestHandler<ProductQuery, IEnumerable<Domain.Models.Product>>,
     IRequestHandler<ProductByIdQuery, Domain.Models.Product>
 {
 
-    private readonly IPgRepository<Domain.Models.Product> _repository;
+    private readonly IUnitOfWork<ProductDbContext> _unitOfWork;
 
-    public ProdutoQueryHandler(IPgRepository<Domain.Models.Product> repository)
+    public ProdutoQueryHandler(IUnitOfWork<ProductDbContext> unitOfWork)
     {
-        _repository = repository;
+        _unitOfWork = unitOfWork;
     }
 
-    public async Task<List<Domain.Models.Product?>> Handle(ProductQuery request, CancellationToken cancellationToken)
+    public async Task<IEnumerable<Domain.Models.Product?>> Handle(ProductQuery request, CancellationToken cancellationToken)
     {
-        return _repository.GetAll().ToList()!;
+        return await _unitOfWork.Repository<Domain.Models.Product>().GetAllAsync();
     }
 
     public async Task<Domain.Models.Product?> Handle(ProductByIdQuery request, CancellationToken cancellationToken)
@@ -31,7 +32,7 @@ public class ProdutoQueryHandler :
             throw new ProductNotFoundException("Product Id couldn't empty");
         }
 
-        var produto = _repository.FindOne(x => x.Id == request.Id);
+        var produto = _unitOfWork.Repository<Domain.Models.Product>().FindOne(x => x.Id == request.Id);
 
         if (produto == null) throw new ProductNotFoundException(request.Id); 
 

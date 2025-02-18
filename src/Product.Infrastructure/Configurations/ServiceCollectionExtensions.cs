@@ -1,6 +1,8 @@
 ﻿using Azure.Storage.Blobs;
 using EasyMongoNet.Exntesions;
 using FluentMigrator.Runner;
+using HybridRepoNet.Configurations;
+using HybridRepoNet.Helpers;
 using Keycloak.AuthServices.Authentication;
 using Keycloak.AuthServices.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -29,6 +31,7 @@ public static class ServiceCollectionExtensions
         services.AddOpenTelemetryServices(configuration);
         services.MongoDbService(configuration);
         services.AddMessageBrokerSetup(configuration);
+        services.AddHybridRepoNet<ProductDbContext>(configuration, DbType.PostgreSQL);
 
         return services;
     }
@@ -144,12 +147,7 @@ public static class ServiceCollectionExtensions
         {
             builder
                 .AddAspNetCoreInstrumentation()
-                .AddHttpClientInstrumentation()
-                  .AddJaegerExporter(options =>
-                  {
-                      options.AgentHost = jaegerHost;
-                      options.AgentPort = jaegerPort;
-                  });
+                .AddHttpClientInstrumentation();
         });
 
     }

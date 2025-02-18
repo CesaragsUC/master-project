@@ -125,7 +125,7 @@ public class OrderServiceTest
                     UnitPrice = 100
                 } 
             },
-            CreatedAt = DateTime.Now,
+            CreatedDate = DateTime.Now,
             CustomerId = Guid.NewGuid(),
             Status = (int)OrderStatus.Created,
             Name = "Test",

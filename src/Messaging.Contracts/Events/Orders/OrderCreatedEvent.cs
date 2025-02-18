@@ -1,5 +1,4 @@
-﻿using Amazon.Runtime.Internal;
-using MediatR;
+﻿using MediatR;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Messaging.Contracts.Events.Orders;
