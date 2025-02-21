@@ -10,6 +10,8 @@ public class OpenTelemetryOptions
     public Jaeger? Jaeger { get; set; }
     public OtlExporter? OtlExporter { get; set; }
 
+    public GrafanaLoki? GrafanaLoki { get; set; }
+
 }
 
 [ExcludeFromCodeCoverage]

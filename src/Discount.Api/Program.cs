@@ -1,3 +1,4 @@
+using Discount.Api.Configurations;
 using Discount.Api.Services;
 using Discount.Domain.Abstractions;
 using Discount.Infrastructure.Configurations;
@@ -5,7 +6,7 @@ using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+LogConfig.SetupLogging(builder, builder.Configuration);
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -20,7 +21,9 @@ builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// more configuring metrics for grafana
+app.UseOpenTelemetryPrometheusScrapingEndpoint();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

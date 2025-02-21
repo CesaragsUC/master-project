@@ -73,22 +73,4 @@ public static class ServiceCollectionExtensions
         builder.Database = string.Empty; // Remove o nome do banco de dados
         return builder.ToString();
     }
-
-    private static void RollbackMigration(IMigrationRunner runner, long targetVersion)
-    {
-        // Reverte para a versão especificada
-        runner.MigrateDown(targetVersion);
-    }
-
-    private static void RollbackAllMigrations(IMigrationRunner runner)
-    {
-        // Reverte todas as migrações
-        runner.MigrateDown(0);
-    }
-
-    private static void RollbackLastMigrations(IMigrationRunner runner, int steps)
-    {
-        // Reverte as últimas 'steps' migrações
-        runner.Rollback(steps);
-    }
 }

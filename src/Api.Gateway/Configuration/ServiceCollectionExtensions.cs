@@ -2,8 +2,7 @@
 using Api.Gateway.Services;
 using Ocelot.Cache.CacheManager;
 using Ocelot.DependencyInjection;
-using OpenTelemetry.Resources;
-using OpenTelemetry.Trace;
+using Shared.Kernel.Opentelemetry;
 using Shared.Kernel.Models;
 
 
@@ -15,11 +14,10 @@ public static class ServiceCollectionExtensions
     {
         services.AddHttpClient<AuthenticationService>();
         services.AddHttpClient();
-
         services.AddJwtServices(configuration);
-        services.AddOpenTelemetryServices(configuration);
         services.AddAuthServices(configuration);
         services.AddCors(configuration);
+        services.AddGrafanaSetup(configuration);
 
     }
 
@@ -84,27 +82,4 @@ public static class ServiceCollectionExtensions
 
     }
 
-    public static void AddOpenTelemetryServices(this IServiceCollection services, IConfiguration configuration)
-    {
-        var jaegerConfig = configuration.GetSection("OpenTelemetry");
-        var serviceName = jaegerConfig.GetValue<string>("ServiceName");
-        var jaegerHost = jaegerConfig.GetValue<string>("Jaeger:AgentHost");
-        var jaegerPort = jaegerConfig.GetValue<int>("Jaeger:AgentPort");
-
-
-        services.AddOpenTelemetry()
-        .ConfigureResource(resource => resource.AddService(serviceName))
-        .WithTracing(builder =>
-        {
-            builder
-                .AddAspNetCoreInstrumentation()
-                .AddHttpClientInstrumentation()
-                  .AddJaegerExporter(options =>
-                  {
-                      options.AgentHost = jaegerHost;
-                      options.AgentPort = jaegerPort;
-                  });
-        });
-
-    }
 }

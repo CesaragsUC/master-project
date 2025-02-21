@@ -2,6 +2,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics.CodeAnalysis;
+using Shared.Kernel.Opentelemetry;
+
 
 namespace Basket.Infrastructure.Configurations;
 
@@ -16,6 +18,7 @@ public static class ServiceCollectionExtension
     {
         services.AddEasyMongoNet(configuration);
         services.AddMessageBrokerSetup(configuration);
+        services.AddGrafanaSetup(configuration);
     }
 
 }

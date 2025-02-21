@@ -8,8 +8,7 @@ using Keycloak.AuthServices.Authentication;
 using Keycloak.AuthServices.Authorization;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
-using OpenTelemetry.Resources;
-using OpenTelemetry.Trace;
+using Shared.Kernel.Opentelemetry;
 using ResultNet;
 using System.Reflection;
 
@@ -25,11 +24,10 @@ public static class ServiceCollectionExtensions
         services.AddScoped(typeof(IResult<>), typeof(Result<>));
         services.AddAutoMapper(Assembly.GetExecutingAssembly());
         services.MongoDbService(configuration);
-
+        services.AddGrafanaSetup(configuration);
 
         services.AddSwaggerServices();
         services.AddKeycloakServices(configuration);
-        services.AddOpenTelemetryServices(configuration);
         services.AddAzureBlobServices(configuration);
     }
 
@@ -92,30 +90,6 @@ public static class ServiceCollectionExtensions
                                     .Get<KeycloakProtectionClientOptions>();
 
         services.AddKeycloakAuthorization(authorizationOptions!);
-    }
-
-    public static void AddOpenTelemetryServices(this IServiceCollection services, IConfiguration configuration)
-    {
-        var jaegerConfig = configuration.GetSection("OpenTelemetry");
-        var serviceName = jaegerConfig.GetValue<string>("ServiceName");
-        var jaegerHost = jaegerConfig.GetValue<string>("Jaeger:AgentHost");
-        var jaegerPort = jaegerConfig.GetValue<int>("Jaeger:AgentPort");
-
-
-        services.AddOpenTelemetry()
-        .ConfigureResource(resource => resource.AddService(serviceName))
-        .WithTracing(builder =>
-        {
-            builder
-                .AddAspNetCoreInstrumentation()
-                .AddHttpClientInstrumentation()
-                  .AddJaegerExporter(options =>
-                  {
-                      options.AgentHost = jaegerHost;
-                      options.AgentPort = jaegerPort;
-                  });
-        });
-
     }
 
     public static void AddAzureBlobServices(this IServiceCollection services, IConfiguration configuration)
