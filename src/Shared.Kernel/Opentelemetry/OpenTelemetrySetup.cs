@@ -8,9 +8,11 @@ using Serilog;
 using Serilog.Exceptions;
 using Serilog.Sinks.Grafana.Loki;
 using Shared.Kernel.Models;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Shared.Kernel.Opentelemetry;
 
+[ExcludeFromCodeCoverage]
 public static class OpenTelemetrySetup
 {
     public static IServiceCollection AddGrafanaSetup(this IServiceCollection services,
