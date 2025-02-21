@@ -6,7 +6,7 @@ using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+LogConfig.SetupLogging(builder, builder.Configuration);
 
 builder.Services.AddControllers();
 
@@ -21,7 +21,9 @@ builder.Services.AddInfra(builder.Configuration);
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// more configuring metrics for grafana
+app.UseOpenTelemetryPrometheusScrapingEndpoint();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using Shared.Kernel.Opentelemetry;
 
 namespace Discount.Infrastructure.Configurations;
 
@@ -18,6 +19,7 @@ public static class ServiceCollectionExtensions
         services.AddHybridRepoNet<CouponsDbContext>(configuration, DbType.PostgreSQL);
 
         services.ConfigureFluentMigration(configuration);
+        services.AddGrafanaSetup(configuration);
 
         return services;
     }
@@ -82,23 +84,5 @@ public static class ServiceCollectionExtensions
         var builder = new NpgsqlConnectionStringBuilder(connectionString);
         builder.Database = string.Empty; // Remove o nome do banco de dados
         return builder.ToString();
-    }
-
-    private static void RollbackMigration(IMigrationRunner runner, long targetVersion)
-    {
-        // Reverte para a versão especificada
-        runner.MigrateDown(targetVersion);
-    }
-
-    private static void RollbackAllMigrations(IMigrationRunner runner)
-    {
-        // Reverte todas as migrações
-        runner.MigrateDown(0);
-    }
-
-    private static void RollbackLastMigrations(IMigrationRunner runner, int steps)
-    {
-        // Reverte as últimas 'steps' migrações
-        runner.Rollback(steps);
     }
 }

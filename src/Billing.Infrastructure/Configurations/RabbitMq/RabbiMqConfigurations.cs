@@ -5,6 +5,7 @@ using Message.Broker.Configurations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics.CodeAnalysis;
+using Shared.Kernel.Opentelemetry;
 
 namespace Billing.Infrastructure.RabbitMq;
 
@@ -21,6 +22,7 @@ public static class RabbiMqConfigurations
             typeof(PaymentFailedConsumer));
 
         services.AddHybridRepoNet<BillingContext>(configuration, DbType.PostgreSQL);
+        services.AddGrafanaSetup(configuration);
 
         return services;
     }

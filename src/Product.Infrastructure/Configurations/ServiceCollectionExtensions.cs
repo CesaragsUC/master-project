@@ -10,12 +10,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Npgsql;
-using OpenTelemetry.Resources;
-using OpenTelemetry.Trace;
 using Product.Infrastructure.Configurations.Azure;
 using Product.Infrastructure.RabbitMq;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using Shared.Kernel.Opentelemetry;
 
 namespace Infrastructure.Configurations;
 
@@ -23,15 +22,15 @@ namespace Infrastructure.Configurations;
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddInfra(this IServiceCollection services,
-    IConfiguration configuration)
+        IConfiguration configuration)
     {
         services.ConfigureFluentMigration(configuration);
         services.AddKeycloakServices(configuration);
         services.AddAzureBlobServices(configuration);
-        services.AddOpenTelemetryServices(configuration);
         services.MongoDbService(configuration);
         services.AddMessageBrokerSetup(configuration);
         services.AddHybridRepoNet<ProductDbContext>(configuration, DbType.PostgreSQL);
+        services.AddGrafanaSetup(configuration);
 
         return services;
     }
@@ -129,25 +128,6 @@ public static class ServiceCollectionExtensions
         {
             var blobContainers = provider.GetRequiredService<IOptions<BlobContainers>>().Value;
             return new BlobServiceClient(blobContainers.ConnectionStrings);
-        });
-
-    }
-
-    public static void AddOpenTelemetryServices(this IServiceCollection services, IConfiguration configuration)
-    {
-        var jaegerConfig = configuration.GetSection("OpenTelemetry");
-        var serviceName = jaegerConfig.GetValue<string>("ServiceName");
-        var jaegerHost = jaegerConfig.GetValue<string>("Jaeger:AgentHost");
-        var jaegerPort = jaegerConfig.GetValue<int>("Jaeger:AgentPort");
-
-
-        services.AddOpenTelemetry()
-        .ConfigureResource(resource => resource.AddService(serviceName))
-        .WithTracing(builder =>
-        {
-            builder
-                .AddAspNetCoreInstrumentation()
-                .AddHttpClientInstrumentation();
         });
 
     }

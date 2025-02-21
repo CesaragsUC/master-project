@@ -8,6 +8,7 @@ using Npgsql;
 using Product.Consumer.Configurations;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
+using Shared.Kernel.Opentelemetry;
 
 namespace Order.Infrastructure.Configurations;
 
@@ -18,6 +19,7 @@ public static class ServiceCollectionExtensions
     {
         services.ConfigureFluentMigration(configuration);
         services.AddMessageBrokerSetup(configuration);
+        services.AddGrafanaSetup(configuration);
         services.AddHybridRepoNet<OrderDbContext>(configuration,DbType.PostgreSQL);
     }
     public static ServiceProvider ConfigureFluentMigration(this IServiceCollection services, IConfiguration configuration)

@@ -9,6 +9,7 @@ using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
+LogConfig.SetupLogging(builder, builder.Configuration);
 
 builder.Services.AddControllers();
 
@@ -39,6 +40,10 @@ builder.Services.AddStackExchangeRedisCache(options =>
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
 var app = builder.Build();
+
+// more configuring metrics for grafana
+app.UseOpenTelemetryPrometheusScrapingEndpoint();
+
 
 if (app.Environment.IsDevelopment())
 {

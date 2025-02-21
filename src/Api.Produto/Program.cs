@@ -3,11 +3,6 @@ using Product.Api.Configuration;
 using Product.Api.Exceptions;
 using Serilog;
 
-Log.Logger = new LoggerConfiguration()
-    .Enrich.FromLogContext()
-    .WriteTo.Console()
-    .CreateLogger();
-
 try
 {
     var builder = WebApplication.CreateBuilder(args);
@@ -15,6 +10,7 @@ try
     builder.Services.AddControllers();
     builder.Services.AddEndpointsApiExplorer();
 
+    LogConfig.SetupLogging(builder, builder.Configuration);
 
     builder.Services.AddServices(builder.Configuration);
     builder.Services.AddInfra(builder.Configuration);
@@ -26,6 +22,8 @@ try
 
     var app = builder.Build();
 
+    // more configuring metrics for grafana
+    app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
     app.UseSwagger();
     app.UseSwaggerUI();
@@ -49,5 +47,3 @@ catch (Exception ex)
     Log.Error(ex, "Erro ao iniciar a aplicacao");
     throw;
 }
-
-
