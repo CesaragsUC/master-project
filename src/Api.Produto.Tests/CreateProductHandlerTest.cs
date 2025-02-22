@@ -1,6 +1,5 @@
 using Domain.Interfaces;
 using HybridRepoNet.Abstractions;
-using HybridRepoNet.Repository;
 using Infrastructure;
 using Moq;
 using Product.Application.Comands.Product;

@@ -10,10 +10,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Npgsql;
-using OpenTelemetry.Resources;
-using OpenTelemetry.Trace;
 using Product.Infrastructure.Configurations.Azure;
 using Product.Infrastructure.RabbitMq;
+using Serilog;
+using Shared.Kernel.Opentelemetry;
+using Shared.Kernel.Polices;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
@@ -23,22 +24,22 @@ namespace Infrastructure.Configurations;
 public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddInfra(this IServiceCollection services,
-    IConfiguration configuration)
+        IConfiguration configuration)
     {
         services.ConfigureFluentMigration(configuration);
         services.AddKeycloakServices(configuration);
         services.AddAzureBlobServices(configuration);
-        services.AddOpenTelemetryServices(configuration);
-        services.MongoDbService(configuration);
         services.AddMessageBrokerSetup(configuration);
-        services.AddHybridRepoNet<ProductDbContext>(configuration, DbType.PostgreSQL);
+        services.AddHybridRepoNet<ProductDbContext>(configuration, DbType.PostgreSQL,(int)HealthCheck.Active);
+        services.AddGrafanaSetup(configuration);
+        services.MongoDbService(configuration);
 
         return services;
     }
 
     public static ServiceProvider ConfigureFluentMigration(this IServiceCollection services, IConfiguration configuration)
     {
-        var migrationService =  new ServiceCollection().AddFluentMigratorCore()
+        var migrationService = new ServiceCollection().AddFluentMigratorCore()
               .ConfigureRunner(rb => rb
               .AddPostgres15_0()
               .WithGlobalConnectionString(configuration.GetConnectionString("PostgresConnection"))// Set the connection string
@@ -46,51 +47,65 @@ public static class ServiceCollectionExtensions
               .AddLogging(lb => lb.AddFluentMigratorConsole()) // Enable logging to console in the FluentMigrator way
               .BuildServiceProvider(false);
 
-        UpdateDatabase(migrationService, configuration);
+        ResiliencePolicies.GetDatabaseRetryPolicy().ExecuteAsync(() => Task.Run(() => UpdateDatabase(migrationService, configuration)));
 
         return migrationService;
     }
 
 
-    private static void UpdateDatabase(IServiceProvider serviceProvider, IConfiguration configuration)
+    private static async Task UpdateDatabase(IServiceProvider serviceProvider, IConfiguration configuration)
     {
         // Garante que o banco de dados exista
-         EnsureDatabaseExists(configuration);
+        await EnsureDatabaseExists(configuration);
 
         // Instantiate the runner
         var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
 
-         runner.ListMigrations();
+        runner.ListMigrations();
 
         // Execute the migrations
-         runner.MigrateUp();
+        runner.MigrateUp();
     }
 
-    private static void EnsureDatabaseExists(IConfiguration configuration)
+    private static async Task EnsureDatabaseExists(IConfiguration configuration)
     {
-        var defaultConnectionString = configuration.GetConnectionString("PostgresConnection");
-        var connectionStringWithoutDatabase = RemoveDatabaseFromConnectionString(defaultConnectionString);
-
-        using (var connection = new NpgsqlConnection(connectionStringWithoutDatabase))
+        try
         {
-            connection.Open();
+            var retryPolicy = ResiliencePolicies.GetDatabaseRetryPolicy();
 
-            var dbName = new NpgsqlConnectionStringBuilder(defaultConnectionString).Database;
+            var defaultConnectionString = configuration.GetConnectionString("PostgresConnection");
+            var connectionStringWithoutDatabase = RemoveDatabaseFromConnectionString(defaultConnectionString!);
 
-            using (var command = new NpgsqlCommand($"SELECT 1 FROM pg_database WHERE datname = '{dbName}'", connection))
+            await retryPolicy.ExecuteAsync(async () =>
             {
-                var exists = command.ExecuteScalar() != null;
-
-                if (!exists)
+                using (var connection = new NpgsqlConnection(connectionStringWithoutDatabase))
                 {
-                    using (var createCommand = new NpgsqlCommand($"CREATE DATABASE \"{dbName}\"", connection))
+                    await connection.OpenAsync();
+
+                    var dbName = new NpgsqlConnectionStringBuilder(defaultConnectionString).Database;
+
+                    using (var command = new NpgsqlCommand($"SELECT 1 FROM pg_database WHERE datname = '{dbName}'", connection))
                     {
-                        createCommand.ExecuteNonQuery();
+                        var exists = command.ExecuteScalarAsync() != null;
+
+                        if (!exists)
+                        {
+                            using (var createCommand = new NpgsqlCommand($"CREATE DATABASE \"{dbName}\"", connection))
+                            {
+                                await createCommand.ExecuteNonQueryAsync();
+                            }
+                        }
                     }
                 }
-            }
+            });
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "An unexpected error occurred while ensuring the database exists");
+            throw;
         }
     }
+
     private static string RemoveDatabaseFromConnectionString(string connectionString)
     {
         var builder = new NpgsqlConnectionStringBuilder(connectionString);
@@ -104,11 +119,11 @@ public static class ServiceCollectionExtensions
                     .GetSection(KeycloakAuthenticationOptions.Section)
                     .Get<KeycloakAuthenticationOptions>();
 
-        var metaDataConfig = configuration.GetSection("Keycloak:MetadataAddress");
+        var keyCloakConfig = configuration.GetSection("Keycloak:MetadataAddress");
 
         services.AddKeycloakAuthentication(authenticationOptions!, options =>
         {
-            options.MetadataAddress = metaDataConfig.Value!;
+            options.MetadataAddress = keyCloakConfig.Value!;
             options.RequireHttpsMetadata = false;
         });
 
@@ -118,6 +133,7 @@ public static class ServiceCollectionExtensions
                                     .Get<KeycloakProtectionClientOptions>();
 
         services.AddKeycloakAuthorization(authorizationOptions!);
+
     }
 
 
@@ -130,30 +146,9 @@ public static class ServiceCollectionExtensions
             var blobContainers = provider.GetRequiredService<IOptions<BlobContainers>>().Value;
             return new BlobServiceClient(blobContainers.ConnectionStrings);
         });
-
     }
-
-    public static void AddOpenTelemetryServices(this IServiceCollection services, IConfiguration configuration)
-    {
-        var jaegerConfig = configuration.GetSection("OpenTelemetry");
-        var serviceName = jaegerConfig.GetValue<string>("ServiceName");
-        var jaegerHost = jaegerConfig.GetValue<string>("Jaeger:AgentHost");
-        var jaegerPort = jaegerConfig.GetValue<int>("Jaeger:AgentPort");
-
-
-        services.AddOpenTelemetry()
-        .ConfigureResource(resource => resource.AddService(serviceName))
-        .WithTracing(builder =>
-        {
-            builder
-                .AddAspNetCoreInstrumentation()
-                .AddHttpClientInstrumentation();
-        });
-
-    }
-
     public static IServiceCollection MongoDbService(this IServiceCollection services,
-    IConfiguration configuration)
+        IConfiguration configuration)
     {
         services.AddEasyMongoNet(configuration);
 

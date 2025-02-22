@@ -1,12 +1,8 @@
 using Infrastructure.Configurations;
 using Product.Api.Configuration;
 using Product.Api.Exceptions;
+using Shared.Kernel.Opentelemetry;
 using Serilog;
-
-Log.Logger = new LoggerConfiguration()
-    .Enrich.FromLogContext()
-    .WriteTo.Console()
-    .CreateLogger();
 
 try
 {
@@ -15,17 +11,21 @@ try
     builder.Services.AddControllers();
     builder.Services.AddEndpointsApiExplorer();
 
+    OpenTelemetrySetup.SetupLogging(builder, builder.Configuration);
 
     builder.Services.AddServices(builder.Configuration);
     builder.Services.AddInfra(builder.Configuration);
 
     builder.Services.AddExceptionHandler<ProductInvalidExceptionHandler>();
+    builder.Services.AddExceptionHandler<InvalidExceptionHandler>();
     builder.Services.AddExceptionHandler<ProductNotFoundExceptionHandler>();
     builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
     builder.Services.AddProblemDetails();
 
     var app = builder.Build();
 
+    // more configuring metrics for grafana
+    app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
     app.UseSwagger();
     app.UseSwaggerUI();
@@ -49,5 +49,3 @@ catch (Exception ex)
     Log.Error(ex, "Erro ao iniciar a aplicacao");
     throw;
 }
-
-

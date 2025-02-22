@@ -5,14 +5,13 @@ using Api.Gateway.Services;
 using Microsoft.OpenApi.Models;
 using Ocelot.Middleware;
 using Serilog;
+using Shared.Kernel.Opentelemetry;
 
-Log.Logger = new LoggerConfiguration()
-    .Enrich.FromLogContext()
-    .WriteTo.Console()
-    .CreateLogger();
 try
 {
     var builder = WebApplication.CreateBuilder(args);
+
+    OpenTelemetrySetup.SetupLogging(builder, builder.Configuration);
 
     builder.Services.AddControllers();
     builder.Services.AddEndpointsApiExplorer();
@@ -33,6 +32,9 @@ try
     var _fontUri = builder.Configuration.GetSection("FrontEndUri").Get<FrontEndUri>();
 
     var app = builder.Build();
+
+    // more configuring metrics for grafana
+    app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
 
     app.UseSwagger();

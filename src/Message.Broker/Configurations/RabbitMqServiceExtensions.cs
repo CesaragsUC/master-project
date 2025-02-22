@@ -4,6 +4,7 @@ using Message.Broker.RabbitMq;
 using Message.Broker.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using RabbitMQ.Client.Exceptions;
 using System.Diagnostics.CodeAnalysis;
 using System.Security.Authentication;
 

@@ -1,15 +1,14 @@
 using Catalogo.Api.Configurations;
 using Serilog;
+using Shared.Kernel.Opentelemetry;
 
-Log.Logger = new LoggerConfiguration()
-    .Enrich.FromLogContext()
-    .WriteTo.Console()
-    .CreateLogger();
 
 try
 {
 
     var builder = WebApplication.CreateBuilder(args);
+
+    OpenTelemetrySetup.SetupLogging(builder, builder.Configuration);
 
     builder.Services.AddControllers();
 
@@ -20,6 +19,8 @@ try
 
     var app = builder.Build();
 
+    // more configuring metrics for grafana
+    app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
     app.UseSwagger();
     app.UseSwaggerUI();

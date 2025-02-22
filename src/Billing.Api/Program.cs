@@ -2,11 +2,12 @@ using Billing.Api.Configurations;
 using Billing.Application.Service;
 using Billing.Infrastructure.Configurations;
 using Billing.Infrastructure.RabbitMq;
+using Shared.Kernel.Opentelemetry;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+OpenTelemetrySetup.SetupLogging(builder, builder.Configuration);
 
 builder.Services.AddControllers();
 
@@ -21,7 +22,9 @@ builder.Services.AddInfra(builder.Configuration);
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// more configuring metrics for grafana
+app.UseOpenTelemetryPrometheusScrapingEndpoint();
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
