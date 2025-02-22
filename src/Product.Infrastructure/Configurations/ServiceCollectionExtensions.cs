@@ -1,4 +1,5 @@
 ﻿using Azure.Storage.Blobs;
+using EasyMongoNet.Exntesions;
 using FluentMigrator.Runner;
 using HybridRepoNet.Configurations;
 using HybridRepoNet.Helpers;
@@ -29,15 +30,16 @@ public static class ServiceCollectionExtensions
         services.AddKeycloakServices(configuration);
         services.AddAzureBlobServices(configuration);
         services.AddMessageBrokerSetup(configuration);
-        services.AddHybridRepoNet<ProductDbContext>(configuration, DbType.PostgreSQL);
+        services.AddHybridRepoNet<ProductDbContext>(configuration, DbType.PostgreSQL,(int)HealthCheck.Active);
         services.AddGrafanaSetup(configuration);
+        services.MongoDbService(configuration);
 
         return services;
     }
 
     public static ServiceProvider ConfigureFluentMigration(this IServiceCollection services, IConfiguration configuration)
     {
-        var migrationService =  new ServiceCollection().AddFluentMigratorCore()
+        var migrationService = new ServiceCollection().AddFluentMigratorCore()
               .ConfigureRunner(rb => rb
               .AddPostgres15_0()
               .WithGlobalConnectionString(configuration.GetConnectionString("PostgresConnection"))// Set the connection string
@@ -59,10 +61,10 @@ public static class ServiceCollectionExtensions
         // Instantiate the runner
         var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
 
-         runner.ListMigrations();
+        runner.ListMigrations();
 
         // Execute the migrations
-         runner.MigrateUp();
+        runner.MigrateUp();
     }
 
     private static async Task EnsureDatabaseExists(IConfiguration configuration)
@@ -144,5 +146,12 @@ public static class ServiceCollectionExtensions
             var blobContainers = provider.GetRequiredService<IOptions<BlobContainers>>().Value;
             return new BlobServiceClient(blobContainers.ConnectionStrings);
         });
+    }
+    public static IServiceCollection MongoDbService(this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        services.AddEasyMongoNet(configuration);
+
+        return services;
     }
 }

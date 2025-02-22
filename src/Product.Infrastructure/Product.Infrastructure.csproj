@@ -7,7 +7,8 @@
   </PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="HybridRepoNet" Version="3.0.6" />
+		<PackageReference Include="EasyMongoNet" Version="2.0.1" />
+		<PackageReference Include="HybridRepoNet" Version="3.1.5" />
 		<PackageReference Include="Azure.Storage.Blobs" Version="12.23.0" />
 		<PackageReference Include="Bogus" Version="35.6.2" />
 		<PackageReference Include="FluentMigrator" Version="6.0.0" />

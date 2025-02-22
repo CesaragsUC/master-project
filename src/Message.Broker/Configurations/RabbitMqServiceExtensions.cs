@@ -19,6 +19,8 @@ public static class RabbitMqServiceExtensions
         IConfiguration configuration,
         params Type[] consumerAssemblies)
     {
+        services.Configure<RabbitMqConfig>(configuration.GetSection("RabbitMqTransportOptions"));
+
         var rabbitMqOptions = new RabbitMqConfig();
         configuration.GetSection("RabbitMqTransportOptions").Bind(rabbitMqOptions);
 
