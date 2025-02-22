@@ -1,5 +1,6 @@
 using Catalogo.Api.Configurations;
 using Serilog;
+using Shared.Kernel.Opentelemetry;
 
 
 try
@@ -7,7 +8,7 @@ try
 
     var builder = WebApplication.CreateBuilder(args);
 
-    LogConfig.SetupLogging(builder, builder.Configuration);
+    OpenTelemetrySetup.SetupLogging(builder, builder.Configuration);
 
     builder.Services.AddControllers();
 

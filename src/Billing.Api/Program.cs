@@ -2,11 +2,12 @@ using Billing.Api.Configurations;
 using Billing.Application.Service;
 using Billing.Infrastructure.Configurations;
 using Billing.Infrastructure.RabbitMq;
+using Shared.Kernel.Opentelemetry;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-LogConfig.SetupLogging(builder, builder.Configuration);
+OpenTelemetrySetup.SetupLogging(builder, builder.Configuration);
 
 builder.Services.AddControllers();
 

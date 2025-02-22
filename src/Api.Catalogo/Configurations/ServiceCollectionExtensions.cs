@@ -34,8 +34,7 @@ public static class ServiceCollectionExtensions
 
     public static IServiceCollection MongoDbService(this IServiceCollection services, IConfiguration configuration)
     {
-
-        services.AddEasyMongoNet(configuration);
+        services.AddEasyMongoNet(configuration, (int)HealthCheckOptions.Active);
 
         return services;
     }

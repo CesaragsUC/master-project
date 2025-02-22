@@ -4,6 +4,7 @@ using Message.Broker.RabbitMq;
 using Message.Broker.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using RabbitMQ.Client.Exceptions;
 using System.Diagnostics.CodeAnalysis;
 using System.Security.Authentication;
 
@@ -18,8 +19,6 @@ public static class RabbitMqServiceExtensions
         IConfiguration configuration,
         params Type[] consumerAssemblies)
     {
-        services.Configure<RabbitMqConfig>(configuration.GetSection("RabbitMqTransportOptions"));
-
         var rabbitMqOptions = new RabbitMqConfig();
         configuration.GetSection("RabbitMqTransportOptions").Bind(rabbitMqOptions);
 

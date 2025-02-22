@@ -8,6 +8,7 @@ using Npgsql;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Shared.Kernel.Opentelemetry;
+using Shared.Kernel.Polices;
 
 namespace Discount.Infrastructure.Configurations;
 
@@ -34,16 +35,16 @@ public static class ServiceCollectionExtensions
               .AddLogging(lb => lb.AddFluentMigratorConsole()) // Enable logging to console in the FluentMigrator way
               .BuildServiceProvider(false);
 
-        UpdateDatabase(migrationService, configuration);
+        ResiliencePolicies.GetDatabaseRetryPolicy().ExecuteAsync(() => Task.Run(() => UpdateDatabase(migrationService, configuration)));
 
         return migrationService;
     }
 
 
-    private static void UpdateDatabase(IServiceProvider serviceProvider, IConfiguration configuration)
+    private static async Task UpdateDatabase(IServiceProvider serviceProvider, IConfiguration configuration)
     {
         // Garante que o banco de dados exista
-        EnsureDatabaseExists(configuration);
+        await EnsureDatabaseExists(configuration);
 
         // Instantiate the runner
         var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
@@ -54,31 +55,38 @@ public static class ServiceCollectionExtensions
         runner.MigrateUp();
     }
 
-    private static void EnsureDatabaseExists(IConfiguration configuration)
+    private static async Task EnsureDatabaseExists(IConfiguration configuration)
     {
+        var retryPolicy = ResiliencePolicies.GetDatabaseRetryPolicy();
+
         var defaultConnectionString = configuration.GetConnectionString("PostgresConnection");
         var connectionStringWithoutDatabase = RemoveDatabaseFromConnectionString(defaultConnectionString);
 
-        using (var connection = new NpgsqlConnection(connectionStringWithoutDatabase))
+        await retryPolicy.ExecuteAsync(async () =>
         {
-            connection.Open();
-
-            var dbName = new NpgsqlConnectionStringBuilder(defaultConnectionString).Database;
-
-            using (var command = new NpgsqlCommand($"SELECT 1 FROM pg_database WHERE datname = '{dbName}'", connection))
+            using (var connection = new NpgsqlConnection(connectionStringWithoutDatabase))
             {
-                var exists = command.ExecuteScalar() != null;
+                await connection.OpenAsync();
 
-                if (!exists)
+                var dbName = new NpgsqlConnectionStringBuilder(defaultConnectionString).Database;
+
+                using (var command = new NpgsqlCommand($"SELECT 1 FROM pg_database WHERE datname = '{dbName}'", connection))
                 {
-                    using (var createCommand = new NpgsqlCommand($"CREATE DATABASE \"{dbName}\"", connection))
+                    var exists = command.ExecuteScalarAsync() != null;
+
+                    if (!exists)
                     {
-                        createCommand.ExecuteNonQuery();
+                        using (var createCommand = new NpgsqlCommand($"CREATE DATABASE \"{dbName}\"", connection))
+                        {
+                            await createCommand.ExecuteNonQueryAsync();
+                        }
                     }
                 }
             }
-        }
+        });
+
     }
+
     private static string RemoveDatabaseFromConnectionString(string connectionString)
     {
         var builder = new NpgsqlConnectionStringBuilder(connectionString);

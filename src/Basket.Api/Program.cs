@@ -4,12 +4,13 @@ using Basket.Api.Services;
 using Basket.Domain.Abstractions;
 using Basket.Infrastructure.Configurations;
 using Basket.Infrastructure.Repository;
+using Shared.Kernel.Opentelemetry;
 using StackExchange.Redis;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-LogConfig.SetupLogging(builder, builder.Configuration);
+OpenTelemetrySetup.SetupLogging(builder, builder.Configuration);
 
 builder.Services.AddControllers();
 

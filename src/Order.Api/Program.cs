@@ -2,11 +2,12 @@ using Order.Api.Configurations;
 using Order.Application.Abstractions;
 using Order.Application.Service;
 using Order.Infrastructure.Configurations;
+using Shared.Kernel.Opentelemetry;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-LogConfig.SetupLogging(builder, builder.Configuration);
+OpenTelemetrySetup.SetupLogging(builder, builder.Configuration);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

@@ -1,8 +1,10 @@
 ﻿using Serilog.Core;
 using Serilog.Events;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Shared.Kernel.Models;
 
+[ExcludeFromCodeCoverage]
 public class SerilogEnricher : ILogEventEnricher
 {
     private readonly string _ApplicationName;

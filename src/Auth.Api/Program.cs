@@ -1,5 +1,4 @@
 using Auth.Api.Abstractions;
-using Auth.Api.Configurations;
 using Auth.Api.Services;
 using Keycloak.AuthServices.Authentication;
 using Keycloak.AuthServices.Authorization;
@@ -11,7 +10,7 @@ using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
-LogConfig.SetupLogging(builder, builder.Configuration);
+OpenTelemetrySetup.SetupLogging(builder, builder.Configuration);
 
 builder.Services.AddControllers();
 

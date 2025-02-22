@@ -5,12 +5,13 @@ using Api.Gateway.Services;
 using Microsoft.OpenApi.Models;
 using Ocelot.Middleware;
 using Serilog;
+using Shared.Kernel.Opentelemetry;
 
 try
 {
     var builder = WebApplication.CreateBuilder(args);
 
-    LogConfig.SetupLogging(builder, builder.Configuration);
+    OpenTelemetrySetup.SetupLogging(builder, builder.Configuration);
 
     builder.Services.AddControllers();
     builder.Services.AddEndpointsApiExplorer();

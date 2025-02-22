@@ -1,6 +1,7 @@
 using Infrastructure.Configurations;
 using Product.Api.Configuration;
 using Product.Api.Exceptions;
+using Shared.Kernel.Opentelemetry;
 using Serilog;
 
 try
@@ -10,12 +11,13 @@ try
     builder.Services.AddControllers();
     builder.Services.AddEndpointsApiExplorer();
 
-    LogConfig.SetupLogging(builder, builder.Configuration);
+    OpenTelemetrySetup.SetupLogging(builder, builder.Configuration);
 
     builder.Services.AddServices(builder.Configuration);
     builder.Services.AddInfra(builder.Configuration);
 
     builder.Services.AddExceptionHandler<ProductInvalidExceptionHandler>();
+    builder.Services.AddExceptionHandler<InvalidExceptionHandler>();
     builder.Services.AddExceptionHandler<ProductNotFoundExceptionHandler>();
     builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
     builder.Services.AddProblemDetails();

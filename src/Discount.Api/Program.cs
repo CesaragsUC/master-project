@@ -1,12 +1,12 @@
-using Discount.Api.Configurations;
 using Discount.Api.Services;
 using Discount.Domain.Abstractions;
 using Discount.Infrastructure.Configurations;
+using Shared.Kernel.Opentelemetry;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-LogConfig.SetupLogging(builder, builder.Configuration);
+OpenTelemetrySetup.SetupLogging(builder, builder.Configuration);
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
