@@ -11,7 +11,6 @@ OpenTelemetrySetup.SetupLogging(builder, builder.Configuration);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
 builder.Services.ConfigureFluentMigration(builder.Configuration);
 builder.Services.AddScoped<IOrderService,OrderService>();
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());

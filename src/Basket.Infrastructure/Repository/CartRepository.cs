@@ -17,17 +17,17 @@ public class CartRepository : ICartRepository
 
     public async Task UpsertAsync(Cart cart)
     {
-       await _repository.UpsertAsync(x=> x.CustomerId!.Equals(cart.CustomerId), cart);
+       await _repository.UpsertAsync(x=> x.CustomerId == cart.CustomerId, cart);
     }
 
     public async Task DeleteAsync(Guid customerId)
     {
-        await _repository.DeleteOneAsync(x=> x.CustomerId!.Equals(customerId.ToString()));
+        await _repository.DeleteOneAsync(x=> x.CustomerId == customerId);
     }
 
     public async Task<Cart?> GetAsync(Guid customerId)
     {
-        return await _repository.FindOneAsync(x => x.CustomerId!.Equals(customerId.ToString()));
+        return await _repository.FindOneAsync(x => x.CustomerId == customerId);
     }
 
     public async Task UpdateAsync(Cart cart)

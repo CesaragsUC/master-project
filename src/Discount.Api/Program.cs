@@ -1,3 +1,4 @@
+using Discount.Api.Configurations;
 using Discount.Api.Services;
 using Discount.Domain.Abstractions;
 using Discount.Infrastructure.Configurations;
@@ -9,11 +10,10 @@ var builder = WebApplication.CreateBuilder(args);
 OpenTelemetrySetup.SetupLogging(builder, builder.Configuration);
 
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddServices();
 
-builder.Services.PostgresDbService(builder.Configuration);
+builder.Services.AddInfra(builder.Configuration);
 
 builder.Services.AddScoped<ICouponService, CouponService>();
 

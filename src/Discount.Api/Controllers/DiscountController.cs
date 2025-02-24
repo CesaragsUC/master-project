@@ -1,5 +1,6 @@
 ﻿using Discount.Domain.Abstractions;
 using Discount.Domain.Dtos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics.CodeAnalysis;
 
@@ -8,12 +9,14 @@ namespace Discount.Api.Controllers;
 [ExcludeFromCodeCoverage]
 [ApiController]
 [Route("api/discount")]
+[Authorize]
 public class DiscountController(ICouponService couponService) : ControllerBase
 {
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Route("all")]
+    [Authorize(Roles = "Read")]
     public async Task<IActionResult> Get()
     {
         var result = await couponService.GetAll();
@@ -25,6 +28,7 @@ public class DiscountController(ICouponService couponService) : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Route("coupon")]
+    [Authorize(Roles = "Read")]
     public async Task<IActionResult> GetByCode(string code)
     {
         var result = await couponService.GetCouponByCode(code);
@@ -53,6 +57,7 @@ public class DiscountController(ICouponService couponService) : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Route("create")]
+    [Authorize(Roles = "Create")]
     public async Task<IActionResult> Add(CouponCreateDto couponCreate)
     {
         var result = await couponService.CreateCoupon(couponCreate);
@@ -64,6 +69,7 @@ public class DiscountController(ICouponService couponService) : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Route("update")]
+    [Authorize(Roles = "Update")]
     public async Task<IActionResult> Update(CouponUpdateDto couponUpdate)
     {
         var result = await couponService.UpdateCoupon(couponUpdate);
@@ -75,6 +81,7 @@ public class DiscountController(ICouponService couponService) : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Route("delete/{id:guid}")]
+    [Authorize(Roles = "Delete")]
     public async Task<IActionResult> Delete(Guid id)
     {
         var result = await couponService.DeleteCoupon(id);
