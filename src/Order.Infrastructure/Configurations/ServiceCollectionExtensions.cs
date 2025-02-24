@@ -10,6 +10,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Shared.Kernel.Opentelemetry;
 using Shared.Kernel.Polices;
+using Keycloak.AuthServices.Authentication;
+using Keycloak.AuthServices.Authorization;
 
 namespace Order.Infrastructure.Configurations;
 
@@ -22,6 +24,7 @@ public static class ServiceCollectionExtensions
         services.AddMessageBrokerSetup(configuration);
         services.AddGrafanaSetup(configuration);
         services.AddHybridRepoNet<OrderDbContext>(configuration,DbType.PostgreSQL);
+        services.AddKeycloakServices(configuration);
     }
     public static ServiceProvider ConfigureFluentMigration(this IServiceCollection services, IConfiguration configuration)
     {
@@ -90,5 +93,28 @@ public static class ServiceCollectionExtensions
         var builder = new NpgsqlConnectionStringBuilder(connectionString);
         builder.Database = string.Empty; // Remove o nome do banco de dados
         return builder.ToString();
+    }
+
+    public static void AddKeycloakServices(this IServiceCollection services, IConfiguration configuration)
+    {
+        var authenticationOptions = configuration
+                    .GetSection(KeycloakAuthenticationOptions.Section)
+                    .Get<KeycloakAuthenticationOptions>();
+
+        var keyCloakConfig = configuration.GetSection("Keycloak:MetadataAddress");
+
+        services.AddKeycloakAuthentication(authenticationOptions!, options =>
+        {
+            options.MetadataAddress = keyCloakConfig.Value!;
+            options.RequireHttpsMetadata = false;
+        });
+
+
+        var authorizationOptions = configuration
+                                    .GetSection(KeycloakProtectionClientOptions.Section)
+                                    .Get<KeycloakProtectionClientOptions>();
+
+        services.AddKeycloakAuthorization(authorizationOptions!);
+
     }
 }

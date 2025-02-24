@@ -1,15 +1,11 @@
-﻿using Billing.Application.Configurations;
-using Billing.Infrastructure.Configurations.RabbitMq;
-using Microsoft.OpenApi.Models;
+﻿using Microsoft.OpenApi.Models;
 
-namespace Billing.Api.Configurations;
+namespace Discount.Api.Configurations;
 
 public static class ServiceCollectionExtensions
 {
-    public static void AddServices(this IServiceCollection services,IConfiguration configuration)
+    public static void AddServices(this IServiceCollection services)
     {
-        services.AddApplicationService(configuration);
-        services.AddScoped<IQueueService, QueueService>();
         services.AddSwaggerServices();
     }
 
@@ -18,7 +14,7 @@ public static class ServiceCollectionExtensions
 
         services.AddSwaggerGen(cf =>
         {
-            cf.SwaggerDoc("v1", new OpenApiInfo { Title = "Billing Api", Version = "v1" });
+            cf.SwaggerDoc("v1", new OpenApiInfo { Title = "Discount Api", Version = "v1" });
 
             // Configuração do esquema de segurança JWT para o Swagger
             cf.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme

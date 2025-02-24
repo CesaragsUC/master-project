@@ -9,18 +9,21 @@ using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using Shared.Kernel.Opentelemetry;
 using Shared.Kernel.Polices;
+using Keycloak.AuthServices.Authentication;
+using Keycloak.AuthServices.Authorization;
 
 namespace Discount.Infrastructure.Configurations;
 
 [ExcludeFromCodeCoverage]
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection PostgresDbService(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddInfra(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddHybridRepoNet<CouponsDbContext>(configuration, DbType.PostgreSQL);
 
         services.ConfigureFluentMigration(configuration);
         services.AddGrafanaSetup(configuration);
+        services.AddKeycloakServices(configuration);
 
         return services;
     }
@@ -92,5 +95,28 @@ public static class ServiceCollectionExtensions
         var builder = new NpgsqlConnectionStringBuilder(connectionString);
         builder.Database = string.Empty; // Remove o nome do banco de dados
         return builder.ToString();
+    }
+
+    public static void AddKeycloakServices(this IServiceCollection services, IConfiguration configuration)
+    {
+        var authenticationOptions = configuration
+                    .GetSection(KeycloakAuthenticationOptions.Section)
+                    .Get<KeycloakAuthenticationOptions>();
+
+        var keyCloakConfig = configuration.GetSection("Keycloak:MetadataAddress");
+
+        services.AddKeycloakAuthentication(authenticationOptions!, options =>
+        {
+            options.MetadataAddress = keyCloakConfig.Value!;
+            options.RequireHttpsMetadata = false;
+        });
+
+
+        var authorizationOptions = configuration
+                                    .GetSection(KeycloakProtectionClientOptions.Section)
+                                    .Get<KeycloakProtectionClientOptions>();
+
+        services.AddKeycloakAuthorization(authorizationOptions!);
+
     }
 }

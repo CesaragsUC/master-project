@@ -1,5 +1,6 @@
 ﻿using Billing.Application.Dtos;
 using Billing.Application.Service;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics.CodeAnalysis;
 
@@ -7,7 +8,8 @@ namespace Billing.Api.Controllers;
 
 [ExcludeFromCodeCoverage]
 [ApiController]
-[Route("api/payment")]
+[Route("api/billing")]
+[Authorize]
 public class PaymentController(IPaymentService paymentService) : ControllerBase
 {
     [HttpPost]
@@ -20,6 +22,7 @@ public class PaymentController(IPaymentService paymentService) : ControllerBase
 
     [HttpGet]
     [Route("payments")]
+    [Authorize(Roles = "Read")]
     public async Task<IActionResult> ListAsync()
     {
         var result = await paymentService.GetAllPaymentAsync();
@@ -29,6 +32,7 @@ public class PaymentController(IPaymentService paymentService) : ControllerBase
 
     [HttpGet]
     [Route("{transactionId}")]
+    [Authorize(Roles = "Read")]
     public async Task<IActionResult> GetByIdAsync(string transactionId)
     {
         var result = await paymentService.GetPaymentAsync(transactionId);
@@ -37,6 +41,7 @@ public class PaymentController(IPaymentService paymentService) : ControllerBase
 
     [HttpDelete]
     [Route("delete/{transactionId}")]
+    [Authorize(Roles = "Delete")]
     public async Task<IActionResult> DeleteAsync(string transactionId)
     {
         var result = await paymentService.DeletePaymentAsync(transactionId);
