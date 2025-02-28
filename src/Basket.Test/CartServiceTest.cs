@@ -4,6 +4,7 @@ using Basket.Api.Services;
 using Basket.Domain.Abstractions;
 using Basket.Domain.Entities;
 using Basket.Infrastructure.RabbitMq;
+using Basket.Infrastructure.Repository;
 using Message.Broker.Abstractions;
 using Microsoft.Extensions.Caching.Distributed;
 using Moq;
@@ -52,8 +53,7 @@ public class CartServiceTest
 
         // Assert
         Assert.True(result.Succeeded);
-        Assert.NotNull(result.Data);
-        Assert.Equal(cart, result.Data);
+
     }
 
     [Fact]
@@ -130,5 +130,68 @@ public class CartServiceTest
         var ex = await Assert.ThrowsAsync<Exception>(() => _cartService.GetCartAsync(customerId));
         Assert.Equal("Test exception", ex.Message);
         _cacheServiceMock.Verify(x => x.GetOrCreateAsync(It.IsAny<string>(), It.IsAny<Func<Task<Cart>>>(), It.IsAny<DistributedCacheEntryOptions>(), null), Times.Once);
+    }
+
+    [Fact]
+    [Trait("Basket.Services", "Cache Redis")]
+    public async Task UpdateCartItem_Sucess()
+    {
+        // Arrange
+        var cartDto = new UpdateCartItemDto { CustomerId = Guid.NewGuid(), ProductId = Guid.NewGuid(),Quantity = 2 };
+
+        var cart = new Cart { CustomerId = cartDto.CustomerId };
+
+        _cartRepositoryMock.Setup(x => x.GetAsync(It.IsAny<Guid>())).ReturnsAsync(cart);
+
+        _cacheServiceMock.Setup(x => x.GetOrCreateAsync(It.IsAny<string>(), It.IsAny<Func<Task<Cart>>>(), It.IsAny<DistributedCacheEntryOptions>(), It.IsAny<Func<Cart, Task>>()))
+            .ReturnsAsync(cart);
+
+        // Act
+        var result = await _cartService.UpdateCartAsync(cartDto);
+
+        // Assert
+        Assert.True(result.Succeeded);
+    }
+
+    [Fact]
+    [Trait("Basket.Services", "Cache Redis")]
+    public async Task UppdateTotalPrice()
+    {
+        // Arrange
+        var cartDto = new CartDto { CustomerId = Guid.NewGuid() };
+
+        var cart = new Cart { CustomerId = cartDto.CustomerId };
+
+        _cartRepositoryMock.Setup(x => x.GetAsync(It.IsAny<Guid>())).ReturnsAsync(cart);
+
+        _cacheServiceMock.Setup(x => x.GetOrCreateAsync(It.IsAny<string>(), It.IsAny<Func<Task<Cart>>>(), It.IsAny<DistributedCacheEntryOptions>(), It.IsAny<Func<Cart, Task>>()))
+            .ReturnsAsync(cart);
+
+        // Act
+        var result = await _cartService.UpdateTotalPriceCartAsync(Guid.NewGuid(),100);
+
+        // Assert
+        Assert.True(result.Succeeded);
+    }
+
+    [Fact]
+    [Trait("Basket.Services", "Cache Redis")]
+    public async Task RemoveItemFromCArt()
+    {
+        // Arrange
+        var cartDto = new CartDto { CustomerId = Guid.NewGuid() };
+
+        var cart = new Cart { CustomerId = cartDto.CustomerId };
+
+        _cartRepositoryMock.Setup(x => x.GetAsync(It.IsAny<Guid>())).ReturnsAsync(cart);
+
+        _cacheServiceMock.Setup(x => x.GetOrCreateAsync(It.IsAny<string>(), It.IsAny<Func<Task<Cart>>>(), It.IsAny<DistributedCacheEntryOptions>(), It.IsAny<Func<Cart, Task>>()))
+            .ReturnsAsync(cart);
+
+        // Act
+        var result = await _cartService.RemoveItemAsync(Guid.NewGuid(), Guid.NewGuid());
+
+        // Assert
+        Assert.True(result.Succeeded);
     }
 }

@@ -114,11 +114,10 @@ public class CartService : ICartService
         {
             return await Result<bool>.SuccessAsync("cart saved");
         }
-        else
-        {
-            return await Result<bool>.
+
+        return await Result<bool>.
                 FailureAsync("An error occour while attempt to save product.");
-        }
+        
     }
 
     public async Task<Result<bool>> UpdateCartAsync(UpdateCartItemDto cartDto)
@@ -152,11 +151,10 @@ public class CartService : ICartService
         {
             return await Result<bool>.SuccessAsync("cart saved");
         }
-        else
-        {
-            return await Result<bool>.
+
+        return await Result<bool>.
                 FailureAsync("An error occour while attempt to save product.");
-        }
+        
     }
 
     public async Task<Result<bool>> UpdateTotalPriceCartAsync(Guid customerId, decimal discount)
@@ -190,11 +188,10 @@ public class CartService : ICartService
         {
             return await Result<bool>.SuccessAsync("cart saved");
         }
-        else
-        {
-            return await Result<bool>.
+
+        return await Result<bool>.
                 FailureAsync("An error occour while attempt to save product.");
-        }
+        
     }
 
     public async Task<Result<bool>> RemoveItemAsync(Guid customerId, Guid productId)
@@ -228,11 +225,10 @@ public class CartService : ICartService
         {
             return await Result<bool>.SuccessAsync("cart saved");
         }
-        else
-        {
-            return await Result<bool>.
+
+         return await Result<bool>.
                 FailureAsync("An error occour while attempt to save product.");
-        }
+        
     }
 
     public async Task<Result<bool>> CheckoutAsync(CartDto checkoutDto)
