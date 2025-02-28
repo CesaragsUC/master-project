@@ -9,7 +9,6 @@ namespace Discount.Api.Controllers;
 [ExcludeFromCodeCoverage]
 [ApiController]
 [Route("api/discount")]
-[Authorize]
 public class DiscountController(ICouponService couponService) : ControllerBase
 {
     [HttpGet]

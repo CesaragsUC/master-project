@@ -12,18 +12,23 @@ public class CartDto
 
     public List<CartItensDto> Items { get; set; } = new();
 
-    public decimal TotalPrice => Items.Sum(x => x.TotalPrice);
+    public decimal TotalPrice { get; set; } 
 
     [SwaggerIgnore]
-    public decimal SubTotal { get; set; }
+    public decimal SubTotal => Items.Sum(x => x.TotalPrice);
 
     public string? UserName { get; set; }
 
     [NotMapped]
     public string? CouponCode { get; set; }
 
+    public decimal? DiscountApplied { get; set; }
+
     public void SetDiscount(decimal discount)
     {
-        SubTotal = TotalPrice - discount;
+        TotalPrice = Items.Sum(x => x.TotalPrice);
+        TotalPrice -= discount;
+        DiscountApplied = discount;
     }
+
 }

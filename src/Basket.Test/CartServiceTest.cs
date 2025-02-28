@@ -89,7 +89,7 @@ public class CartServiceTest
             .ReturnsAsync(cart);
 
         // Act
-        var result = await _cartService.SaveOrUpdateCartAsync(cartDto);
+        var result = await _cartService.SaveCartAsync(cartDto);
 
         // Assert
         Assert.True(result.Succeeded);
@@ -110,7 +110,7 @@ public class CartServiceTest
             .ReturnsAsync((Cart)null);
 
         // Act
-        var result = await _cartService.SaveOrUpdateCartAsync(cartDto);
+        var result = await _cartService.SaveCartAsync(cartDto);
 
         // Assert
         Assert.False(result.Succeeded);

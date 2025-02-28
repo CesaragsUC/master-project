@@ -9,5 +9,6 @@ public record CartItensDto
     public string? ProductName { get; init; }
     public int Quantity { get; init; }
     public decimal UnitPrice { get; init; }
+    public string? ImageUrl { get; set; }
     public decimal TotalPrice => Quantity * UnitPrice;
 }

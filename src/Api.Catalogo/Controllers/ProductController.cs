@@ -8,7 +8,6 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Api.Catalogo.Controllers;
 
-[Authorize]
 [Route("api/catalog")]
 [ApiController]
 [ExcludeFromCodeCoverage]
@@ -17,7 +16,6 @@ public class ProductController(IProductService service) : ControllerBase
 
     [HttpGet]
     [Route("all")]
-    [Authorize(Roles = "Read")]
     public async Task<IActionResult> Index([FromQuery] ProductFilter filter)
     {
         var produtos = await service.GetAll(filter);
