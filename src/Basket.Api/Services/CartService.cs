@@ -47,7 +47,7 @@ public class CartService : ICartService
     };
 
 
-    public async Task<Result<Cart?>> GetCartAsync(Guid customerId)
+    public async Task<Result<CartDto?>> GetCartAsync(Guid customerId)
     {
         try
         {
@@ -61,13 +61,15 @@ public class CartService : ICartService
 
             }, Expiration);
 
+
+
             if (cart is not null)
             {
-                return await Result<Cart?>.SuccessAsync(cart);
+                return await Result<CartDto?>.SuccessAsync(cart.ToDto());
             }
             else
             {
-                return await Result<Cart?>.FailureAsync("product not found");
+                return await Result<CartDto?>.FailureAsync("product not found");
             }
 
         }
@@ -78,9 +80,21 @@ public class CartService : ICartService
         }
     }
 
-    public async Task<Result<bool>> SaveOrUpdateCartAsync(CartDto cartDto)
+    public async Task<Result<bool>> SaveCartAsync(CartDto cartDto)
     {
-        var cart = cartDto.ToCart();
+        Cart? cart = new();
+
+        cart = await _cartRepository.GetAsync(cartDto.CustomerId);
+
+        if (cart is not null)
+        {
+            cart.Items = cartDto.Items.Select(item => item.ToCartItem()).ToList();
+            cart.UpdateTotalPrice(cart);
+        }
+        else
+        {
+            cart = cartDto.ToCart();
+        }
 
         var cacheKey = $"cart:{cart.CustomerId}";
 
@@ -100,17 +114,127 @@ public class CartService : ICartService
         {
             return await Result<bool>.SuccessAsync("cart saved");
         }
-        else
-        {
-            return await Result<bool>.
+
+        return await Result<bool>.
                 FailureAsync("An error occour while attempt to save product.");
+        
+    }
+
+    public async Task<Result<bool>> UpdateCartAsync(UpdateCartItemDto cartDto)
+    {
+        Cart? cart = new();
+
+        cart = await _cartRepository.GetAsync(cartDto.CustomerId);
+
+        if (cart is null)
+        {
+            return await Result<bool>.FailureAsync("cart not found");
         }
+
+        cart.UpdateCarItem(cart.Items, cartDto.ProductId, cartDto.Quantity);
+
+        var cacheKey = $"cart:{cart.CustomerId}";
+
+        var result = await _cacheService.GetOrCreateAsync(
+            key: cacheKey,
+            factory: async () =>
+            {
+                return cart;
+            },
+             Expiration,
+            updateDatabase: async (updatedCart) =>
+            {
+                await _cartRepository.UpsertAsync(cart);
+            });
+
+        if (result is not null)
+        {
+            return await Result<bool>.SuccessAsync("cart saved");
+        }
+
+        return await Result<bool>.
+                FailureAsync("An error occour while attempt to save product.");
+        
+    }
+
+    public async Task<Result<bool>> UpdateTotalPriceCartAsync(Guid customerId, decimal discount)
+    {
+        Cart? cart = new();
+
+        cart = await _cartRepository.GetAsync(customerId);
+
+        if (cart is null)
+        {
+            return await Result<bool>.FailureAsync("cart not found");
+        }
+
+        cart.UpdateTotalPriceCart(discount);
+
+        var cacheKey = $"cart:{cart.CustomerId}";
+
+        var result = await _cacheService.GetOrCreateAsync(
+            key: cacheKey,
+            factory: async () =>
+            {
+                return cart;
+            },
+             Expiration,
+            updateDatabase: async (updatedCart) =>
+            {
+                await _cartRepository.UpsertAsync(cart);
+            });
+
+        if (result is not null)
+        {
+            return await Result<bool>.SuccessAsync("cart saved");
+        }
+
+        return await Result<bool>.
+                FailureAsync("An error occour while attempt to save product.");
+        
+    }
+
+    public async Task<Result<bool>> RemoveItemAsync(Guid customerId, Guid productId)
+    {
+        Cart? cart = new();
+
+        cart = await _cartRepository.GetAsync(customerId);
+
+        if (cart is null)
+        {
+            return await Result<bool>.FailureAsync("cart not found");
+        }
+
+        cart.RemoveItem(cart.Items!, productId);
+
+        var cacheKey = $"cart:{cart.CustomerId}";
+
+        var result = await _cacheService.GetOrCreateAsync(
+            key: cacheKey,
+            factory: async () =>
+            {
+                return cart;
+            },
+             Expiration,
+            updateDatabase: async (updatedCart) =>
+            {
+                await _cartRepository.UpsertAsync(cart);
+            });
+
+        if (result is not null)
+        {
+            return await Result<bool>.SuccessAsync("cart saved");
+        }
+
+         return await Result<bool>.
+                FailureAsync("An error occour while attempt to save product.");
+        
     }
 
     public async Task<Result<bool>> CheckoutAsync(CartDto checkoutDto)
     {
         try
-        { 
+        {
             var orderCreated = checkoutDto.ToCheckoutEvent();
             orderCreated.PaymentToken = PaymentTokenService.GenerateToken();
 
@@ -129,20 +253,21 @@ public class CartService : ICartService
     public async Task<Result<CartDto>> ApplyDiscountAsync(CartDto cartDto)
     {
 
-        var response = await _discountApi.
+        var discountResponse = await _discountApi.
                             ApplyDiscountAsync(cartDto.CouponCode!,
                             cartDto.TotalPrice);
 
-       
-
-        if (response.IsSuccessStatusCode && response.Content!.Succeed)
+        if (discountResponse.IsSuccessStatusCode && discountResponse.Content!.Succeed)
         {
-            cartDto.SetDiscount(response.Content!.TotalDiscount);
+            cartDto.SetDiscount(discountResponse.Content!.TotalDiscount);
+
+           await UpdateTotalPriceCartAsync(cartDto.CustomerId, discountResponse.Content!.TotalDiscount);
+
             return await Result<CartDto>.SuccessAsync(cartDto);
         }
         else
         {
-            var error = JsonSerializer.Deserialize<DiscountResponse>(response.Error.Content);
+            var error = JsonSerializer.Deserialize<DiscountResponse>(discountResponse.Error.Content);
             return await Result<CartDto>.FailureAsync(error.Message);
         }
 

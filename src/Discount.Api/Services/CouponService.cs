@@ -56,7 +56,7 @@ public class CouponService : ICouponService
                 switch (coupon.Type)
                 {
                     case (int)DiscountType.Percentage:
-                        orderDiscount.TotalDiscount = (discountRequest.Total * coupon.Value) / 100;
+                        orderDiscount.TotalDiscount = Math.Round((discountRequest.Total * coupon.Value) / 100, 2);
                         break;
 
                     case (int)DiscountType.Value:

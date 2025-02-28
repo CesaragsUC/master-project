@@ -6,11 +6,17 @@ namespace Basket.Api.Abstractions;
 
 public interface ICartService
 {
-    Task<Result<Cart?>> GetCartAsync(Guid customerId);
+    Task<Result<CartDto?>> GetCartAsync(Guid customerId);
 
-    Task<Result<bool>> SaveOrUpdateCartAsync(CartDto cartDto);
+    Task<Result<bool>> SaveCartAsync(CartDto cartDto);
+
+    Task<Result<bool>> UpdateCartAsync(UpdateCartItemDto cartDto);
+
+    Task<Result<bool>> RemoveItemAsync(Guid customerId, Guid productId);
 
     Task<Result<bool>> CheckoutAsync(CartDto checkoutDto);
 
     Task<Result<CartDto>> ApplyDiscountAsync(CartDto discountRequest);
+
+    Task<Result<bool>> UpdateTotalPriceCartAsync(Guid customerId, decimal discount);
 }

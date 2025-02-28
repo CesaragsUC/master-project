@@ -21,6 +21,7 @@ public static class CartExtenstions
 
         return cart;
     }
+
     public static CartItem ToCartItem(this CartItensDto cartItensDto)
     {
         var cartItem = new CartItem
@@ -29,7 +30,22 @@ public static class CartExtenstions
             ProductName = cartItensDto.ProductName,
             Quantity = cartItensDto.Quantity,
             UnitPrice = cartItensDto.UnitPrice,
-            TotalPrice = cartItensDto.TotalPrice
+            TotalPrice = cartItensDto.TotalPrice,
+            ImageUrl = cartItensDto.ImageUrl
+        };
+
+        return cartItem;
+    }
+
+    public static CartItensDto  ToCartItemDto(this CartItem cartItensDto)
+    {
+        var cartItem = new CartItensDto
+        {
+            ProductId = cartItensDto.ProductId,
+            ProductName = cartItensDto.ProductName,
+            Quantity = cartItensDto.Quantity,
+            UnitPrice = cartItensDto.UnitPrice,
+            ImageUrl = cartItensDto.ImageUrl
         };
 
         return cartItem;
@@ -47,8 +63,10 @@ public static class CartExtenstions
                 ProductId = item.ProductId,
                 ProductName = item.ProductName,
                 Quantity = item.Quantity,
-                UnitPrice = item.UnitPrice
+                UnitPrice = item.UnitPrice,
+                ImageUrl = item.ImageUrl
             }).ToList(),
+
             TotalPrice = cartDto.TotalPrice,
             PaymentToken = PaymentTokenService.GenerateToken()
         };
@@ -56,8 +74,19 @@ public static class CartExtenstions
 
     }
 
-    private static decimal TotalPrice(this List<CartItensDto> itens)
+    public static decimal TotalPrice(this List<CartItensDto> itens)
     {
         return itens.Sum(item => item.TotalPrice);
+    }
+
+    public static CartDto ToDto(this Cart cart)
+    {
+        var cartDto = new CartDto
+        {
+            CustomerId = cart.CustomerId,
+            Items = cart.Items.Select(item => item.ToCartItemDto()).ToList(),
+            TotalPrice = cart.TotalPrice
+        };
+        return cartDto;
     }
 }

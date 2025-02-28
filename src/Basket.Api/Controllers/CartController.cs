@@ -30,15 +30,34 @@ public class CartController : ControllerBase
     }
 
     [HttpPost]
-    [Route("upsert")]
+    [Route("save")]
     [ProducesResponseType(typeof(Result<Cart?>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Result<Cart?>), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> UpsertAsync(CartDto request)
     {
-        var result = await _cartService.SaveOrUpdateCartAsync(request);
+        var result = await _cartService.SaveCartAsync(request);
         return result.Succeeded ? Ok(result) : BadRequest(result);
     }
 
+    [HttpPut]
+    [Route("update")]
+    [ProducesResponseType(typeof(Result<Cart?>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Result<Cart?>), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> UpdateItem(UpdateCartItemDto request)
+    {
+        var result = await _cartService.UpdateCartAsync(request);
+        return result.Succeeded ? Ok(result) : BadRequest(result);
+    }
+
+    [HttpDelete]
+    [Route("remove-item/{customerId}/{productId}")]
+    [ProducesResponseType(typeof(Result<Cart?>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Result<Cart?>), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> RemoveItem(Guid customerId, Guid productId)
+    {
+        var result = await _cartService.RemoveItemAsync(customerId, productId);
+        return result.Succeeded ? Ok(result) : BadRequest(result);
+    }
 
     [HttpPost]
     [Route("checkout")]
