@@ -44,7 +44,7 @@ public class PaymentService : IPaymentService
     {
         try
         {
-            var orderResult = await GetOrderAsync(paymentDto.OrderId);
+            var orderResult = await GetOrderAsync(paymentDto.OrderId, paymentDto.CustomerId);
             if (!orderResult.Succeeded)
             {
                 return await Result<bool>.FailureAsync(orderResult.Messages!);
@@ -68,9 +68,9 @@ public class PaymentService : IPaymentService
         }
     }
 
-    private async Task<Result<OrderDto>> GetOrderAsync(Guid orderId)
+    private async Task<Result<OrderDto>> GetOrderAsync(Guid orderId, Guid customerId)
     {
-        var orderResponse = await _oderApi.GetOrderAsync(orderId);
+        var orderResponse = await _oderApi.GetOrderAsync(orderId, customerId);
         if (!orderResponse.IsSuccessStatusCode)
         {
             return await Result<OrderDto>.FailureAsync("Order not founded");

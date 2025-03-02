@@ -9,7 +9,6 @@ namespace Billing.Api.Controllers;
 [ExcludeFromCodeCoverage]
 [ApiController]
 [Route("api/billing")]
-[Authorize]
 public class PaymentController(IPaymentService paymentService) : ControllerBase
 {
     [HttpPost]
@@ -31,7 +30,7 @@ public class PaymentController(IPaymentService paymentService) : ControllerBase
 
 
     [HttpGet]
-    [Route("{transactionId}")]
+    [Route("payment{transactionId}")]
     [Authorize(Roles = "Read")]
     public async Task<IActionResult> GetByIdAsync(string transactionId)
     {

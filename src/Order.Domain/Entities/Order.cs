@@ -14,4 +14,5 @@ public class Order : BaseEntity
     public int Status { get; set; }
     public string? Name { get; set; }
     public string? PaymentToken { get; set; }
+
 }

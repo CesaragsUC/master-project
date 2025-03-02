@@ -47,16 +47,16 @@ public static class ServiceCollectionExtensions
               .AddLogging(lb => lb.AddFluentMigratorConsole()) // Enable logging to console in the FluentMigrator way
               .BuildServiceProvider(false);
 
-        ResiliencePolicies.GetDatabaseRetryPolicy().ExecuteAsync(() => Task.Run(() => UpdateDatabase(migrationService, configuration)));
+       UpdateDatabase(migrationService, configuration);
 
         return migrationService;
     }
 
 
-    private static async Task UpdateDatabase(IServiceProvider serviceProvider, IConfiguration configuration)
+    private static void UpdateDatabase(IServiceProvider serviceProvider, IConfiguration configuration)
     {
         // Garante que o banco de dados exista
-        await EnsureDatabaseExists(configuration);
+        EnsureDatabaseExists(configuration);
 
         // Instantiate the runner
         var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
@@ -67,42 +67,29 @@ public static class ServiceCollectionExtensions
         runner.MigrateUp();
     }
 
-    private static async Task EnsureDatabaseExists(IConfiguration configuration)
+    private static void EnsureDatabaseExists(IConfiguration configuration)
     {
-        try
+        var defaultConnectionString = configuration.GetConnectionString("PostgresConnection");
+        var connectionStringWithoutDatabase = RemoveDatabaseFromConnectionString(defaultConnectionString);
+
+        using (var connection = new NpgsqlConnection(connectionStringWithoutDatabase))
         {
-            var retryPolicy = ResiliencePolicies.GetDatabaseRetryPolicy();
+            connection.Open();
 
-            var defaultConnectionString = configuration.GetConnectionString("PostgresConnection");
-            var connectionStringWithoutDatabase = RemoveDatabaseFromConnectionString(defaultConnectionString!);
+            var dbName = new NpgsqlConnectionStringBuilder(defaultConnectionString).Database;
 
-            await retryPolicy.ExecuteAsync(async () =>
+            using (var command = new NpgsqlCommand($"SELECT 1 FROM pg_database WHERE datname = '{dbName}'", connection))
             {
-                using (var connection = new NpgsqlConnection(connectionStringWithoutDatabase))
+                var exists = command.ExecuteScalar() != null;
+
+                if (!exists)
                 {
-                    await connection.OpenAsync();
-
-                    var dbName = new NpgsqlConnectionStringBuilder(defaultConnectionString).Database;
-
-                    using (var command = new NpgsqlCommand($"SELECT 1 FROM pg_database WHERE datname = '{dbName}'", connection))
+                    using (var createCommand = new NpgsqlCommand($"CREATE DATABASE \"{dbName}\"", connection))
                     {
-                        var exists = command.ExecuteScalarAsync() != null;
-
-                        if (!exists)
-                        {
-                            using (var createCommand = new NpgsqlCommand($"CREATE DATABASE \"{dbName}\"", connection))
-                            {
-                                await createCommand.ExecuteNonQueryAsync();
-                            }
-                        }
+                        createCommand.ExecuteNonQuery();
                     }
                 }
-            });
-        }
-        catch (Exception ex)
-        {
-            Log.Error(ex, "An unexpected error occurred while ensuring the database exists");
-            throw;
+            }
         }
     }
 

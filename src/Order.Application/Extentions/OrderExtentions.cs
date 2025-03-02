@@ -1,6 +1,7 @@
 ﻿using Messaging.Contracts.Events.Orders;
 using Order.Application.Dto;
 using Order.Domain.Entities;
+using Shared.Kernel.Core.Enuns;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Order.Application.Extentions;
@@ -121,6 +122,33 @@ public static class OrderExtentions
 
         orderDto.Items = order?.Items?.Select(x => x.ToOrderItemDto(orderDto.Id)).ToList();
         orderDto.TotalAmount = orderDto.Items.Any() ? orderDto.Items.Sum(x => x.UnitPrice * x.Quantity) : 0;
+
+        return orderDto;
+    }
+
+   public static IEnumerable<OrderDto> ToOrderListDto(this List<Domain.Entities.Order> orders)
+    {
+        var orderDto = new List<OrderDto>();
+
+        foreach (var item in orders)
+        {
+            var dto = new OrderDto
+            {
+                Id = item.Id,
+                CreatedAt = item.CreatedDate,
+                CustomerId = item.CustomerId,
+                TotalAmount = item.TotalAmount,
+                Status = item.Status,
+                Name = item.Name,
+                PaymentToken = item.PaymentToken
+            };
+
+            dto.Items = item?.Items?.Select(x => x.ToOrderItemDto(dto.Id)).ToList();
+            dto.TotalAmount = dto.Items.Any() ? dto.Items.Sum(x => x.UnitPrice * x.Quantity) : 0;
+
+            orderDto.Add(dto);
+
+        }
 
         return orderDto;
     }

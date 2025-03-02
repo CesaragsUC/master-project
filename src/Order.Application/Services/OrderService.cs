@@ -59,11 +59,36 @@ public class OrderService : IOrderService
 
     }
 
-    public async Task<Result<OrderDto>> Get(Guid id)
+    public async Task<Result<IEnumerable<OrderDto>>> Get(Guid custumerId)
     {
         try
         {
-            var order = await _unitOfWork.Repository<Domain.Entities.Order>().FindAsync(x => x.Id == id, o => o.Items);
+            var order = await _unitOfWork.Repository<Domain.Entities.Order>().GetAllAsync(x => x.CustomerId == custumerId, o => o.Items);
+
+            if (order is null)
+            {
+                return await Result<IEnumerable<OrderDto>>.FailureAsync("Order not found");
+            }
+
+            var orderDto = order.ToList();
+            return await Result<IEnumerable<OrderDto>>.SuccessAsync(orderDto.Select(x => x.ToOrderDto()));
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Error while getting order");
+            throw;
+        }
+    }
+
+
+    public async Task<Result<OrderDto>> Get(Guid orderId,Guid customerId)
+    {
+        try
+        {
+            var order = await _unitOfWork.Repository<Domain.Entities.Order>().FindAsync(
+                x => x.Id == orderId 
+                && x.CustomerId == customerId,
+                i => i.Items!);
 
             if (order is null)
             {
