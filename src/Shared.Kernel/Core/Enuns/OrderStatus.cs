@@ -10,5 +10,6 @@ public enum OrderStatus
     Returned = 6,
     Refunded = 7,
     PartiallyRefunded = 8,
-    PaymentFailed = 9
+    PaymentFailed = 9,
+    Pending = 10,
 }

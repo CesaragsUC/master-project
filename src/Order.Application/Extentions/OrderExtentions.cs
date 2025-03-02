@@ -1,6 +1,7 @@
 ﻿using Messaging.Contracts.Events.Orders;
 using Order.Application.Dto;
 using Order.Domain.Entities;
+using Shared.Kernel.Core.Enuns;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Order.Application.Extentions;

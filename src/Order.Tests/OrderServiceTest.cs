@@ -1,7 +1,9 @@
+using Castle.Core.Resource;
 using HybridRepoNet.Abstractions;
 using Moq;
 using Order.Application.Dto;
 using Order.Application.Service;
+using Order.Domain.Entities;
 using Order.Infrastructure;
 using Shared.Kernel.Core.Enuns;
 using System.Linq.Expressions;
@@ -147,9 +149,16 @@ public class OrderServiceTest
     public async Task Get_ShouldReturnFailureResult_WhenOrderNotFound()
     {
         // Arrange
+        List<Domain.Entities.Order> order = null;
+
         var orderId = Guid.NewGuid();
-        _unitOfWorkMock.Setup(u => u.Repository<Domain.Entities.Order>().FindAsync(It.IsAny<Expression<Func<Domain.Entities.Order, bool>>>(), It.IsAny<Expression<Func<Domain.Entities.Order, object>>>()))
-            .ReturnsAsync((Domain.Entities.Order)null);
+
+        _unitOfWorkMock
+            .Setup(uow => uow.Repository<Domain.Entities.Order>()
+            .GetAllAsync(It.IsAny<Expression<Func<Domain.Entities.Order, bool>>>(),
+                         It.IsAny<Expression<Func<Domain.Entities.Order, object>>[]>()))
+            .ReturnsAsync(order);
+
 
         // Act
         var result = await _orderService.Get(orderId);
@@ -165,8 +174,13 @@ public class OrderServiceTest
     {
         // Arrange
         var orderId = Guid.NewGuid();
-        _unitOfWorkMock.Setup(u => u.Repository<Domain.Entities.Order>().FindAsync(It.IsAny<Expression<Func<Domain.Entities.Order, bool>>>(), It.IsAny<Expression<Func<Domain.Entities.Order, object>>>()))
-            .ThrowsAsync(new Exception("Database error"));
+
+        _unitOfWorkMock
+            .Setup(uow => uow.Repository<Domain.Entities.Order>()
+            .GetAllAsync(It.IsAny<Expression<Func<Domain.Entities.Order, bool>>>(),
+                         It.IsAny<Expression<Func<Domain.Entities.Order, object>>[]>()))
+           .ThrowsAsync(new Exception("Database error"));
+
 
         // Act & Assert
         await Assert.ThrowsAsync<Exception>(() => _orderService.Get(orderId));

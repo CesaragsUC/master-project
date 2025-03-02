@@ -5,6 +5,7 @@ using Order.Application.Extentions;
 using Order.Domain.Entities;
 using Order.Infrastructure;
 using Serilog;
+using Shared.Kernel.Core.Enuns;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Order.Application.Handlers.Events;
