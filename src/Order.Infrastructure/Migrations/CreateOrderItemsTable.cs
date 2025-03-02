@@ -26,7 +26,8 @@ public class CreateOrderItemsTable : Migration
             
             Create.ForeignKey("FK_OrderItens_Orders")
                 .FromTable("OrderItens").ForeignColumns("OrderId")
-                .ToTable("Orders").PrimaryColumn("Id");
+                .ToTable("Orders").PrimaryColumn("Id")
+                .OnDeleteOrUpdate(Rule.Cascade);
         }
 
         Console.WriteLine("Table OrderItens created.");

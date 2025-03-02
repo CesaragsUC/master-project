@@ -21,10 +21,18 @@ public class OrdersController(IOrderService orderService, IMapper mapper) : Cont
     }
 
     [HttpGet]
-    [Route("{id:guid}")]
-    public async Task<IActionResult> Get(Guid id)
+    [Route("{customerId:guid}")]
+    public async Task<IActionResult> Get(Guid customerId)
     {
-        var result = await orderService.Get(id);
+        var result = await orderService.Get(customerId);
+        return result.Succeeded ? Ok(result) : BadRequest(result);
+    }
+
+    [HttpGet]
+    [Route("{orderId:guid}/{customerId:guid}")]
+    public async Task<IActionResult> Get(Guid orderId, Guid customerId)
+    {
+        var result = await orderService.Get(orderId,customerId);
         return result.Succeeded ? Ok(result) : BadRequest(result);
     }
 }

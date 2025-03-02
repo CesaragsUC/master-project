@@ -13,6 +13,8 @@ public interface ICartService
     Task<Result<bool>> UpdateCartAsync(UpdateCartItemDto cartDto);
 
     Task<Result<bool>> RemoveItemAsync(Guid customerId, Guid productId);
+    
+    Task<Result<bool>> DeleteCart(Guid customerId);
 
     Task<Result<bool>> CheckoutAsync(CartDto checkoutDto);
 

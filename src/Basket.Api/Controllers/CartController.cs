@@ -78,4 +78,14 @@ public class CartController : ControllerBase
         var discountResult = await _cartService.ApplyDiscountAsync(cart);
         return discountResult.Succeeded ? Ok(discountResult) : BadRequest(discountResult);
     }
+
+    [HttpDelete]
+    [Route("delete")]
+    [ProducesResponseType(typeof(Result<Cart?>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(Result<Cart?>), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> Delete(Guid customerId)
+    {
+        var discountResult = await _cartService.DeleteCart(customerId);
+        return discountResult.Succeeded ? Ok(discountResult) : BadRequest(discountResult);
+    }
 }

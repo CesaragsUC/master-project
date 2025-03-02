@@ -40,10 +40,10 @@ public class CartService : ICartService
     [ExcludeFromCodeCoverage]
     private DistributedCacheEntryOptions Expiration => new()
     {
-        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(3),
+        AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(60),
 
         //should always be set lower than the absolute expiration
-        SlidingExpiration = TimeSpan.FromMinutes(1)
+        SlidingExpiration = TimeSpan.FromMinutes(60)
     };
 
 
@@ -227,8 +227,43 @@ public class CartService : ICartService
         }
 
          return await Result<bool>.
-                FailureAsync("An error occour while attempt to save product.");
+                FailureAsync("An error occour while attempt to remove item from cart.");
         
+    }
+
+    public async Task<Result<bool>> DeleteCart(Guid customerId)
+    {
+        Cart? cart = new();
+
+        cart = await _cartRepository.GetAsync(customerId);
+
+        if (cart is null)
+        {
+            return await Result<bool>.FailureAsync("cart not found");
+        }
+
+        var cacheKey = $"cart:{cart.CustomerId}";
+
+        var result = await _cacheService.GetOrCreateAsync(
+            key: cacheKey,
+            factory: async () =>
+            {
+                return cart;
+            },
+             Expiration,
+            updateDatabase: async (updatedCart) =>
+            {
+                await _cartRepository.DeleteAsync(customerId);
+            });
+
+        if (result is not null)
+        {
+            return await Result<bool>.SuccessAsync("cart deleted");
+        }
+
+        return await Result<bool>.
+                FailureAsync("An error occour while attempt to delete cart.");
+
     }
 
     public async Task<Result<bool>> CheckoutAsync(CartDto checkoutDto)

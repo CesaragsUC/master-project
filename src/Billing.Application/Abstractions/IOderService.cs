@@ -6,6 +6,6 @@ namespace Billing.Application.Abstractions;
 
 public interface IOderApi
 {
-    [Get("/{id}")]
-    Task<ApiResponse<Result<OrderDto>>> GetOrderAsync(Guid id);
+    [Get("/{orderId}/{customerId}")]
+    Task<ApiResponse<Result<OrderDto>>> GetOrderAsync(Guid orderId,Guid customerId);
 }
