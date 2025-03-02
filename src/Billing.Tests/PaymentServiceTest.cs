@@ -59,7 +59,7 @@ public class PaymentServiceTest
             new RefitSettings()
         );
 
-        _oderApiMock.Setup(x => x.GetOrderAsync(It.IsAny<Guid>())).ReturnsAsync(apiResponse);
+        _oderApiMock.Setup(x => x.GetOrderAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(apiResponse);
 
         _unitOfWorkMock.Setup(x => x.Repository<Payment>().AddAsync(It.IsAny<Payment>())).Returns(Task.CompletedTask);
 
@@ -89,7 +89,7 @@ public class PaymentServiceTest
             new RefitSettings()
         );
 
-        _oderApiMock.Setup(x => x.GetOrderAsync(It.IsAny<Guid>())).ReturnsAsync(apiResponse);
+        _oderApiMock.Setup(x => x.GetOrderAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(apiResponse);
 
         _unitOfWorkMock.Setup(x => x.Repository<Payment>().AddAsync(It.IsAny<Payment>())).
             ThrowsAsync(new Exception("Error on create payment"));
@@ -202,7 +202,7 @@ public class PaymentServiceTest
             new RefitSettings()
         );
 
-        _oderApiMock.Setup(x => x.GetOrderAsync(It.IsAny<Guid>())).ReturnsAsync(apiResponse);
+        _oderApiMock.Setup(x => x.GetOrderAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(apiResponse);
 
         _unitOfWorkMock.Setup(x => x.Repository<Payment>().AddAsync(It.IsAny<Payment>())).Returns(Task.CompletedTask);
 
