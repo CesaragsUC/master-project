@@ -46,7 +46,7 @@ public class ProductUpdateEventHandler :
 
             await _repository.UpdateAsync(productDb);
 
-            Log.Information("Product: {Nome} - {Data} was updated.", request.Name, DateTime.Now);
+            Log.Information("Product: {Name} - {Date} was updated.", request.Name, DateTime.Now);
 
             return true;
         }

@@ -8,37 +8,37 @@
       "UpstreamHttpMethod": [ "GET" ],
       "DownstreamHostAndPorts": [
         {
-          "Host": "catalog.masterproject.com", // Subdomínio para o serviço Catalog
+          "Host": "casoft-store.catalog.com", // Subdomínio para o serviço Catalog
           "Port": 443 // Porta padrão para HTTPS
         }
       ],
       "RateLimitOptions": {
         "ClientWhitelist": [],
         "EnableRateLimiting": true,
-        "PeriodTimespan": 5, 
-        "Period": "10s", 
-        "Limit": 10 
+        "PeriodTimespan": 5,
+        "Period": "10s",
+        "Limit": 10
       },
       "FileCacheOptions": {
-        "TtlSeconds": 10 
+        "TtlSeconds": 10
       }
     },
     {
       "UpstreamPathTemplate": "/product/{everything}", //rota publica
       "DownstreamPathTemplate": "/api/product/{everything}", //rota privada
       "DownstreamScheme": "https",
-      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ], 
+      "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ],
       "DownstreamHostAndPorts": [
         {
-          "Host": "product.masterproject.com",
+          "Host": "casoft-store.product.com",
           "Port": 443
         }
       ],
       "RateLimitOptions": {
         "ClientWhitelist": [],
         "EnableRateLimiting": true,
-        "PeriodTimespan": 5, 
-        "Period": "10s", 
+        "PeriodTimespan": 5,
+        "Period": "10s",
         "Limit": 10
       }
     }

@@ -4,7 +4,7 @@ public enum OrderStatus
 {
     Created = 1,
     Cancelled = 2,
-    Complted = 3,
+    Completed = 3,
     Shipped = 4,
     Delivered = 5,
     Returned = 6,

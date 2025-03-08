@@ -1,0 +1,98 @@
+route:
+  receiver: 'Default'
+  group_by: ['alertname', 'team', 'instance']
+  group_wait: 15s
+  group_interval: 15s
+  repeat_interval: 1m
+  routes:
+
+    - receiver: AlertGatewayApi
+      group_wait: 10s
+      match:
+        team: "casoft-api-gateway"
+      continue: true    
+
+    - receiver: AlertApiAuth
+      group_wait: 10s
+      match:
+        team: "casoft-api-auth"
+      continue: true 
+
+    - receiver: AlertBasketApi
+      group_wait: 10s
+      match:
+        team: "casoft-basket-api"
+      continue: true    
+
+    - receiver: AlertBillingApi
+      group_wait: 10s
+      match:
+        team: "casoft-billing-api"
+      continue: true 
+
+    - receiver: AlertCatalogApi
+      group_wait: 10s
+      match:
+        team: "casoft-catalog-api"
+      continue: true 
+
+    - receiver: AlertDiscountApi
+      group_wait: 10s
+      match:
+        team: "casoft-discount-api"
+      continue: true 
+
+    - receiver: AlertOrderApi
+      group_wait: 10s
+      match:
+        team: "casoft-order-api"
+      continue: true     
+
+    - receiver: AlertProductApi
+      group_wait: 10s
+      match:
+        team: "casoft-product-api"
+      continue: true
+
+    # Rota padrão (fallback)
+    - receiver: Default
+      match:
+        team: ""  # Captura alertas SEM a label 'team'
+      continue: false
+
+receivers:
+  - name: Default
+    webhook_configs:
+      - url: 'http://alertview:8181/webhook'
+
+  - name: AlertGatewayApi
+    webhook_configs:
+      - url: 'http://alertview:8181/webhook'
+
+  - name: AlertApiAuth
+    webhook_configs:
+      - url: 'http://alertview:8181/webhook'  
+      
+  - name: AlertBasketApi
+    webhook_configs:
+      - url: 'http://alertview:8181/webhook'      
+
+  - name: AlertBillingApi
+    webhook_configs:
+      - url: 'http://alertview:8181/webhook'
+
+  - name: AlertCatalogApi
+    webhook_configs:
+      - url: 'http://alertview:8181/webhook'
+
+  - name: AlertDiscountApi
+    webhook_configs:
+      - url: 'http://alertview:8181/webhook'
+
+  - name: AlertOrderApi
+    webhook_configs:
+      - url: 'http://alertview:8181/webhook'
+
+  - name: AlertProductApi
+    webhook_configs:
+      - url: 'http://alertview:8181/webhook'                                               

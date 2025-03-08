@@ -1,4 +1,5 @@
 ﻿using Message.Broker.Abstractions;
+using Message.Broker.Services;
 using Messaging.Contracts.Events.Product;
 using Product.Domain.Abstractions;
 using Product.Domain.Events;
@@ -34,11 +35,14 @@ public class ProductService : IProductService
             };
 
             await _rabbitMqService.Send(productCreated, _queueService.ProductCreatedMessage);
+            
+
+            Log.Information($"Product sent to queue: {_queueService.ProductCreatedMessage}");
 
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "Error to send saved product to Queue");
+            Log.Error(ex, "Error to send product to Queue");
             throw;
         }
 

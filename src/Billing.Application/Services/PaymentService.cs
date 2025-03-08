@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using Billing.Application.Abstractions;
 using Billing.Application.Dtos;
 using Billing.Application.Extentions;
@@ -9,7 +8,6 @@ using Billing.Infrastructure.Configurations.RabbitMq;
 using HybridRepoNet.Abstractions;
 using Message.Broker.Abstractions;
 using Messaging.Contracts.Events.Payments;
-using Microsoft.EntityFrameworkCore;
 using ResultNet;
 using Serilog;
 using Shared.Kernel.Core.Enuns;
@@ -44,20 +42,42 @@ public class PaymentService : IPaymentService
     {
         try
         {
+            Payment payment = new();
+            PaymentCreatedEvent paymentEvent = new();
+
             var orderResult = await GetOrderAsync(paymentDto.OrderId, paymentDto.CustomerId);
+
             if (!orderResult.Succeeded)
             {
                 return await Result<bool>.FailureAsync(orderResult.Messages!);
             }
 
-            var payment = CreatePaymentEntity(paymentDto, orderResult!.Data!.ToOrder()!);
+            payment = await _unitOfWork.Repository<Payment>()
+                                       .FindAsync(x => x.OrderId == paymentDto.OrderId &&
+                                                  x.CustomerId == paymentDto.CustomerId);
 
-            await _unitOfWork.Repository<Payment>().AddAsync(payment);
-            await _unitOfWork.Commit();
+            if (payment is not null && 
+                payment.Status == (int)PaymentStatus.Completed)
+            {
+                Log.Warning("Order already paid.");
+                return await Result<bool>.SuccessAsync("Order already paid.");
+            }
 
-            var paymentCreated = CreatePaymentCreatedEvent(payment, orderResult!.Data!.ToOrder()!);
+            if (payment is not null)
+            {
+                paymentEvent = GetExistentPaymentEvent(payment, orderResult!.Data!.ToOrder()!, paymentDto);
+            }
+            else
+            {
+                payment = CreatePaymentEntity(paymentDto, orderResult!.Data!.ToOrder()!);
 
-            await _rabbitMqService.Send(paymentCreated, _queueService.PaymentCreatedMessage);
+                await _unitOfWork.Repository<Payment>().AddAsync(payment);
+                await _unitOfWork.Commit();
+
+                paymentEvent = NewPaymentCreatedEvent(payment, orderResult!.Data!.ToOrder()!, paymentDto);
+            }
+
+            await _rabbitMqService.Send(paymentEvent, _queueService.PaymentCreatedMessage);
 
             return await Result<bool>.SuccessAsync("Payment created");
         }
@@ -89,7 +109,7 @@ public class PaymentService : IPaymentService
         return payment;
     }
 
-    private PaymentCreatedEvent CreatePaymentCreatedEvent(Payment payment, Order order)
+    private PaymentCreatedEvent NewPaymentCreatedEvent(Payment payment, Order order, PaymentCreatDto dto)
     {
         return new PaymentCreatedEvent
         {
@@ -100,17 +120,38 @@ public class PaymentService : IPaymentService
             PaymentDate = DateTime.Now,
             Status = (int)PaymentStatus.Pending,
             PaymentMethod = (int)PaymentMethod.CreditCard,
+
             CreditCard = new Messaging.Contracts.Events.Payments.CreditCard
             {
-                CardNumber = payment.CreditCard!.CardNumber,
-                ExpirationDate = payment.CreditCard.ExpirationDate,
-                SecurityCode = payment.CreditCard.SecurityCode,
-                Holder = payment.CreditCard.Holder,
+                CardNumber = dto.CreditCard!.CardNumber,
+                ExpirationDate = dto.CreditCard.ExpirationDate,
+                SecurityCode = dto.CreditCard.SecurityCode,
+                Holder = dto.CreditCard.Holder,
             }
         };
     }
 
+    private PaymentCreatedEvent GetExistentPaymentEvent(Payment payment, Order order, PaymentCreatDto dto)
+    {
+        return new PaymentCreatedEvent
+        {
+            OrderId = order.Id,
+            PaymentToken = order.PaymentToken,
+            Amount = order.TotalAmount,
+            CustomerId = order.CustomerId,
+            PaymentDate = payment.PaymentDate,
+            Status = payment.Status,
+            PaymentMethod = payment.Method,
 
+            CreditCard = new Messaging.Contracts.Events.Payments.CreditCard
+            {
+                CardNumber = dto.CreditCard!.CardNumber,
+                ExpirationDate = dto.CreditCard.ExpirationDate,
+                SecurityCode = dto.CreditCard.SecurityCode,
+                Holder = dto.CreditCard.Holder,
+            }
+        };
+    }
 
     public async Task<Result<bool>> DeletePaymentAsync(string transactionId)
     {
@@ -133,7 +174,7 @@ public class PaymentService : IPaymentService
     {
         var result = await _unitOfWork.Repository<Payment>().GetAllAsync();
 
-       var listDto = _mapper.Map<IEnumerable<PaymentDto>>(result.Where(x => !x.IsDeleted).ToList());
+        var listDto = _mapper.Map<IEnumerable<PaymentDto>>(result.Where(x => !x.IsDeleted).ToList());
 
         return await Result<IEnumerable<PaymentDto>>.SuccessAsync(listDto);
     }

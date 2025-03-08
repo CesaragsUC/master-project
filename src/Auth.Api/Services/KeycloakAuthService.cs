@@ -63,7 +63,7 @@ public class KeycloakAuthService : IAuthKeyCloakService
         if (userInfo == null)
         {
             Log.Error("Failed to fetch user info: {Message}", response.StatusCode);
-            return await Result<LoginResponse>.FailureAsync(400, "An error occour during login");
+            return await Result<LoginResponse>.FailureAsync(400, "An error occour during fetch user information");
         }
 
 
@@ -187,7 +187,7 @@ public class KeycloakAuthService : IAuthKeyCloakService
         if (!response.IsSuccessStatusCode)
         {
             Log.Error("Failed to logout from Keycloak: {StatusCode}", response.StatusCode);
-            return await Result<bool>.FailureAsync(500, "An error occour during login");
+            return await Result<bool>.FailureAsync(500, "An error occour during logout");
         }
 
         return await Result<bool>.SuccessAsync("logout success.");

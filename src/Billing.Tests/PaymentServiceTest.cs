@@ -12,6 +12,8 @@ using Message.Broker.Abstractions;
 using Moq;
 using Refit;
 using ResultNet;
+using Shared.Kernel.Core.Enuns;
+using Shared.Kernel.Utils;
 using System.Linq.Expressions;
 using System.Net;
 
@@ -48,8 +50,24 @@ public class PaymentServiceTest
     public async Task CreatePaymentAsync_ShouldReturnSuccess_WhenOrderIsFound()
     {
         // Arrange
-        var paymentDto = new PaymentCreatDto { OrderId = Guid.NewGuid() };
-        var order = new OrderDto { Id = paymentDto.OrderId, TotalAmount = 100 };
+        var paymentDto = new PaymentCreatDto {
+            OrderId = Guid.NewGuid(),
+            CustomerId = Guid.NewGuid(),
+             CreditCard = new CreditCardDto
+             {
+                 Holder = "John Doe",
+                 CardNumber = "1234567890123456",
+                 ExpirationDate = "12/2022",
+                 SecurityCode = "123"
+             }
+        };
+
+        var order = new OrderDto { 
+            Id = paymentDto.OrderId,
+            CustomerId = Guid.NewGuid(),
+            TotalAmount = 100,
+            PaymentToken = PaymentTokenService.GenerateToken()
+        };
 
         var orderResult = await Result<OrderDto>.SuccessAsync(order);
 
@@ -213,6 +231,122 @@ public class PaymentServiceTest
 
         // Assert
         Assert.False(result.Succeeded);
+    }
+
+    [Fact(DisplayName = "Test 08")]
+    [Trait("Billing", "PaymentServiceTest")]
+    public async Task Teste08()
+    {
+        // Arrange
+        var paymentDto = new PaymentCreatDto
+        {
+            OrderId = Guid.NewGuid(),
+            CustomerId = Guid.NewGuid(),
+            CreditCard = new CreditCardDto
+            {
+                Holder = "John Doe",
+                CardNumber = "1234567890123456",
+                ExpirationDate = "12/2022",
+                SecurityCode = "123"
+            }
+        };
+
+        var order = new OrderDto
+        {
+            Id = paymentDto.OrderId,
+            CustomerId = Guid.NewGuid(),
+            TotalAmount = 100,
+            PaymentToken = PaymentTokenService.GenerateToken()
+        };
+
+        var payment = new Payment
+        {
+            Id = Guid.NewGuid(),
+            Amount = order.TotalAmount,
+            Status = (int)PaymentStatus.Pending,
+            Method = (int)PaymentMethod.CreditCard,
+            PaymentDate = DateTime.Now,
+            TransactionId = PaymentHelper.GenerateTransactionIdWithPrefix()
+        };
+
+        var orderResult = await Result<OrderDto>.SuccessAsync(order);
+
+        var apiResponse = new ApiResponse<Result<OrderDto>>(
+            new HttpResponseMessage(HttpStatusCode.OK),
+            orderResult,
+            new RefitSettings()
+        );
+
+        _oderApiMock.Setup(x => x.GetOrderAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(apiResponse);
+
+        _unitOfWorkMock.Setup(x => x.Repository<Payment>().AddAsync(It.IsAny<Payment>())).Returns(Task.CompletedTask);
+        _unitOfWorkMock.Setup(x => x.Repository<Payment>().FindAsync(It.IsAny<Expression<Func<Payment, bool>>>())).ReturnsAsync(payment);
+
+        _queueServiceMock.Setup(x => x.PaymentCreatedMessage).Returns(new Uri("queue:PaymentCreated"));
+
+        // Act
+        var result = await _paymentService.CreatePaymentAsync(paymentDto);
+
+        // Assert
+        Assert.True(result.Succeeded);
+    }
+
+    [Fact(DisplayName = "Test 09")]
+    [Trait("Billing", "PaymentServiceTest")]
+    public async Task Teste09()
+    {
+        // Arrange
+        var paymentDto = new PaymentCreatDto
+        {
+            OrderId = Guid.NewGuid(),
+            CustomerId = Guid.NewGuid(),
+            CreditCard = new CreditCardDto
+            {
+                Holder = "John Doe",
+                CardNumber = "1234567890123456",
+                ExpirationDate = "12/2022",
+                SecurityCode = "123"
+            }
+        };
+
+        var order = new OrderDto
+        {
+            Id = paymentDto.OrderId,
+            CustomerId = Guid.NewGuid(),
+            TotalAmount = 100,
+            PaymentToken = PaymentTokenService.GenerateToken()
+        };
+
+        var payment = new Payment
+        {
+            Id = Guid.NewGuid(),
+            Amount = order.TotalAmount,
+            Status = (int)PaymentStatus.Completed,
+            Method = (int)PaymentMethod.CreditCard,
+            PaymentDate = DateTime.Now,
+            TransactionId = PaymentHelper.GenerateTransactionIdWithPrefix()
+        };
+
+        var orderResult = await Result<OrderDto>.SuccessAsync(order);
+
+        var apiResponse = new ApiResponse<Result<OrderDto>>(
+            new HttpResponseMessage(HttpStatusCode.OK),
+            orderResult,
+            new RefitSettings()
+        );
+
+        _oderApiMock.Setup(x => x.GetOrderAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(apiResponse);
+
+        _unitOfWorkMock.Setup(x => x.Repository<Payment>().AddAsync(It.IsAny<Payment>())).Returns(Task.CompletedTask);
+        _unitOfWorkMock.Setup(x => x.Repository<Payment>().FindAsync(It.IsAny<Expression<Func<Payment, bool>>>())).ReturnsAsync(payment);
+
+        _queueServiceMock.Setup(x => x.PaymentCreatedMessage).Returns(new Uri("queue:PaymentCreated"));
+
+        // Act
+        var result = await _paymentService.CreatePaymentAsync(paymentDto);
+
+        // Assert
+        Assert.True(result.Succeeded);
     }
 }
 

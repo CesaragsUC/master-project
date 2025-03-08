@@ -12,10 +12,12 @@ public static class OrderExtentions
         return new Order
         {
             Id = dto.Id,
-            CreatedAt = dto.CreatedAt,
+            CreatedDate = dto.CreatedAt,
             CustomerId = dto.CustomerId,
             TotalAmount = dto.TotalAmount,
-            Status = dto.Status
+            Status = dto.Status,
+            PaymentToken = dto.PaymentToken,
+            Name = dto.Name
         };
     }
 }

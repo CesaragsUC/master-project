@@ -23,11 +23,8 @@ var app = builder.Build();
 // more configuring metrics for grafana
 app.UseOpenTelemetryPrometheusScrapingEndpoint();
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 

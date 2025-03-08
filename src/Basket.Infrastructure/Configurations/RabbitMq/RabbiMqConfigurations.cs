@@ -1,4 +1,5 @@
-﻿using Message.Broker.Configurations;
+﻿using Basket.Infrastructure.Service;
+using Message.Broker.Configurations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics.CodeAnalysis;
@@ -13,7 +14,7 @@ public static class RabbiMqConfigurations
         IConfiguration configuration)
     {
 
-        services.AddMassTransitSetupConfig(configuration);
+        services.AddMassTransitSetupConfig(configuration, typeof(RemoveCartConsumer));
 
         return services;
     }

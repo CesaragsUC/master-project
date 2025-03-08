@@ -1,5 +1,4 @@
 ﻿using Basket.Api.Dtos;
-using Basket.Domain.Entities;
 using ResultNet;
 
 namespace Basket.Api.Abstractions;
@@ -18,7 +17,7 @@ public interface ICartService
 
     Task<Result<bool>> CheckoutAsync(CartDto checkoutDto);
 
-    Task<Result<CartDto>> ApplyDiscountAsync(CartDto discountRequest);
+    Task<Result<DiscountResultResponse>> ApplyDiscountAsync(DiscountRequest discountRequest);
 
     Task<Result<bool>> UpdateTotalPriceCartAsync(Guid customerId, decimal discount);
 }

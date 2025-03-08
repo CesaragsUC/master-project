@@ -4,10 +4,14 @@
 		<TargetFramework>net8.0</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
+		<UserSecretsId>a7f685e3-4ca4-401d-957d-aa3c70947352</UserSecretsId>
+		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+		<DockerfileContext>..\..</DockerfileContext>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="AutoMapper" Version="13.0.1" />
 		<PackageReference Include="FluentResultNet" Version="1.1.0" />
+		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
 		<PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.11.0-beta.1" />
 	</ItemGroup>
