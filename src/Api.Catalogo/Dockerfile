@@ -2,7 +2,7 @@
 
 # This stage is used when running from VS in fast mode (Default for Debug configuration)
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-USER app
+USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
@@ -13,10 +13,10 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["Api.Catalogo/Catalog.Api.csproj", "Api.Catalogo/"]
-COPY ["Application.Dtos/Application.Dtos.csproj", "Application.Dtos/"]
+COPY ["Catalog.Application/Catalog.Application.csproj", "Catalog.Application/"]
 COPY ["Catalog.Domain/Catalog.Domain.csproj", "Catalog.Domain/"]
 COPY ["Catalog.Infrastructure/Catalog.Infrastructure.csproj", "Catalog.Infrastructure/"]
-COPY ["Catalog.Services/Catalog.Service.csproj", "Catalog.Services/"]
+COPY ["Shared.Kernel/Shared.Kernel.csproj", "Shared.Kernel/"]
 RUN dotnet restore "./Api.Catalogo/Catalog.Api.csproj"
 COPY . .
 WORKDIR "/src/Api.Catalogo"

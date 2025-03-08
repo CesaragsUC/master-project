@@ -4,7 +4,7 @@ using Message.Broker.RabbitMq;
 using Message.Broker.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using RabbitMQ.Client.Exceptions;
+using Serilog;
 using System.Diagnostics.CodeAnalysis;
 using System.Security.Authentication;
 
@@ -78,8 +78,15 @@ public static class RabbitMqServiceExtensions
                 retry.Ignore<ConsumerCanceledException>();
                 retry.Exponential(3, TimeSpan.FromSeconds(5), TimeSpan.FromHours(1), TimeSpan.FromSeconds(10))
                     .Handle<Exception>();
+
+                retry.Handle<Exception>(ex =>
+                {
+                    Log.Error(ex, $"An Error occour on retry: {ex.Message}");
+                    return  true;
+                });
             });
 
+            configureEndpoint.AutoDelete  = false;
             configureEndpoint.ConfigureConsumer<TConsumer>(context);
         });
     }
@@ -93,7 +100,7 @@ public static class RabbitMqServiceExtensions
             QueueName = $"{rabbitMqConfig.Prefix}.casoft.{eventName.ToLower()}.v1",
             RoutingKey = eventName,
             ExchangeType = RabbitMQ.Client.ExchangeType.Fanout,
-            RetryLimit = 2,
+            RetryLimit = 3,
             Interval = TimeSpan.FromSeconds(3),
             ConfigureConsumeTopology = false,
             PrefetchCount = 5

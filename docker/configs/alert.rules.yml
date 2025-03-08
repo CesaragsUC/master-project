@@ -1,0 +1,89 @@
+groups:
+- name: GatewayApi
+  rules:
+  - alert: GatewayApiAlert
+    expr: rate(mongodb_op_counters_total{type="query"}[10m]) > 0.15
+    for:  5s
+    labels:
+      team: casoft-api-gateway
+    annotations:
+      summary: "Muitas consultas"
+      description: "O {{ $labels.instance }} Gateway API received to many requests ({{ $value }})"
+
+
+- name: ProductAPI
+  rules:
+  - alert: ProductApiAlert - To many requests
+    expr: sum(rate(http_requests_received_total[1m]))  by (instance) > 1
+    for: 30s # perido de tempo para disparar o alerta
+    labels:
+      team: casoft-product-api # serve para o alertmanager rotear o alerta, usado no arquivo alertmanager.yml
+    annotations:
+      summary: "High number of requests"
+      description: "{{ $labels.instance }} Product API received to many requests ({{ $value }})"
+
+- name: BasketAPI
+  rules:
+  - alert: BasketApiAlert - To many requests
+    expr: sum(rate(http_requests_received_total[1m]))  by (instance) > 1
+    for: 30s # perido de tempo para disparar o alerta
+    labels:
+      team: casoft-basket-api # serve para o alertmanager rotear o alerta, usado no arquivo alertmanager.yml
+    annotations:
+      summary: "High number of requests"
+      description: "{{ $labels.instance }} Basket API received to many requests ({{ $value }})"      
+
+- name: BillingAPI
+  rules:
+  - alert: BillingApiAlert - To many requests
+    expr: sum(rate(http_requests_received_total[1m]))  by (instance) > 1
+    for: 30s # perido de tempo para disparar o alerta
+    labels:
+      team: casoft-billing-api # serve para o alertmanager rotear o alerta, usado no arquivo alertmanager.yml
+    annotations:
+      summary: "High number of requests"
+      description: "{{ $labels.instance }} Billing API received to many requests ({{ $value }})"
+
+- name: CatalogAPI
+  rules:
+  - alert: CatalogApiAlert - To many requests
+    expr: sum(rate(http_requests_received_total[1m]))  by (instance) > 1
+    for: 30s # perido de tempo para disparar o alerta
+    labels:
+      team: casoft-catalog-api # serve para o alertmanager rotear o alerta, usado no arquivo alertmanager.yml
+    annotations:
+      summary: "High number of requests"
+      description: "{{ $labels.instance }} Catalog API received to many requests ({{ $value }})"
+
+- name: DiscountAPI
+  rules:
+  - alert: DiscountApiAlert - To many requests
+    expr: sum(rate(http_requests_received_total[1m]))  by (instance) > 1
+    for: 30s # perido de tempo para disparar o alerta
+    labels:
+      team: casoft-discount-api # serve para o alertmanager rotear o alerta, usado no arquivo alertmanager.yml
+    annotations:
+      summary: "High number of requests"
+      description: "{{ $labels.instance }} Discount API received to many requests ({{ $value }})"
+
+- name: OrderAPI
+  rules:
+  - alert: OrderApiAlert - To many requests
+    expr: sum(rate(http_requests_received_total[1m]))  by (instance) > 1
+    for: 30s # perido de tempo para disparar o alerta
+    labels:
+      team: casoft-order-api # serve para o alertmanager rotear o alerta, usado no arquivo alertmanager.yml
+    annotations:
+      summary: "High number of requests"
+      description: "{{ $labels.instance }} Order API received to many requests ({{ $value }})"
+
+- name: AuthAPI
+  rules:
+  - alert: AuthApiAlert - To many requests
+    expr: sum(rate(http_requests_received_total[1m]))  by (instance) > 1
+    for: 30s # perido de tempo para disparar o alerta
+    labels:
+      team: casoft-api-auth # serve para o alertmanager rotear o alerta, usado no arquivo alertmanager.yml
+    annotations:
+      summary: "High number of requests"
+      description: "{{ $labels.instance }} Auth API received to many requests ({{ $value }})"                              

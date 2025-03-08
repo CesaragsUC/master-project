@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 
-set -e  # Para parar a execução se algum comando falhar
+set -e # Abort script at first error
 
-echo "Inicializando os bancos de dados..."
+echo "Initializing database..."
 
 # Conectar ao PostgreSQL como superusuário e criar os bancos
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "postgres" <<-EOSQL
     CREATE DATABASE quartznet;
 EOSQL
 
-echo "Bancos de dados criados com sucesso!"
+echo "Database quartznet created successfully!"
 
 # Executar comandos no banco `quartznet`
 echo "Criando tabelas no banco quartznet..."
@@ -188,4 +188,6 @@ create index idx_qrtz_ft_job_req_recovery on qrtz_fired_triggers(requests_recove
     set client_min_messages = NOTICE;
 EOSQL
 
-echo "Tabelas no banco quartznet criadas com sucesso!"
+echo "QuartzNet tables created successfully!"
+
+# In not using this, but it's here for reference in how to initialize the database for QuartzNet

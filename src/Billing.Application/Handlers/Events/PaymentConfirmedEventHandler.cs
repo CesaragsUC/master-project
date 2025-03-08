@@ -49,7 +49,7 @@ public class PaymentConfirmedEventHandler :
                 {
                     OrderId = request.OrderId,
                     CustomerId = request.CustomerId,
-                    Status = (int)OrderStatus.Complted
+                    Status = (int)OrderStatus.Completed
                 };
 
                 await _rabbitMqService.Send(orderUpdateMessage, _queueService.OrderUpdateMessage);

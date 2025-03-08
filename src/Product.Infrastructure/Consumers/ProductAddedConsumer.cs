@@ -20,6 +20,8 @@ public class ProductAddedConsumer : IConsumer<ProductAddedEvent>
     {
         try
         {
+            Log.Information("Startings consume product created message");
+
             var produto = new ProductAddedEvent
             {
                 ProductId = context.Message.ProductId,
@@ -31,6 +33,8 @@ public class ProductAddedConsumer : IConsumer<ProductAddedEvent>
             };
 
             await _mediator.Send(produto);
+
+            Log.Information("Product message consumed");
         }
         catch (Exception ex)
         {

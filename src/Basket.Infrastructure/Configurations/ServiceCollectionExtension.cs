@@ -13,12 +13,13 @@ public static class ServiceCollectionExtension
     public static void AddInfra(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddMongoDb(configuration);
+        services.AddMessageBrokerSetup(configuration);
+        services.AddGrafanaSetup(configuration);
     }
+
     public static void AddMongoDb(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddEasyMongoNet(configuration);
-        services.AddMessageBrokerSetup(configuration);
-        services.AddGrafanaSetup(configuration);
     }
 
 }

@@ -1,16 +1,16 @@
 services:
   
-  casoft-store-web:
-     image: cesarags/casoft-store-web:v1
-     container_name: casoft-store-web
-     ports:
-      - "4200:80"
-     environment:
-        - NODE_ENV=docker
-        - API_URL=http://localhost:5214/casoft/
-        - IMAGES_URL=http://localhost:5214/
-     depends_on:
-      - casoft-store-api-gateway
+  # casoft-store-web:
+  #    image: cesarags/casoft-store-web:v1
+  #    container_name: casoft-store-web
+  #    ports:
+  #     - "4200:80"
+  #    environment:
+  #       - NODE_ENV=docker
+  #       - API_URL=http://localhost:5214/casoft/
+  #       - IMAGES_URL=http://localhost:5214/
+  #    depends_on:
+  #     - casoft-store-api-gateway
 
   casoft-store-api-gateway:
     image: cesarags/casoft-store-api-gateway:v1
@@ -24,80 +24,21 @@ services:
       - ENDPOINTURI__AUTHAPI=${AUTH_URI_ENDPOINT}
       - FRONTENDURI__URI=${FRONT_END_URI}
       - FRONTENDURI__NAME=${FRONT_END_NAME}
-      - OPENTELEMETRY__SERVICE_NAME=Api.Gateway
-      - OPENTELEMETRY__JAEGER__AGENTHOST=${OPEN_TELEMETRY_HOST}
-      - OPENTELEMETRY__JAEGER__AGENTPORT=6831
+      - OPENTELEMETRYOPTIONS__SERVICE_NAME=Api.Gateway
+      - OPENTELEMETRYOPTIONS__ENVIRONMENT= ${OPENTELEMETRY_ENVIROMENT}
+      - OPENTELEMETRYOPTIONS__APPNAME=Api.Gateway
+      - OPENTELEMETRYOPTIONS__OTLEXPORTER__ENDPOINT=${OTLEXPORTER_ENDPOINT}
+      - OPENTELEMETRYOPTIONS__GRAFANALOKI__ENDPOINT=${GRAFANALOKI_ENDPOINT}
       - ASPNETCORE_ENVIRONMENT=Docker 
       - ASPNETCORE_URLS=http://*:5214
     ports:
       - "5214:5214"
     depends_on:
-      - casoft-store-product-service
+      - casoft-store-product
       - casoft-store-catalog
-      - casoft-store-consumer
       - casoft-store-auth
       - casoft-store-keycloak
-
-  casoft-store-product-service:
-    image: cesarags/casoft-store-product-service:v1
-    container_name: casoft-store-product-service
-    build:
-        context: ../src
-        dockerfile: ./Api.Produto/Dockerfile
-    environment:
-      - KEYCLOAK__REALM=${KEYCLOAK_REALM}
-      - KEYCLOAK__AUTH_SERVER_URL=${KEYCLOAK_SERVER_URL}
-      - KEYCLOAK__SSL_REQUIRED=${KEYCLOAK_SSL_REQUIRED}
-      - KEYCLOAK__RESOURCE=${KEYCLOAK_CLIENT_ID}
-      - KEYCLOAK__VERIFY_TOKEN_AUDIENCE=true
-      - KEYCLOAK__CREDENTIALS__SECRET=${KEYCLOAK_CLIENT_SECRET}
-      - KEYCLOAK__METADATADDRESS=${KEYCLOAK_METADATA_ADRESS}
-      - CONNECTIONSTRINGS__DEFAULTCONNECTION=${PRODUCT_SERVICE_DB}
-      - OPENTELEMETRY__SERVICE_NAME=Product.Api
-      - OPENTELEMETRY__JAEGER__AGENTHOST=${OPEN_TELEMETRY_HOST}
-      - OPENTELEMETRY__JAEGER__AGENTPORT=6831
-      - RABBITMQTRANSPORT__HOST=${RABBITMQ_HOST}
-      - RABBITMQTRANSPORT__PORT=${RABBITMQ_PORT}
-      - RABBITMQTRANSPORT__USER=${RABBITMQ_USER}
-      - RABBITMQTRANSPORT__PASS=${RABBITMQ_PASS}
-      - BLOBCONTAINERS__CONNECTIONSTRINGS=${AZURE_BLOB_URL}
-      - BLOBCONTAINERS__CONTAINERNAME=${BLOB_CONTAINER_NAME}
-      - ASPNETCORE_ENVIRONMENT=Docker 
-      - ASPNETCORE_URLS=http://*:5256
-    ports:
-      - "5256:5256"
-    depends_on:
-      - casoft-store-postgres-db
-      - casoft-store-rabbitmq
-      - casoft-store-keycloak
-    restart: always  
-
-  casoft-store-catalog:
-    image: cesarags/casoft-store-catalog:v1
-    container_name: casoft-store-catalog
-    build:
-        context: ../src
-        dockerfile: ./Api.Catalogo/Dockerfile
-    environment:
-      - KEYCLOAK__REALM=${KEYCLOAK_REALM}
-      - KEYCLOAK__AUTH_SERVER_URL=${KEYCLOAK_SERVER_URL}
-      - KEYCLOAK__SSL_REQUIRED=${KEYCLOAK_SSL_REQUIRED}
-      - KEYCLOAK__RESOURCE=${KEYCLOAK_CLIENT_ID}
-      - KEYCLOAK__VERIFY_TOKEN_AUDIENCE=true
-      - KEYCLOAK__CREDENTIALS__SECRET=${KEYCLOAK_SECRET}
-      - OPENTELEMETRY__SERVICE_NAME=Catalog.Api
-      - OPENTELEMETRY__JAEGER__AGENTHOST=${OPEN_TELEMETRY_HOST}
-      - OPENTELEMETRY__JAEGER__AGENTPORT=6831
-      - MONGODBSETTINGS__CONNECTIONSTRING=${MONGO_SERVER_URL}
-      - MONGODBSETTINGS__DATABASENAME=${MONGO_DATABASE_NAME}
-      - ASPNETCORE_ENVIRONMENT=Docker 
-      - ASPNETCORE_URLS=http://*:5294
-    ports:
-      - "5294:5294"
-    depends_on:
-      - casoft-store-mongodb
-      - casoft-store-keycloak
-
+      
   casoft-store-auth:
     image: cesarags/casoft-store-auth:v1
     container_name: casoft-store-auth
@@ -111,7 +52,10 @@ services:
       - KEYCLOAK__RESOURCE=${KEYCLOAK_CLIENT_ID}
       - KEYCLOAK__VERIFY_TOKEN_AUDIENCE=true
       - KEYCLOAK__CREDENTIALS__SECRET=${KEYCLOAK_CLIENT_SECRET}
-      - OPENTELEMETRY__SERVICE_NAME=Auth.Api
+      - OPENTELEMETRYOPTIONS__ENVIRONMENT= ${OPENTELEMETRY_ENVIROMENT}
+      - OPENTELEMETRYOPTIONS__APPNAME=Auth.Api
+      - OPENTELEMETRYOPTIONS__OTLEXPORTER__ENDPOINT=${OTLEXPORTER_ENDPOINT}
+      - OPENTELEMETRYOPTIONS__GRAFANALOKI__ENDPOINT=${GRAFANALOKI_ENDPOINT}
       - OPENTELEMETRY__JAEGER__AGENTHOST=${OPEN_TELEMETRY_HOST}
       - OPENTELEMETRY__JAEGER__AGENTPORT=6831
       - ASPNETCORE_ENVIRONMENT=Docker 
@@ -120,29 +64,223 @@ services:
       - "5283:5283"
     depends_on:
       - casoft-store-keycloak
-
-  casoft-store-consumer:
-    image: cesarags/casoft-consumer:v1
-    container_name: casoft-consumer
+    restart: always  
+      
+  
+  casoft-store-basket:
+    image: cesarags/casoft-store-basket:v1
+    container_name: casoft-store-basket
     build:
         context: ../src
-        dockerfile: ./Product.Consumer/Dockerfile
+        dockerfile: ./Basket.Api/Dockerfile
     environment:
-      - QUARTZENDPOINT__QUEUENAME=${QUARTZ_JOB_QUEUE_NAME}
-      - QUARTZENDPOINT__PREFETCHCOUNT=${QUARTZ_JOB_PREFETCH_COUNT}
-      - CONNECTIONSTRINGS__POSTGRESQL=${QUARTZ_JOB_DB_CONNECTION_STRING}
+      - KEYCLOAK__REALM=${KEYCLOAK_REALM}
+      - KEYCLOAK__AUTH_SERVER_URL=${KEYCLOAK_AUTH_SERVER_URL}
+      - KEYCLOAK__SSL_REQUIRED=${KEYCLOAK_SSL_REQUIRED}
+      - KEYCLOAK__RESOURCE=${KEYCLOAK_CLIENT_ID}
+      - KEYCLOAK__VERIFY_TOKEN_AUDIENCE=true
+      - KEYCLOAK__CREDENTIALS__SECRET=${KEYCLOAK_CLIENT_SECRET}
+      - OPENTELEMETRYOPTIONS__ENVIRONMENT= ${OPENTELEMETRY_ENVIROMENT}
+      - OPENTELEMETRYOPTIONS__APPNAME=Basket.Api
+      - OPENTELEMETRYOPTIONS__OTLEXPORTER__ENDPOINT=${OTLEXPORTER_ENDPOINT}
+      - OPENTELEMETRYOPTIONS__GRAFANALOKI__ENDPOINT=${GRAFANALOKI_ENDPOINT}
+      - OPENTELEMETRY__JAEGER__AGENTHOST=${OPEN_TELEMETRY_HOST}
+      - OPENTELEMETRY__JAEGER__AGENTPORT=6831
+      - RABBITMQTRANSPORTOPTIONS__HOST=${RABBITMQ_HOST}
+      - RABBITMQTRANSPORTOPTIONS__VHOST=${RABBITMQ_VHOST}
+      - RABBITMQTRANSPORTOPTIONS__PORT=${RABBITMQ_PORT}
+      - RABBITMQTRANSPORTOPTIONS__USER=${RABBITMQ_USER}
+      - RABBITMQTRANSPORTOPTIONS__PASS=${RABBITMQ_PASS}
+      - RABBITMQTRANSPORTOPTIONS__PREFIX=${RABBITMQ_PREFIX}
+      - RABBITMQTRANSPORTOPTIONS__USESSQL=${RABBITMQ_USESSQL}
+      - REDIS__CONNECTIONSTRING=${REDIS_CONNECTIONSTRING}
+      - REDIS__INSTANCENAME=${REDIS_INSTANCE_NAME}
+      - DISCOUNTAPI__BASEURL=${DISCOUNT_API_BASEURL}
       - MONGODBSETTINGS__CONNECTIONSTRING=${MONGO_SERVER_URL}
       - MONGODBSETTINGS__DATABASENAME=${MONGO_DATABASE_NAME}
-      - RABBITMQTRANSPORT__HOST=${RABBITMQ_HOST}
-      - RABBITMQTRANSPORT__PORT=${RABBITMQ_PORT}
-      - RABBITMQTRANSPORT__USER=${RABBITMQ_USER}
-      - RABBITMQTRANSPORT__PASS=${RABBITMQ_PASS}
-      - ASPNETCORE_ENVIRONMENT=Production 
+      - ASPNETCORE_ENVIRONMENT=Docker 
+      - ASPNETCORE_URLS=http://*:5289
+    ports:
+      - "5289:5289"
     depends_on:
       - casoft-store-rabbitmq
-      - casoft-store-mongodb
-      - casoft-store-postgres-db
+      - casoft-store-keycloak
     restart: always  
+
+
+  
+  casoft-store-billing:
+    image: cesarags/casoft-store-billing:v1
+    container_name: casoft-store-billing
+    build:
+        context: ../src
+        dockerfile: ./Billing.Api/Dockerfile
+    environment:
+      - KEYCLOAK__REALM=${KEYCLOAK_REALM}
+      - KEYCLOAK__AUTH_SERVER_URL=${KEYCLOAK_AUTH_SERVER_URL}
+      - KEYCLOAK__SSL_REQUIRED=${KEYCLOAK_SSL_REQUIRED}
+      - KEYCLOAK__RESOURCE=${KEYCLOAK_CLIENT_ID}
+      - KEYCLOAK__VERIFY_TOKEN_AUDIENCE=true
+      - OPENTELEMETRYOPTIONS__ENVIRONMENT= ${OPENTELEMETRY_ENVIROMENT}
+      - OPENTELEMETRYOPTIONS__APPNAME=Billing.Api
+      - OPENTELEMETRYOPTIONS__OTLEXPORTER__ENDPOINT=${OTLEXPORTER_ENDPOINT}
+      - OPENTELEMETRYOPTIONS__GRAFANALOKI__ENDPOINT=${GRAFANALOKI_ENDPOINT}
+      - RABBITMQTRANSPORTOPTIONS__HOST=${RABBITMQ_HOST}
+      - RABBITMQTRANSPORTOPTIONS__VHOST=${RABBITMQ_VHOST}
+      - RABBITMQTRANSPORTOPTIONS__PORT=${RABBITMQ_PORT}
+      - RABBITMQTRANSPORTOPTIONS__USER=${RABBITMQ_USER}
+      - RABBITMQTRANSPORTOPTIONS__PASS=${RABBITMQ_PASS}
+      - RABBITMQTRANSPORTOPTIONS__PREFIX=${RABBITMQ_PREFIX}
+      - RABBITMQTRANSPORTOPTIONS__USESSQL=${RABBITMQ_USESSQL}
+      - CONNECTIONSTRINGS__POSTGRESCONNECTION=${BILLING_DB_URL_SERVER}
+      - ASPNETCORE_ENVIRONMENT=Docker 
+      - ASPNETCORE_URLS=http://*:5066
+    ports:
+      - "5066:5066"
+    depends_on:
+      - casoft-store-postgres-db
+      - casoft-store-rabbitmq
+      - casoft-store-keycloak
+    restart: always  
+      
+      
+  casoft-store-catalog:
+    image: cesarags/casoft-store-catalog:v1
+    container_name: casoft-store-catalog
+    build:
+        context: ../src
+        dockerfile: ./Api.Catalogo/Dockerfile
+    environment:
+      - KEYCLOAK__REALM=${KEYCLOAK_REALM}
+      - KEYCLOAK__AUTH_SERVER_URL=${KEYCLOAK_SERVER_URL}
+      - KEYCLOAK__SSL_REQUIRED=${KEYCLOAK_SSL_REQUIRED}
+      - KEYCLOAK__RESOURCE=${KEYCLOAK_CLIENT_ID}
+      - KEYCLOAK__VERIFY_TOKEN_AUDIENCE=true
+      - KEYCLOAK__CREDENTIALS__SECRET=${KEYCLOAK_CLIENT_SECRET}
+      - OPENTELEMETRYOPTIONS__ENVIRONMENT= ${OPENTELEMETRY_ENVIROMENT}
+      - OPENTELEMETRYOPTIONS__APPNAME=Api.Catalogo
+      - OPENTELEMETRYOPTIONS__OTLEXPORTER__ENDPOINT=${OTLEXPORTER_ENDPOINT}
+      - OPENTELEMETRYOPTIONS__GRAFANALOKI__ENDPOINT=${GRAFANALOKI_ENDPOINT}
+      - ASPNETCORE_ENVIRONMENT=Docker 
+      - ASPNETCORE_URLS=http://*:5294
+    ports:
+      - "5294:5294"
+    depends_on:
+      - casoft-store-mongodb
+      - casoft-store-keycloak
+    restart: always  
+      
+  casoft-store-discount:
+    image: cesarags/casoft-store-discount:v1
+    container_name: casoft-store-discount
+    build:
+        context: ../src
+        dockerfile: ./Discount.Api/Dockerfile
+    environment:
+      - KEYCLOAK__REALM=${KEYCLOAK_REALM}
+      - KEYCLOAK__AUTH_SERVER_URL=${KEYCLOAK_AUTH_SERVER_URL}
+      - KEYCLOAK__SSL_REQUIRED=${KEYCLOAK_SSL_REQUIRED}
+      - KEYCLOAK__RESOURCE=${KEYCLOAK_CLIENT_ID}
+      - KEYCLOAK__VERIFY_TOKEN_AUDIENCE=true
+      - KEYCLOAK__CREDENTIALS__SECRET=${KEYCLOAK_CLIENT_SECRET}
+      - OPENTELEMETRYOPTIONS__ENVIRONMENT= ${OPENTELEMETRY_ENVIROMENT}
+      - OPENTELEMETRYOPTIONS__APPNAME=Discount.Api
+      - OPENTELEMETRYOPTIONS__OTLEXPORTER__ENDPOINT=${OTLEXPORTER_ENDPOINT}
+      - OPENTELEMETRYOPTIONS__GRAFANALOKI__ENDPOINT=${GRAFANALOKI_ENDPOINT}
+      - CONNECTIONSTRINGS__POSTGRESCONNECTION=${DISCOUNT_DB_URL_SERVER}
+      - ASPNETCORE_ENVIRONMENT=Docker 
+      - ASPNETCORE_URLS=http://*:5025
+    ports:
+      - "5025:5025"
+    depends_on:
+      - casoft-store-postgres-db
+      - casoft-store-rabbitmq
+      - casoft-store-keycloak
+    restart: always  
+  
+  casoft-store-order:
+    image: cesarags/casoft-store-order:v1
+    container_name: casoft-store-order
+    build:
+        context: ../src
+        dockerfile: ./Order.Api/Dockerfile
+    environment:
+      - KEYCLOAK__REALM=${KEYCLOAK_REALM}
+      - KEYCLOAK__AUTH_SERVER_URL=${KEYCLOAK_AUTH_SERVER_URL}
+      - KEYCLOAK__SSL_REQUIRED=${KEYCLOAK_SSL_REQUIRED}
+      - KEYCLOAK__RESOURCE=${KEYCLOAK_CLIENT_ID}
+      - KEYCLOAK__VERIFY_TOKEN_AUDIENCE=true
+      - KEYCLOAK__CREDENTIALS__SECRET=${KEYCLOAK_CLIENT_SECRET}
+      - OPENTELEMETRYOPTIONS__ENVIRONMENT= ${OPENTELEMETRY_ENVIROMENT}
+      - OPENTELEMETRYOPTIONS__APPNAME=Order.Api
+      - OPENTELEMETRYOPTIONS__OTLEXPORTER__ENDPOINT=${OTLEXPORTER_ENDPOINT}
+      - OPENTELEMETRYOPTIONS__GRAFANALOKI__ENDPOINT=${GRAFANALOKI_ENDPOINT}
+      - RABBITMQTRANSPORTOPTIONS__HOST=${RABBITMQ_HOST}
+      - RABBITMQTRANSPORTOPTIONS__VHOST=${RABBITMQ_VHOST}
+      - RABBITMQTRANSPORTOPTIONS__PORT=${RABBITMQ_PORT}
+      - RABBITMQTRANSPORTOPTIONS__USER=${RABBITMQ_USER}
+      - RABBITMQTRANSPORTOPTIONS__PASS=${RABBITMQ_PASS}
+      - RABBITMQTRANSPORTOPTIONS__PREFIX=${RABBITMQ_PREFIX}
+      - RABBITMQTRANSPORTOPTIONS__USESSQL=${RABBITMQ_USESSQL}
+      - CONNECTIONSTRINGS__POSTGRESCONNECTION=${ORDER_DB_URL_SERVER}
+      - ASPNETCORE_ENVIRONMENT=Docker 
+      - ASPNETCORE_URLS=http://*:5121
+    ports:
+      - "5121:5121"
+    depends_on:
+      - casoft-store-postgres-db
+      - casoft-store-rabbitmq
+      - casoft-store-keycloak
+    restart: always  
+
+      
+  casoft-store-product:
+    image: cesarags/casoft-store-product:v1
+    container_name: casoft-store-product
+    build:
+        context: ../src
+        dockerfile: ./Api.Produto/Dockerfile
+    environment:
+      - KEYCLOAK__REALM=${KEYCLOAK_REALM}
+      - KEYCLOAK__AUTH_SERVER_URL=${KEYCLOAK_SERVER_URL}
+      - KEYCLOAK__SSL_REQUIRED=${KEYCLOAK_SSL_REQUIRED}
+      - KEYCLOAK__RESOURCE=${KEYCLOAK_CLIENT_ID}
+      - KEYCLOAK__VERIFY_TOKEN_AUDIENCE=true
+      - KEYCLOAK__CREDENTIALS__SECRET=${KEYCLOAK_CLIENT_SECRET}
+      - KEYCLOAK__METADATADDRESS=${KEYCLOAK_METADATA_ADRESS}
+      - OPENTELEMETRYOPTIONS__ENVIRONMENT= ${OPENTELEMETRY_ENVIROMENT}
+      - OPENTELEMETRYOPTIONS__APPNAME=Api.Produto
+      - OPENTELEMETRYOPTIONS__OTLEXPORTER__ENDPOINT=${OTLEXPORTER_ENDPOINT}
+      - OPENTELEMETRYOPTIONS__GRAFANALOKI__ENDPOINT=${GRAFANALOKI_ENDPOINT}
+      - RABBITMQTRANSPORTOPTIONS__HOST=${RABBITMQ_HOST}
+      - RABBITMQTRANSPORTOPTIONS__VHOST=${RABBITMQ_VHOST}
+      - RABBITMQTRANSPORTOPTIONS__PORT=${RABBITMQ_PORT}
+      - RABBITMQTRANSPORTOPTIONS__USER=${RABBITMQ_USER}
+      - RABBITMQTRANSPORTOPTIONS__PASS=${RABBITMQ_PASS}
+      - RABBITMQTRANSPORTOPTIONS__PREFIX=${RABBITMQ_PREFIX}
+      - RABBITMQTRANSPORTOPTIONS__USESSQL=${RABBITMQ_USESSQL}
+      - BLOBCONTAINERS__CONNECTIONSTRINGS=${AZURE_BLOB_URL}
+      - BLOBCONTAINERS__CONTAINERNAME=${BLOB_CONTAINER_NAME}
+      - CONNECTIONSTRINGS__POSTGRESCONNECTION=${PRODUCT_DB_URL_SERVER}
+      - ASPNETCORE_ENVIRONMENT=Docker 
+      - ASPNETCORE_URLS=http://*:5256
+    ports:
+      - "5256:5256"
+    depends_on:
+      - casoft-store-postgres-db
+      - casoft-store-rabbitmq
+      - casoft-store-keycloak
+    restart: always  
+ 
+  casoft-store-redis:
+    image: redis:latest
+    container_name: casoft-store-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: always
+
 
   casoft-store-postgres-db:
     image: postgres:latest
@@ -183,7 +321,7 @@ services:
     volumes:
       - rabbitmq_vol:/var/lib/rabbitmq
 
- #https://medium.com/@fingervinicius/easy-running-keycloak-with-docker-compose-b0d7a4ee2358
+  #https://medium.com/@fingervinicius/easy-running-keycloak-with-docker-compose-b0d7a4ee2358
   casoft-store-keycloak:
     container_name: casoft-store-keycloak
     image: quay.io/keycloak/keycloak:26.0
@@ -208,16 +346,104 @@ services:
     restart: always
     depends_on:
       - casoft-store-postgres-db
-      
-  #https://www.jaegertracing.io/docs/1.6/getting-started/
-  casoft-store-jaeger:
-    image: jaegertracing/all-in-one:1.44
-    container_name: casoft-store-jaeger
+  
+  jaeger:
+    image: jaegertracing/jaeger:2.2.0
+    container_name: jaeger
+    environment:
+      - LOG_LEVEL=debug
     ports:
-    - "16686:16686" # Interface Web do Jaeger
-    - "16687:16687" # Endpoint de configuração do gRPC
-    - "6831:6831/udp" # Porta para o agente Jaeger receber spans (UDP)
-    - "6832:6832/udp" # Porta opcional para comunicação entre agentes (se necessário)
+      - "16686:16686"
+      - "14268:14268"  # Recebe traces via HTTP
+      - "14269:14269"  # Exposição de métricas para Prometheus
+      - "14250:14250" #gRPC
+    restart: unless-stopped 
+
+  loki:
+    image: grafana/loki:2.9.2
+    container_name: loki
+    ports:
+      - "3100:3100"
+    restart: unless-stopped
+    command: -config.file=/etc/loki/loki.yaml -querier.engine.timeout=10m -querier.parallelise-shardable-queries=false -querier.query-timeout=10m -server.http-read-timeout=10m -server.http-write-timeout=10m
+    volumes:
+      - loki_data:/loki
+      - ./configs/loki.yaml:/etc/loki/loki.yaml
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    depends_on:
+      - prometheus
+    environment:
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+      - GF_SERVER_ROOT_URL=https://logs-v2.twistedqueue.com
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - grafana_config_data:/etc/grafana
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    
+  otel-collector:
+    image: otel/opentelemetry-collector:latest
+    container_name: otel-collector
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./configs/otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    restart: on-failure
+    ports:
+      - "1888:1888"
+      - "8888:8888"
+      - "8889:8889"
+      - "13133:13133"
+      - "4317:4317"
+      - "4318:4318"
+      - "55679:55679"
+    depends_on:
+      - jaeger
+      - prometheus
+    
+  # caso de erro sincronização time: https://stackoverflow.com/questions/42200734/how-to-re-synchronize-the-prometheus-time  
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    volumes:
+      - ./configs/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./configs/alert.rules.yml:/etc/prometheus/alert.rules.yml
+      - /etc/localtime:/etc/localtime:ro
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+
+  alertview:
+    image: cesarags/webhookuc:v1
+    container_name: alertview
+    ports:
+      - 8181:8080
+      
+  alertmanager:
+    image: prom/alertmanager:v0.28.0
+    container_name: alertmanager
+    volumes:
+      - ./configs/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+    ports:
+      - 9093:9093
+      
+  mongo-exporter:
+    image: fabricioveronez/mongo_exporter:latest
+    container_name: mongo-exporter
+    ports:
+      - "9216:9216"   
+    environment:
+      MONGODB_URI: ${MONGO_SERVER_URL}
+    depends_on:
+      - casoft-store-mongodb
+     
 
 volumes:
   mongo_vol:
@@ -225,7 +451,19 @@ volumes:
   postgresql_vol:
     driver: local
   rabbitmq_vol:
+    driver: local 
+  redis_data:
+    driver: local  
+  otel_collector_data:
     driver: local
+  prometheus_data:
+    driver: local
+  loki_data:
+    driver: local
+  grafana_data:
+    driver: local  
+  grafana_config_data:
+    driver: local 
 
 networks:
   default:

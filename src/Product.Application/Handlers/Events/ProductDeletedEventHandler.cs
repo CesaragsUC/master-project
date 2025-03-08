@@ -34,7 +34,7 @@ public class ProductDeletedEventHandler :
         }
         catch (Exception ex)
         {
-            Log.Error(ex, "Failt to delete product", ex);
+            Log.Error(ex, "Fail to delete product", ex);
             return false;
         }
     }

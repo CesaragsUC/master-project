@@ -12,9 +12,7 @@ using Microsoft.Extensions.Options;
 using Npgsql;
 using Product.Infrastructure.Configurations.Azure;
 using Product.Infrastructure.RabbitMq;
-using Serilog;
 using Shared.Kernel.Opentelemetry;
-using Shared.Kernel.Polices;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 

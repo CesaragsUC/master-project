@@ -4,4 +4,5 @@ public interface IQueueService
 {
     Uri OrderCreatedMessage { get; }
     Uri OrderDeletedMessage { get; }
+    Uri DeleteCartMessage { get; }
 }

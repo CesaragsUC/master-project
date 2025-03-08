@@ -73,9 +73,9 @@ public class CartController : ControllerBase
     [Route("discount")]
     [ProducesResponseType(typeof(Result<Cart?>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(Result<Cart?>), StatusCodes.Status400BadRequest)]
-    public async Task<IActionResult> Discount(CartDto cart)
+    public async Task<IActionResult> Discount(DiscountRequest discountRequest)
     {
-        var discountResult = await _cartService.ApplyDiscountAsync(cart);
+        var discountResult = await _cartService.ApplyDiscountAsync(discountRequest);
         return discountResult.Succeeded ? Ok(discountResult) : BadRequest(discountResult);
     }
 

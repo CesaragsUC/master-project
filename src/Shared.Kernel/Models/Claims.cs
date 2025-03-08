@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace Auth.Api.Dtos.Login;
+namespace Shared.Kernel.Models;
 
 [ExcludeFromCodeCoverage]
 public record Claims

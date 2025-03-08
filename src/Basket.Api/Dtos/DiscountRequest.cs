@@ -5,6 +5,8 @@ namespace Basket.Api.Dtos;
 [ExcludeFromCodeCoverage]
 public class DiscountRequest
 {
-    public string? Code { get; set; }
-    public decimal Total { get; set; }
+    public Guid CustomerId { get; set; }
+    public string? CouponCode { get; set; }
+    public decimal TotalPrice { get; set; }
+
 }

@@ -28,6 +28,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Basket.Domain\Basket.Domain.csproj" />
     <ProjectReference Include="..\Message.Broker\Message.Broker.csproj" />
+    <ProjectReference Include="..\Messaging.Contracts\Messaging.Contracts.csproj" />
     <ProjectReference Include="..\Shared.Kernel\Shared.Kernel.csproj" />
   </ItemGroup>
 

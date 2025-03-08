@@ -30,13 +30,13 @@ public class ProductAddedEventHandler :
 
             await _repository.InsertOneAsync(product);
 
-            Log.Information("Adicionado produto nome: {Nome} - {Data}", request.Name, DateTime.Now);
+            Log.Information("Added product name: {Name} - {Date}", request.Name, DateTime.Now);
 
             return true;
         }
         catch (Exception ex)
         {
-            Log.Error("Falha ao integrar produto", ex);
+            Log.Error("fail during product integration", ex);
             return false;
         }
 

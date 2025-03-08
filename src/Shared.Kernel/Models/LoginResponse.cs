@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using System.Security.Claims;
 
-namespace Auth.Api.Dtos.Login;
+namespace Shared.Kernel.Models;
 
 [ExcludeFromCodeCoverage]
 public record LoginResponse

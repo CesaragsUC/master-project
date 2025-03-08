@@ -285,25 +285,36 @@ public class CartService : ICartService
 
     }
 
-    public async Task<Result<CartDto>> ApplyDiscountAsync(CartDto cartDto)
+    public async Task<Result<DiscountResultResponse>> ApplyDiscountAsync(DiscountRequest discountRequest)
     {
+        var cart = await _cartRepository.GetAsync(discountRequest.CustomerId);
+
+        if (cart is null)
+        {
+            return await Result<DiscountResultResponse>.FailureAsync("cart not found to apply discount");
+        }
 
         var discountResponse = await _discountApi.
-                            ApplyDiscountAsync(cartDto.CouponCode!,
-                            cartDto.TotalPrice);
+                            ApplyDiscountAsync(discountRequest.CouponCode!,
+                            discountRequest.TotalPrice);
 
         if (discountResponse.IsSuccessStatusCode && discountResponse.Content!.Succeed)
         {
-            cartDto.SetDiscount(discountResponse.Content!.TotalDiscount);
+            var discountAplied = new DiscountResultResponse
+            {
+                DiscountApplied = discountResponse.Content!.TotalDiscount,
+                SubTotal = cart!.TotalPrice,
+                TotalPrice = cart!.TotalPrice - discountResponse.Content!.TotalDiscount
+            };
 
-           await UpdateTotalPriceCartAsync(cartDto.CustomerId, discountResponse.Content!.TotalDiscount);
+            await UpdateTotalPriceCartAsync(cart.CustomerId, discountResponse.Content!.TotalDiscount);
 
-            return await Result<CartDto>.SuccessAsync(cartDto);
+            return await Result<DiscountResultResponse>.SuccessAsync(discountAplied);
         }
         else
         {
             var error = JsonSerializer.Deserialize<DiscountResponse>(discountResponse.Error.Content);
-            return await Result<CartDto>.FailureAsync(error.Message);
+            return await Result<DiscountResultResponse>.FailureAsync(error.Message);
         }
 
     }

@@ -3,6 +3,7 @@
 using Api.Gateway.Dto;
 using Api.Gateway.Dtos;
 using Microsoft.Extensions.Options;
+using ResultNet;
 using Serilog;
 using Shared.Kernel.Models;
 using System.Net.Http;
@@ -21,7 +22,7 @@ public class AuthenticationService
         authUri = endPoint;
     }
 
-    public async Task<TokenResponse> Authenticate(LoginDto loginDto)
+    public async Task<string> Authenticate(LoginDto loginDto)
     {
         try
         {
@@ -32,8 +33,7 @@ public class AuthenticationService
 
             if (response.IsSuccessStatusCode)
             {
-                var responseContent = await response.Content.ReadAsStringAsync();
-                return JsonSerializer.Deserialize<TokenResponse>(responseContent);
+                return await response.Content.ReadAsStringAsync();
             }
             else
             {
