@@ -53,6 +53,9 @@ Design Pattern:
 - Bogus for Unit Tests
 - FluentValidation
 - Redis
+- Prometheus
+- Grafana
+- Azure keyVault
 - Angular v18 for FrontEnd. You can find [HERE](https://github.com/CesaragsUC/master-project-web)
 
   ![design](https://github.com/user-attachments/assets/2199c7e4-16dc-4ce0-803c-86c16162abae)
