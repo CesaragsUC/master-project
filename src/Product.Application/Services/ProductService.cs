@@ -37,7 +37,7 @@ public class ProductService : IProductService
             await _rabbitMqService.Send(productCreated, _queueService.ProductCreatedMessage);
             
 
-            Log.Information($"Product sent to queue: {_queueService.ProductCreatedMessage} - adress: {_rabbitMqService.Bus.Address.ToString()}");
+            Log.Information($"Product sent to queue: {_queueService.ProductCreatedMessage}");
 
         }
         catch (Exception ex)

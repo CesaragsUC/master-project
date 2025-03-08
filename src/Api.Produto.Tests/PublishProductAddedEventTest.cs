@@ -39,6 +39,7 @@ public class PublishProductAddedEventTest
             CreatAt = DateTime.Now
         };
 
+        _queueServiceMock.Setup(x => x.ProductCreatedMessage).Returns(new Uri("http://dev.casoft.productadded.event.v1"));
         _messageBus.Setup(x => x.Send(It.IsAny<ProductAddedEvent>(), default));
 
         await _productService.PublishProductAddedEvent(productCreated);
