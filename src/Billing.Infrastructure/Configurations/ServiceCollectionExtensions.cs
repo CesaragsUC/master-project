@@ -1,13 +1,14 @@
-﻿using FluentMigrator.Runner;
+﻿using Billing.Infrastructure.Consumers;
+using HybridRepoNet.Configurations;
+using HybridRepoNet.Helpers;
 using Keycloak.AuthServices.Authentication;
 using Keycloak.AuthServices.Authorization;
-using Microsoft.EntityFrameworkCore;
+using Message.Broker.Configurations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Npgsql;
-using Shared.Kernel.Polices;
+using Shared.Kernel.FluentMigrator;
+using Shared.Kernel.Opentelemetry;
 using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
 
 namespace Billing.Infrastructure.Configurations;
 
@@ -15,65 +16,49 @@ namespace Billing.Infrastructure.Configurations;
 public static class ServiceCollectionExtensions
 {
 
-    public static ServiceProvider ConfigureFluentMigration(this IServiceCollection services, IConfiguration configuration)
+
+
+    public static IServiceCollection AddInfra(this IServiceCollection services, IConfiguration configuration)
     {
-        var migrationService = new ServiceCollection().AddFluentMigratorCore()
-              .ConfigureRunner(rb => rb
-              .AddPostgres15_0()
-              .WithGlobalConnectionString(configuration.GetConnectionString("PostgresConnection"))// Set the connection string
-              .ScanIn(Assembly.GetExecutingAssembly()).For.Migrations()) // Define the assembly containing the migrations
-              .AddLogging(lb => lb.AddFluentMigratorConsole()) // Enable logging to console in the FluentMigrator way
-              .BuildServiceProvider(false);
+        var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
-       UpdateDatabase(migrationService, configuration);
+        services.AddMassTransitSetupConfig(configuration,
+            typeof(PaymentConsumer),
+            typeof(PaymentConfirmedConsumer),
+            typeof(PaymentFailedConsumer));
 
-        return migrationService;
+        services.AddHybridRepoNet<BillingContext>(
+            configuration,
+            DbType.PostgreSQL,
+            (int)HealthCheck.Active,
+            FluentMigrationConfig.LoadConnectionString(configuration, environment));
+
+        services.AddGrafanaSetup(configuration);
+        services.AddKeycloakServices(configuration);
+        services.AddFluentMigrationConfig(configuration, typeof(Migrations.CreateTablePayment).Assembly);
+
+        return services;
     }
-
-
-    private static void UpdateDatabase(IServiceProvider serviceProvider, IConfiguration configuration)
+    public static void AddKeycloakServices(this IServiceCollection services, IConfiguration configuration)
     {
-        // Garante que o banco de dados exista
-        EnsureDatabaseExists(configuration);
+        var authenticationOptions = configuration
+                    .GetSection(KeycloakAuthenticationOptions.Section)
+                    .Get<KeycloakAuthenticationOptions>();
 
-        // Instantiate the runner
-        var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
+        var keyCloakConfig = configuration.GetSection("Keycloak:MetadataAddress");
 
-        runner.ListMigrations();
-
-        // Execute the migrations
-        runner.MigrateUp();
-    }
-
-    private static void EnsureDatabaseExists(IConfiguration configuration)
-    {
-        var defaultConnectionString = configuration.GetConnectionString("PostgresConnection");
-        var connectionStringWithoutDatabase = RemoveDatabaseFromConnectionString(defaultConnectionString);
-
-        using (var connection = new NpgsqlConnection(connectionStringWithoutDatabase))
+        services.AddKeycloakAuthentication(authenticationOptions!, options =>
         {
-            connection.Open();
+            options.MetadataAddress = keyCloakConfig.Value!;
+            options.RequireHttpsMetadata = false;
+        });
 
-            var dbName = new NpgsqlConnectionStringBuilder(defaultConnectionString).Database;
 
-            using (var command = new NpgsqlCommand($"SELECT 1 FROM pg_database WHERE datname = '{dbName}'", connection))
-            {
-                var exists = command.ExecuteScalar() != null;
+        var authorizationOptions = configuration
+                                    .GetSection(KeycloakProtectionClientOptions.Section)
+                                    .Get<KeycloakProtectionClientOptions>();
 
-                if (!exists)
-                {
-                    using (var createCommand = new NpgsqlCommand($"CREATE DATABASE \"{dbName}\"", connection))
-                    {
-                        createCommand.ExecuteNonQuery();
-                    }
-                }
-            }
-        }
-    }
-    private static string RemoveDatabaseFromConnectionString(string connectionString)
-    {
-        var builder = new NpgsqlConnectionStringBuilder(connectionString);
-        builder.Database = string.Empty; // Remove o nome do banco de dados
-        return builder.ToString();
+        services.AddKeycloakAuthorization(authorizationOptions!);
+
     }
 }

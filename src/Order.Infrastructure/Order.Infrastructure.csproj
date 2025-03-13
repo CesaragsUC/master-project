@@ -7,7 +7,7 @@
   </PropertyGroup>
 	
 	<ItemGroup>
-		<PackageReference Include="HybridRepoNet" Version="3.1.6" />
+		<PackageReference Include="HybridRepoNet" Version="3.1.7" />
 		<PackageReference Include="Keycloak.AuthServices.Authentication" Version="1.5.2" />
 		<PackageReference Include="Keycloak.AuthServices.Authorization" Version="1.5.2" />
 		<PackageReference Include="MassTransit.RabbitMQ" Version="8.3.4" />

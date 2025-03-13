@@ -1,8 +1,7 @@
 ﻿using FluentMigrator;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Infrastructure.Migrations;
+namespace Product.Infrastructure.Migrations;
 
 /// <summary>
 /// Não existe classe Categoria, então é criada a tabela Categoria via migração

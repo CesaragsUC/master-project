@@ -1,5 +1,6 @@
 using Catalogo.Api.Configurations;
 using Serilog;
+using Shared.Kernel.CloudConfig;
 using Shared.Kernel.Opentelemetry;
 
 
@@ -13,6 +14,10 @@ try
     builder.Services.AddControllers();
 
     builder.Services.AddEndpointsApiExplorer();
+
+    var environment = builder.Configuration["ASPNETCORE_ENVIRONMENT"] ?? string.Empty;
+
+    builder.Services.AzureKeyVaultConfig(builder, builder.Configuration, environment);
 
     builder.Services.AddServices(builder.Configuration);
 

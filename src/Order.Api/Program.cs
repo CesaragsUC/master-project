@@ -2,6 +2,7 @@ using Order.Api.Configurations;
 using Order.Application.Abstractions;
 using Order.Application.Service;
 using Order.Infrastructure.Configurations;
+using Shared.Kernel.CloudConfig;
 using Shared.Kernel.Opentelemetry;
 using System.Reflection;
 
@@ -9,9 +10,12 @@ var builder = WebApplication.CreateBuilder(args);
 
 OpenTelemetrySetup.SetupLogging(builder, builder.Configuration);
 
+var environment = builder.Configuration["ASPNETCORE_ENVIRONMENT"] ?? string.Empty;
+
+builder.Services.AzureKeyVaultConfig(builder, builder.Configuration, environment);
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.ConfigureFluentMigration(builder.Configuration);
 builder.Services.AddScoped<IOrderService,OrderService>();
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 builder.Services.AddServices();

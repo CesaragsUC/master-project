@@ -1,7 +1,7 @@
 ﻿using FluentMigrator;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Infrastructure.Migrations;
+namespace Product.Infrastructure.Migrations;
 
 [ExcludeFromCodeCoverage]
 [Migration(202409270001)]

@@ -145,7 +145,7 @@ public class CouponService : ICouponService
                 couponEntity.Value = coupon.Value;
                 couponEntity.MaxUse = coupon.MaxUse;
 
-                _unitOfWork.Repository<Coupon>().UpdateAsync(couponEntity);
+                _unitOfWork.Repository<Coupon>().Update(couponEntity);
                 await _unitOfWork.Commit();
 
                 return await Result<bool>.SuccessAsync("Coupon updated successfully");
@@ -176,7 +176,7 @@ public class CouponService : ICouponService
 
             if (couponEntity is not null)
             {
-                _unitOfWork.Repository<Coupon>().DeleteAsync(couponEntity);
+                _unitOfWork.Repository<Coupon>().Delete(couponEntity);
                 await _unitOfWork.Commit();
 
                 return await Result<bool>.SuccessAsync("Coupon deleted successfully");
@@ -248,7 +248,7 @@ public class CouponService : ICouponService
     private async Task IncreaseCouponUse(Coupon coupon)
     {
         coupon.TotalUse++;
-        _unitOfWork.Repository<Coupon>().UpdateAsync(coupon);
+        _unitOfWork.Repository<Coupon>().Update(coupon);
         await _unitOfWork.Commit();
     }
 
