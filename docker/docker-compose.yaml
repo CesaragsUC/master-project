@@ -1,16 +1,16 @@
 services:
   
-  # casoft-store-web:
-  #    image: cesarags/casoft-store-web:v1
-  #    container_name: casoft-store-web
-  #    ports:
-  #     - "4200:80"
-  #    environment:
-  #       - NODE_ENV=docker
-  #       - API_URL=http://localhost:5214/casoft/
-  #       - IMAGES_URL=http://localhost:5214/
-  #    depends_on:
-  #     - casoft-store-api-gateway
+  casoft-store-web:
+     image: cesarags/casoft-store-web:v1
+     container_name: casoft-store-web
+     ports:
+      - "4200:80"
+     environment:
+        - NODE_ENV=docker
+        - API_URL=http://localhost:5214/casoft/
+        - IMAGES_URL=http://localhost:5214/
+     depends_on:
+      - casoft-store-api-gateway
 
   casoft-store-api-gateway:
     image: cesarags/casoft-store-api-gateway:v1
@@ -95,6 +95,7 @@ services:
       - RABBITMQTRANSPORTOPTIONS__USESSQL=${RABBITMQ_USESSQL}
       - REDIS__CONNECTIONSTRING=${REDIS_CONNECTIONSTRING}
       - REDIS__INSTANCENAME=${REDIS_INSTANCE_NAME}
+      - REDIS__PORT=6379
       - DISCOUNTAPI__BASEURL=${DISCOUNT_API_BASEURL}
       - MONGODBSETTINGS__CONNECTIONSTRING=${MONGO_SERVER_URL}
       - MONGODBSETTINGS__DATABASENAME=${MONGO_DATABASE_NAME}
