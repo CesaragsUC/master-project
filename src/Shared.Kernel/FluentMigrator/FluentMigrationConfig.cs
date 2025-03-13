@@ -2,11 +2,12 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
-using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace Shared.Kernel.FluentMigrator;
 
+[ExcludeFromCodeCoverage]
 public static class FluentMigrationConfig
 {
 
