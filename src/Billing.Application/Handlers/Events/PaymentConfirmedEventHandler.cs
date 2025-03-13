@@ -42,7 +42,7 @@ public class PaymentConfirmedEventHandler :
             {
                 payment.Status = (int)PaymentStatus.Completed;
 
-                _unitOfWork.Repository<Payment>().UpdateAsync(payment);
+                _unitOfWork.Repository<Payment>().Update(payment);
                 await _unitOfWork.Commit();
 
                 var orderUpdateMessage = new OrderUpdateddEvent()

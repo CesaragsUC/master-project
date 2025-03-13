@@ -3,6 +3,7 @@ using Auth.Api.Services;
 using Keycloak.AuthServices.Authentication;
 using Keycloak.AuthServices.Authorization;
 using ResultNet;
+using Shared.Kernel.CloudConfig;
 using Shared.Kernel.Models;
 using Shared.Kernel.Opentelemetry;
 using System.Security.Claims;
@@ -17,6 +18,10 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen();
+
+var environment = builder.Configuration["ASPNETCORE_ENVIRONMENT"] ?? string.Empty;
+
+builder.Services.AzureKeyVaultConfig(builder, builder.Configuration, environment);
 
 builder.Services.AddScoped<IAuthKeyCloakService, KeycloakAuthService>();
 builder.Services.AddScoped(typeof(IResult<>), typeof(Result<>));

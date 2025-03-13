@@ -41,7 +41,7 @@ public class PaymentFailedEventHandler :
             {
                 payment.Status = (int)PaymentStatus.Failed;
 
-                _unitOfWork.Repository<Payment>().UpdateAsync(payment);
+                _unitOfWork.Repository<Payment>().Update(payment);
                 await _unitOfWork.Commit();
 
                 var orderUpdateMessage = new OrderUpdateddEvent()

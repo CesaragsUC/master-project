@@ -5,6 +5,7 @@ using Api.Gateway.Services;
 using Microsoft.OpenApi.Models;
 using Ocelot.Middleware;
 using Serilog;
+using Shared.Kernel.CloudConfig;
 using Shared.Kernel.Opentelemetry;
 
 try
@@ -12,6 +13,10 @@ try
     var builder = WebApplication.CreateBuilder(args);
 
     OpenTelemetrySetup.SetupLogging(builder, builder.Configuration);
+
+    var environment = builder.Configuration["ASPNETCORE_ENVIRONMENT"] ?? string.Empty;
+
+    builder.Services.AzureKeyVaultConfig(builder, builder.Configuration, environment);
 
     builder.Services.AddControllers();
     builder.Services.AddEndpointsApiExplorer();

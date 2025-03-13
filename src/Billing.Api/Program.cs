@@ -1,7 +1,7 @@
 using Billing.Api.Configurations;
 using Billing.Application.Service;
 using Billing.Infrastructure.Configurations;
-using Billing.Infrastructure.RabbitMq;
+using Shared.Kernel.CloudConfig;
 using Shared.Kernel.Opentelemetry;
 using System.Reflection;
 
@@ -11,6 +11,9 @@ OpenTelemetrySetup.SetupLogging(builder, builder.Configuration);
 
 builder.Services.AddControllers();
 
+var environment = builder.Configuration["ASPNETCORE_ENVIRONMENT"] ?? string.Empty;
+
+builder.Services.AzureKeyVaultConfig(builder, builder.Configuration, environment);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 builder.Services.AddScoped<IPaymentService, PaymentService>();

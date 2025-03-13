@@ -4,8 +4,8 @@ using Basket.Api.Services;
 using Basket.Domain.Abstractions;
 using Basket.Infrastructure.Configurations;
 using Basket.Infrastructure.Repository;
+using Shared.Kernel.CloudConfig;
 using Shared.Kernel.Opentelemetry;
-using StackExchange.Redis;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -17,26 +17,15 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Register services
+var environment = builder.Configuration["ASPNETCORE_ENVIRONMENT"] ?? string.Empty;
+
+builder.Services.AzureKeyVaultConfig(builder, builder.Configuration, environment);
 builder.Services.AddServices(builder.Configuration);
 builder.Services.AddScoped<ICartRepository, CartRepository>();
 builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<ICacheService, CacheService>();
 builder.Services.AddMemoryCache();
 builder.Services.AddInfra(builder.Configuration);
-
-string connectionString = builder.Configuration.GetSection("Redis:ConnectionString").Value!;
-
-IConnectionMultiplexer connectionMultiplexer =
-    ConnectionMultiplexer.Connect(connectionString);
-
-builder.Services.AddSingleton(connectionMultiplexer);
-
-builder.Services.AddStackExchangeRedisCache(options =>
-{
-    options.ConnectionMultiplexerFactory =
-        () => Task.FromResult(connectionMultiplexer);
-});
 
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 

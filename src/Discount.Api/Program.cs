@@ -2,12 +2,17 @@ using Discount.Api.Configurations;
 using Discount.Api.Services;
 using Discount.Domain.Abstractions;
 using Discount.Infrastructure.Configurations;
+using Shared.Kernel.CloudConfig;
 using Shared.Kernel.Opentelemetry;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
 OpenTelemetrySetup.SetupLogging(builder, builder.Configuration);
+
+var environment = builder.Configuration["ASPNETCORE_ENVIRONMENT"] ?? string.Empty;
+
+builder.Services.AzureKeyVaultConfig(builder, builder.Configuration, environment);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();

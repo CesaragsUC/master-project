@@ -3,10 +3,15 @@ using Product.Api.Configuration;
 using Product.Api.Exceptions;
 using Shared.Kernel.Opentelemetry;
 using Serilog;
+using Shared.Kernel.CloudConfig;
 
 try
 {
     var builder = WebApplication.CreateBuilder(args);
+
+    var environment = builder.Configuration["ASPNETCORE_ENVIRONMENT"] ?? string.Empty;
+
+    builder.Services.AzureKeyVaultConfig(builder, builder.Configuration, environment);
 
     builder.Services.AddControllers();
     builder.Services.AddEndpointsApiExplorer();

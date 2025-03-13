@@ -38,15 +38,16 @@ public static class ServiceCollectionExtensions
         return services;
     }
 
-    public static void AddJwtServices(this IServiceCollection services,IConfiguration configuration)
+    public static void AddJwtServices(this IServiceCollection services, IConfiguration configuration)
     {
-       var _keycloakSettings = configuration.GetSection("KeycloakSettings").Get<KeycloakSettings>();
+        var keycloakServer = configuration.GetSection("Keycloak:auth-server-url").Value;
+        var keycloakAudience = configuration.GetSection("Keycloak:resource").Value;
 
         services.AddAuthentication("Bearer")
         .AddJwtBearer("Bearer", options =>
         {
-            options.Authority = _keycloakSettings?.AuthServerUrl;
-            options.Audience = _keycloakSettings?.Resource;
+            options.Authority = keycloakServer;
+            options.Audience = keycloakAudience;
             options.RequireHttpsMetadata = false;
         });
 
@@ -60,15 +61,15 @@ public static class ServiceCollectionExtensions
 
     public static void AddCors(this IServiceCollection services, IConfiguration configuration)
     {
-        var _fontUri = configuration.GetSection("FrontEndUri").Get<FrontEndUri>();  
+        var _fontUri = configuration.GetSection("FrontEndUri").Get<FrontEndUri>();
 
         services.AddCors(options =>
         {
             options.AddPolicy(_fontUri.Name!, policy =>
             {
-                 policy.AllowAnyOrigin()
-                        .AllowAnyMethod()
-                        .AllowAnyHeader();
+                policy.AllowAnyOrigin()
+                       .AllowAnyMethod()
+                       .AllowAnyHeader();
             });
 
             options.AddPolicy("Production", policy =>
