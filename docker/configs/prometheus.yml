@@ -16,22 +16,98 @@ scrape_configs:
     scrape_interval: 5s
     static_configs:
       - targets: ['otel-collector:8889']
-      - targets: ['otel-collector:8888']
 
-  - job_name: 'casoft-product-api'
-    scheme: https
+  - job_name: 'casoft-store-api-gateway'
+    scheme: http
     scrape_interval: 5s
     scrape_timeout: 1s
     metrics_path: /metrics
     static_configs:
       - targets: 
-         - 'casoft-product-api:7213'
+         - 'casoft-store-api-gateway:5214'
         labels:
-          team: casoft-product-api
-    tls_config:
-      insecure_skip_verify: true
+          team: casoft-store-api-gateway
 
-# adicionar os demais jobs de scrape aqui
+
+  - job_name: 'casoft-store-auth'
+    scheme: http
+    scrape_interval: 5s
+    scrape_timeout: 1s
+    metrics_path: /metrics
+    static_configs:
+      - targets: 
+         - 'casoft-store-auth:5283'
+        labels:
+          team: casoft-store-auth
+
+
+  - job_name: 'casoft-store-basket'
+    scheme: http
+    scrape_interval: 5s
+    scrape_timeout: 1s
+    metrics_path: /metrics
+    static_configs:
+      - targets: 
+         - 'casoft-store-basket:5289'
+        labels:
+          team: casoft-store-basket
+
+  - job_name: 'casoft-store-billing'
+    scheme: http
+    scrape_interval: 5s
+    scrape_timeout: 1s
+    metrics_path: /metrics
+    static_configs:
+      - targets: 
+         - 'casoft-store-billing:5066'
+        labels:
+          team: casoft-store-billing
+
+
+  - job_name: 'casoft-store-catalog'
+    scheme: http
+    scrape_interval: 5s
+    scrape_timeout: 1s
+    metrics_path: /metrics
+    static_configs:
+      - targets: 
+         - 'casoft-store-catalog:5294'
+        labels:
+          team: casoft-store-catalog
+
+  - job_name: 'casoft-store-discount'
+    scheme: http
+    scrape_interval: 5s
+    scrape_timeout: 1s
+    metrics_path: /metrics
+    static_configs:
+      - targets: 
+         - 'casoft-store-discount:5025'
+        labels:
+          team: casoft-store-discount
+
+  - job_name: 'casoft-store-order'
+    scheme: http
+    scrape_interval: 5s
+    scrape_timeout: 1s
+    metrics_path: /metrics
+    static_configs:
+      - targets: 
+         - 'casoft-store-order:5121'
+        labels:
+          team: casoft-store-order
+
+  - job_name: 'casoft-store-product'
+    scheme: http
+    scrape_interval: 5s
+    scrape_timeout: 1s
+    metrics_path: /metrics
+    static_configs:
+      - targets: 
+         - 'casoft-store-product:5256'
+        labels:
+          team: casoft-store-product
+
 
 alerting:
   alertmanagers:

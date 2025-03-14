@@ -14,21 +14,22 @@ groups:
 - name: ProductAPI
   rules:
   - alert: ProductApiAlert - To many requests
-    expr: sum(rate(http_requests_received_total[1m]))  by (instance) > 1
+    expr: sum(rate(http_server_request_duration_seconds_count{appName="Product.Api"}[1m])) by (instance) > 10
     for: 30s # perido de tempo para disparar o alerta
     labels:
-      team: casoft-product-api # serve para o alertmanager rotear o alerta, usado no arquivo alertmanager.yml
+      team: casoft-store-product # serve para o alertmanager rotear o alerta, usado no arquivo alertmanager.yml
     annotations:
       summary: "High number of requests"
-      description: "{{ $labels.instance }} Product API received to many requests ({{ $value }})"
+      description: "{{ $labels.instance }} Product API received to many requests ({{ $value }}). [Click here to check](http://seusistema.com/dashboard?instance={{ $labels.instance }})"
+      runbook_url: "http://seusistema.com/docs"
 
 - name: BasketAPI
   rules:
   - alert: BasketApiAlert - To many requests
-    expr: sum(rate(http_requests_received_total[1m]))  by (instance) > 1
+    expr: sum(rate(http_server_request_duration_seconds_count{appName="Basket.Api"}[1m])) by (instance) > 10
     for: 30s # perido de tempo para disparar o alerta
     labels:
-      team: casoft-basket-api # serve para o alertmanager rotear o alerta, usado no arquivo alertmanager.yml
+      team: casoft-store-basket # serve para o alertmanager rotear o alerta, usado no arquivo alertmanager.yml
     annotations:
       summary: "High number of requests"
       description: "{{ $labels.instance }} Basket API received to many requests ({{ $value }})"      
@@ -36,10 +37,10 @@ groups:
 - name: BillingAPI
   rules:
   - alert: BillingApiAlert - To many requests
-    expr: sum(rate(http_requests_received_total[1m]))  by (instance) > 1
+    expr: sum(rate(http_server_request_duration_seconds_count{appName="Billing.Api"}[1m])) by (instance) > 10
     for: 30s # perido de tempo para disparar o alerta
     labels:
-      team: casoft-billing-api # serve para o alertmanager rotear o alerta, usado no arquivo alertmanager.yml
+      team: casoft-store-billing # serve para o alertmanager rotear o alerta, usado no arquivo alertmanager.yml
     annotations:
       summary: "High number of requests"
       description: "{{ $labels.instance }} Billing API received to many requests ({{ $value }})"
@@ -47,10 +48,10 @@ groups:
 - name: CatalogAPI
   rules:
   - alert: CatalogApiAlert - To many requests
-    expr: sum(rate(http_requests_received_total[1m]))  by (instance) > 1
+    expr: sum(rate(http_server_request_duration_seconds_count{appName="Catalog.Api"}[1m])) by (instance) > 10
     for: 30s # perido de tempo para disparar o alerta
     labels:
-      team: casoft-catalog-api # serve para o alertmanager rotear o alerta, usado no arquivo alertmanager.yml
+      team: casoft-store-catalog # serve para o alertmanager rotear o alerta, usado no arquivo alertmanager.yml
     annotations:
       summary: "High number of requests"
       description: "{{ $labels.instance }} Catalog API received to many requests ({{ $value }})"
@@ -58,7 +59,7 @@ groups:
 - name: DiscountAPI
   rules:
   - alert: DiscountApiAlert - To many requests
-    expr: sum(rate(http_requests_received_total[1m]))  by (instance) > 1
+    expr: sum(rate(http_server_request_duration_seconds_count{appName="Discount.Api"}[1m])) by (instance) > 10
     for: 30s # perido de tempo para disparar o alerta
     labels:
       team: casoft-discount-api # serve para o alertmanager rotear o alerta, usado no arquivo alertmanager.yml
@@ -69,7 +70,7 @@ groups:
 - name: OrderAPI
   rules:
   - alert: OrderApiAlert - To many requests
-    expr: sum(rate(http_requests_received_total[1m]))  by (instance) > 1
+    expr: sum(rate(http_server_request_duration_seconds_count{appName="Order.Api"}[1m])) by (instance) > 10
     for: 30s # perido de tempo para disparar o alerta
     labels:
       team: casoft-order-api # serve para o alertmanager rotear o alerta, usado no arquivo alertmanager.yml
@@ -80,7 +81,7 @@ groups:
 - name: AuthAPI
   rules:
   - alert: AuthApiAlert - To many requests
-    expr: sum(rate(http_requests_received_total[1m]))  by (instance) > 1
+    expr: sum(rate(http_server_request_duration_seconds_count{appName="Auth.Api"}[1m])) by (instance) > 10
     for: 30s # perido de tempo para disparar o alerta
     labels:
       team: casoft-api-auth # serve para o alertmanager rotear o alerta, usado no arquivo alertmanager.yml

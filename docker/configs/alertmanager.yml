@@ -1,9 +1,9 @@
 route:
   receiver: 'Default'
   group_by: ['alertname', 'team', 'instance']
-  group_wait: 15s
-  group_interval: 15s
-  repeat_interval: 1m
+  group_wait: 30s
+  group_interval: 30s
+  repeat_interval: 30s
   routes:
 
     - receiver: AlertGatewayApi
@@ -21,19 +21,19 @@ route:
     - receiver: AlertBasketApi
       group_wait: 10s
       match:
-        team: "casoft-basket-api"
+        team: "casoft-store-basket"
       continue: true    
 
     - receiver: AlertBillingApi
       group_wait: 10s
       match:
-        team: "casoft-billing-api"
+        team: "casoft-store-billing"
       continue: true 
 
     - receiver: AlertCatalogApi
       group_wait: 10s
       match:
-        team: "casoft-catalog-api"
+        team: "casoft-store-catalog"
       continue: true 
 
     - receiver: AlertDiscountApi
@@ -51,7 +51,19 @@ route:
     - receiver: AlertProductApi
       group_wait: 10s
       match:
-        team: "casoft-product-api"
+        team: "casoft-store-product"
+      continue: true
+
+    - receiver: AlertProductApi2
+      group_wait: 10s
+      match:
+        team: "casoft-store-product"
+      continue: true
+
+    - receiver: AlertProductApi3
+      group_wait: 10s
+      match:
+        team: "casoft-store-product"
       continue: true
 
     # Rota padrão (fallback)
@@ -95,4 +107,15 @@ receivers:
 
   - name: AlertProductApi
     webhook_configs:
-      - url: 'http://alertview:8181/webhook'                                               
+      - send_resolved: true
+        url: 'http://alertview:8181/webhook' 
+
+  - name: 'AlertProductApi2'
+    webhook_configs:
+      - send_resolved: true
+        url: 'http://promteams:2000/high_priority_channel'
+
+  - name: 'AlertProductApi3'
+    webhook_configs:
+      - send_resolved: true
+        url: 'http://promteams:2000/low_priority_channel'                                                     
