@@ -1,0 +1,3 @@
+connectors:
+- high_priority_channel: "https://casoftbr.webhook.office.com/webhookb2/d4de1afa-d062-423d-9a84-c62ff947f329@a2d96b00-a228-43a5-b128-8b1b4d4c6330/IncomingWebhook/b4332e90cb2f439e9644a4e5b021065a/bc32aaf9-2720-40ec-babe-51ea2b852263/V2jh5TOc9YT_wN4eNr4zrjIaBxFIt-52vsFNG9l75YbfE1"
+- low_priority_channel: "https://casoftbr.webhook.office.com/webhookb2/d4de1afa-d062-423d-9a84-c62ff947f329@a2d96b00-a228-43a5-b128-8b1b4d4c6330/IncomingWebhook/74474d55bcd74b27aa1d68942d010364/bc32aaf9-2720-40ec-babe-51ea2b852263/V28fqu-hgy_h6D0shDfl_BcpF4-Y3o9Av45VCZuB0W08g1"

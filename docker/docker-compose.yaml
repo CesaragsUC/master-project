@@ -9,6 +9,8 @@ services:
         - NODE_ENV=docker
         - API_URL=http://localhost:5214/casoft/
         - IMAGES_URL=http://localhost:5214/
+     volumes:
+       - ./nginx.conf:/etc/nginx/conf.d/default.conf   
      depends_on:
       - casoft-store-api-gateway
 
@@ -253,7 +255,7 @@ services:
       - KEYCLOAK__CREDENTIALS__SECRET=${KEYCLOAK_CLIENT_SECRET}
       - KEYCLOAK__METADATADDRESS=${KEYCLOAK_METADATA_ADRESS}
       - OPENTELEMETRYOPTIONS__ENVIRONMENT= ${OPENTELEMETRY_ENVIROMENT}
-      - OPENTELEMETRYOPTIONS__APPNAME=Api.Produto
+      - OPENTELEMETRYOPTIONS__APPNAME=Product.Api
       - OPENTELEMETRYOPTIONS__OTLEXPORTER__ENDPOINT=${OTLEXPORTER_ENDPOINT}
       - OPENTELEMETRYOPTIONS__GRAFANALOKI__ENDPOINT=${GRAFANALOKI_ENDPOINT}
       - RABBITMQTRANSPORTOPTIONS__HOST=${RABBITMQ_HOST}
@@ -351,18 +353,6 @@ services:
     restart: always
     depends_on:
       - casoft-store-postgres-db
-  
-  jaeger:
-    image: jaegertracing/jaeger:2.2.0
-    container_name: jaeger
-    environment:
-      - LOG_LEVEL=debug
-    ports:
-      - "16686:16686"
-      - "14268:14268"  # Recebe traces via HTTP
-      - "14269:14269"  # Exposição de métricas para Prometheus
-      - "14250:14250" #gRPC
-    restart: unless-stopped 
 
   loki:
     image: grafana/loki:2.9.2
@@ -372,8 +362,9 @@ services:
     restart: unless-stopped
     command: -config.file=/etc/loki/loki.yaml -querier.engine.timeout=10m -querier.parallelise-shardable-queries=false -querier.query-timeout=10m -server.http-read-timeout=10m -server.http-write-timeout=10m
     volumes:
-      - loki_data:/loki
-      - ./configs/loki.yaml:/etc/loki/loki.yaml
+      - ./loki:/loki
+      - ./configs/loki.yaml:/etc/loki/loki.yaml 
+
 
   grafana:
     image: grafana/grafana:latest
@@ -384,12 +375,12 @@ services:
       - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
       - GF_SERVER_ROOT_URL=https://logs-v2.twistedqueue.com
     volumes:
-      - grafana_data:/var/lib/grafana
-      - grafana_config_data:/etc/grafana
+      - ./grafana:/var/lib/grafana
+      - ./grafana-config:/etc/grafana
     ports:
       - "3000:3000"
     restart: unless-stopped
-    
+
   otel-collector:
     image: otel/opentelemetry-collector:latest
     container_name: otel-collector
@@ -398,16 +389,28 @@ services:
       - ./configs/otel-collector-config.yaml:/etc/otel-collector-config.yaml
     restart: on-failure
     ports:
-      - "1888:1888"
-      - "8888:8888"
-      - "8889:8889"
-      - "13133:13133"
-      - "4317:4317"
-      - "4318:4318"
-      - "55679:55679"
+      - 1888:1888
+      - 8888:8888
+      - 8889:8889
+      - 13133:13133
+      - 4317:4317
+      - 4318:4318
+      - 55679:55679
     depends_on:
       - jaeger
       - prometheus
+
+
+  jaeger:
+    image: jaegertracing/jaeger:2.2.0
+    container_name: jaeger
+    environment:
+      - LOG_LEVEL=debug
+    ports:
+      - "16686:16686"
+    restart: unless-stopped 
+
+
     
   # caso de erro sincronização time: https://stackoverflow.com/questions/42200734/how-to-re-synchronize-the-prometheus-time  
   prometheus:
@@ -418,16 +421,17 @@ services:
     volumes:
       - ./configs/prometheus.yml:/etc/prometheus/prometheus.yml
       - ./configs/alert.rules.yml:/etc/prometheus/alert.rules.yml
-      - /etc/localtime:/etc/localtime:ro
-      - prometheus_data:/prometheus
+      - ./prometheus:/prometheus
     ports:
       - "9090:9090"
 
   alertview:
-    image: cesarags/webhookuc:v1
+    image: cesarags/webhookuc:v2
     container_name: alertview
+    environment:
+      - ASPNETCORE_URLS=http://*:8181
     ports:
-      - 8181:8080
+      - 8181:8181
       
   alertmanager:
     image: prom/alertmanager:v0.28.0
@@ -438,6 +442,23 @@ services:
       - '--config.file=/etc/alertmanager/alertmanager.yml'
     ports:
       - 9093:9093
+
+  #https://github.com/CesaragsUC/prometheus-msteams
+  promteams:
+    image: bzon/prometheus-msteams
+    container_name: promteams
+    ports:
+      - "2000:2000"
+    environment:
+      - TEAMS_INCOMING_WEBHOOK_URL=${TEAMS_WEBHOOK_URL}
+      - TEAMS_REQUEST_URI=${TEAMS_REQUEST_URI}
+      - PROMTEAMS_DEBUG=true
+      - CONFIG_FILE=/tmp/config.yml
+    depends_on:
+      - alertmanager
+    volumes:
+      - ./tmp/config.yml:/tmp/config.yml  
+    restart: always   
       
   mongo-exporter:
     image: fabricioveronez/mongo_exporter:latest
@@ -447,7 +468,7 @@ services:
     environment:
       MONGODB_URI: ${MONGO_SERVER_URL}
     depends_on:
-      - casoft-store-mongodb
+      - casoft-store-mongodb 
      
 
 volumes:
@@ -466,7 +487,7 @@ volumes:
   loki_data:
     driver: local
   grafana_data:
-    driver: local  
+    driver: local
   grafana_config_data:
     driver: local 
 

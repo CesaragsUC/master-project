@@ -28,7 +28,7 @@
       "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ], //verbos permitidos
       "DownstreamHostAndPorts": [
         {
-          "Host": "casoft-store-product-service", // container name api product
+          "Host": "casoft-store-product", // container name api product
           "Port": 5256 // port for api product
         }
       ],
@@ -59,7 +59,7 @@
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost", //host api Basket
+          "Host": "casoft-store-basket", //host api Basket
           "Port": 5289 //port api Basket
         }
       ]
@@ -71,7 +71,7 @@
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost", //host api Billing
+          "Host": "casoft-store-billing", //host api Billing
           "Port": 5066 //port api Billing
         }
       ],
@@ -90,7 +90,7 @@
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost", //host api Discount
+          "Host": "casoft-store-discount", //host api Discount
           "Port": 5025 //port api Discount
         }
       ],
@@ -109,7 +109,7 @@
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost", //host api Order
+          "Host": "casoft-store-order", //host api Order
           "Port": 5121 //port api Order
         }
       ],
