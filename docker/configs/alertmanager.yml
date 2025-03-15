@@ -15,7 +15,7 @@ route:
     - receiver: AlertApiAuth
       group_wait: 10s
       match:
-        team: "casoft-api-auth"
+        team: "casoft-store-auth"
       continue: true 
 
     - receiver: AlertBasketApi
