@@ -414,7 +414,7 @@ services:
     
   # caso de erro sincronização time: https://stackoverflow.com/questions/42200734/how-to-re-synchronize-the-prometheus-time  
   prometheus:
-    image: prom/prometheus:latest
+    image: prom/prometheus:v3.2.1
     container_name: prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
