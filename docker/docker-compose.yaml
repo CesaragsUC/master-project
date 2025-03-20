@@ -15,7 +15,7 @@ services:
       - casoft-store-api-gateway
 
   casoft-store-api-gateway:
-    image: cesarags/casoft-store-api-gateway:v1
+    image: casoftlabs/casoft-store-api-gateway:v2
     container_name: casoft-store-api-gateway
     build:
         context: ../src
@@ -42,7 +42,7 @@ services:
       - casoft-store-keycloak
       
   casoft-store-auth:
-    image: cesarags/casoft-store-auth:v1
+    image: casoftlabs/casoft-store-auth:v1
     container_name: casoft-store-auth
     build:
         context: ../src
@@ -70,7 +70,7 @@ services:
       
   
   casoft-store-basket:
-    image: cesarags/casoft-store-basket:v1
+    image: casoftlabs/casoft-store-basket:v1
     container_name: casoft-store-basket
     build:
         context: ../src
@@ -113,7 +113,7 @@ services:
 
   
   casoft-store-billing:
-    image: cesarags/casoft-store-billing:v1
+    image: casoftlabs/casoft-store-billing:v1
     container_name: casoft-store-billing
     build:
         context: ../src
@@ -149,7 +149,7 @@ services:
       
       
   casoft-store-catalog:
-    image: cesarags/casoft-store-catalog:v1
+    image: casoftlabs/casoft-store-catalog:v1
     container_name: casoft-store-catalog
     build:
         context: ../src
@@ -175,7 +175,7 @@ services:
     restart: always  
       
   casoft-store-discount:
-    image: cesarags/casoft-store-discount:v1
+    image: casoftlabs/casoft-store-discount:v1
     container_name: casoft-store-discount
     build:
         context: ../src
@@ -204,7 +204,7 @@ services:
     restart: always  
   
   casoft-store-order:
-    image: cesarags/casoft-store-order:v1
+    image: casoftlabs/casoft-store-order:v1
     container_name: casoft-store-order
     build:
         context: ../src
@@ -241,7 +241,7 @@ services:
 
       
   casoft-store-product:
-    image: cesarags/casoft-store-product:v1
+    image: casoftlabs/casoft-store-product:v1
     container_name: casoft-store-product
     build:
         context: ../src
@@ -367,7 +367,7 @@ services:
 
 
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:11.5.2
     container_name: grafana
     depends_on:
       - prometheus
@@ -382,7 +382,7 @@ services:
     restart: unless-stopped
 
   otel-collector:
-    image: otel/opentelemetry-collector:latest
+    image: otel/opentelemetry-collector:0.122.0
     container_name: otel-collector
     command: ["--config=/etc/otel-collector-config.yaml"]
     volumes:
@@ -390,12 +390,13 @@ services:
     restart: on-failure
     ports:
       - 1888:1888
-      - 8888:8888
+      - 8888:8888 # default
       - 8889:8889
       - 13133:13133
       - 4317:4317
       - 4318:4318
       - 55679:55679
+      - "55670:55679" # zpages extension
     depends_on:
       - jaeger
       - prometheus

@@ -8,6 +8,7 @@ ACR_LOGIN_SERVER="$ACR_NAME.azurecr.io"
 
 # Lista das imagens que deseja enviar para o ACR
 IMAGES=(
+    "quay.io/prometheusmsteams/prometheus-msteams",
     "cesarags/casoft-store-web:v1"
     "cesarags/casoft-store-api-gateway:v1"
     "cesarags/casoft-store-basket:v1"

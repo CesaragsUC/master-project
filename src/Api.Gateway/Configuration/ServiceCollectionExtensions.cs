@@ -33,6 +33,16 @@ public static class ServiceCollectionExtensions
 
         Console.WriteLine($"Api.Gateway Environment: {environment}");
 
+        // Adiciona o HttpClient personalizado para ignorar erros de SSL
+        services.AddHttpClient("OcelotClient")
+            .ConfigurePrimaryHttpMessageHandler(() =>
+            {
+                return new HttpClientHandler
+                {
+                    ServerCertificateCustomValidationCallback = (sender, cert, chain, sslPolicyErrors) => true
+                };
+            });
+
         services.AddOcelot().AddCacheManager(x => x.WithDictionaryHandle());
 
         return services;
