@@ -1,0 +1,36 @@
+receivers:
+  otlp:
+    protocols:
+      grpc:
+        endpoint: https://otel-collector.thankfulmushroom-fe2ec090.eastus2.azurecontainerapps.io:4317
+      http:
+        endpoint: https://otel-collector.thankfulmushroom-fe2ec090.eastus2.azurecontainerapps.io:4318
+
+extensions:
+  health_check: {}
+
+exporters:
+  otlp:
+    endpoint: https://jaegertracing.thankfulmushroom-fe2ec090.eastus2.azurecontainerapps.io:4317
+    tls:
+      insecure: true
+  prometheus:
+    endpoint: "https://otel-collector.thankfulmushroom-fe2ec090.eastus2.azurecontainerapps.io:8889"
+    resource_to_telemetry_conversion:
+      enabled: true
+  debug:
+#    verbosity: detailed
+
+processors:
+  batch:
+
+service:
+  pipelines:
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [otlp]
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [debug, prometheus]

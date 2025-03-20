@@ -1,0 +1,99 @@
+route:
+  receiver: 'Default'
+  group_by: ['alertname', 'team', 'instance']
+  group_wait: 30s
+  group_interval: 30s
+  repeat_interval: 30s
+  routes:
+
+    - receiver: AlertGatewayApi
+      group_wait: 10s
+      match:
+        team: "casoft-api-gateway"
+      continue: true    
+
+    - receiver: AlertApiAuth
+      group_wait: 10s
+      match:
+        team: "casoft-store-auth"
+      continue: true 
+
+    - receiver: AlertBasketApi
+      group_wait: 10s
+      match:
+        team: "casoft-store-basket"
+      continue: true    
+
+    - receiver: AlertBillingApi
+      group_wait: 10s
+      match:
+        team: "casoft-store-billing"
+      continue: true 
+
+    - receiver: AlertCatalogApi
+      group_wait: 10s
+      match:
+        team: "casoft-store-catalog"
+      continue: true 
+
+    - receiver: AlertDiscountApi
+      group_wait: 10s
+      match:
+        team: "casoft-discount-api"
+      continue: true 
+
+    - receiver: AlertOrderApi
+      group_wait: 10s
+      match:
+        team: "casoft-order-api"
+      continue: true     
+
+    - receiver: AlertProductApi
+      group_wait: 10s
+      match:
+        team: "casoft-store-product"
+      continue: true
+
+    # Rota padrão (fallback)
+    - receiver: Default
+      match:
+        team: ""  # Captura alertas SEM a label 'team'
+      continue: false
+
+receivers:
+  - name: Default
+    webhook_configs:
+      - url: 'https://alertview-webhook.thankfulmushroom-fe2ec090.eastus2.azurecontainerapps.io/webhook'
+
+  - name: AlertGatewayApi
+    webhook_configs:
+      - url: 'https://alertview-webhook.thankfulmushroom-fe2ec090.eastus2.azurecontainerapps.io/webhook'
+
+  - name: AlertApiAuth
+    webhook_configs:
+      - url: 'https://alertview-webhook.thankfulmushroom-fe2ec090.eastus2.azurecontainerapps.io/webhook'  
+      
+  - name: AlertBasketApi
+    webhook_configs:
+      - url: 'https://alertview-webhook.thankfulmushroom-fe2ec090.eastus2.azurecontainerapps.io/webhook'      
+
+  - name: AlertBillingApi
+    webhook_configs:
+      - url: 'https://alertview-webhook.thankfulmushroom-fe2ec090.eastus2.azurecontainerapps.io/webhook'
+
+  - name: AlertCatalogApi
+    webhook_configs:
+      - url: 'https://alertview-webhook.thankfulmushroom-fe2ec090.eastus2.azurecontainerapps.io/webhook'
+
+  - name: AlertDiscountApi
+    webhook_configs:
+      - url: 'https://alertview-webhook.thankfulmushroom-fe2ec090.eastus2.azurecontainerapps.io/webhook'
+
+  - name: AlertOrderApi
+    webhook_configs:
+      - url: 'https://alertview-webhook.thankfulmushroom-fe2ec090.eastus2.azurecontainerapps.io/webhook'
+
+  - name: AlertProductApi
+    webhook_configs:
+      - send_resolved: true
+        url: 'https://alertview-webhook.thankfulmushroom-fe2ec090.eastus2.azurecontainerapps.io/webhook'                                                    
