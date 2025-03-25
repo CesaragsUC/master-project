@@ -9,6 +9,15 @@ env:
     DOTNET_VERSION: '8.0.x'
     AZURE_CONTAINER_REGISTRY: casoftregistry
     RESOURCE_GROUP: casoft
+    CATALOG_CONTAINER_APP: casoft-store-catalog
+    GATEWAY_CONTAINER_APP: casoft-store-api-gateway
+    AUTH_CONTAINER_APP: casoft-store-auth
+    BASKET_CONTAINER_APP: casoft-store-basket
+    BILLING_CONTAINER_APP: casoft-store-billing
+    DISCOUNT_CONTAINER_APP: casoft-store-discount
+    ORDER_CONTAINER_APP: casoft-store-order
+    PRODUCT_CONTAINER_APP: casoft-store-product
+
 jobs:
   build:
     name: Quality Gate ⚙️
@@ -122,7 +131,7 @@ jobs:
                   push: true
                   tags: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ vars.CONTAINER_APP_DISCOUNT }}:${{ github.sha }}
                   file: ./src/Discount.Api/Dockerfile   
-                   
+
           - name: Build and push container Order
             uses: docker/build-push-action@v6
             with:
@@ -149,7 +158,7 @@ jobs:
             with:
               imageToDeploy: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ vars.CONTAINER_APP_CATALOG }}:${{ github.sha }}
               resourceGroup: ${{ env.RESOURCE_GROUP }}
-              containerAppName: ${{ vars.CONTAINER_APP_CATALOG }}
+              containerAppName: ${{ env.CATALOG_CONTAINER_APP }}
               environmentVariables: |
                 ASPNETCORE_ENVIRONMENT=Production  
 
@@ -158,7 +167,7 @@ jobs:
             with:
               imageToDeploy: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ vars.CONTAINER_APP_API_GATEWAY }}:${{ github.sha }}
               resourceGroup: ${{ env.RESOURCE_GROUP }}
-              containerAppName: ${{ vars.CONTAINER_APP_API_GATEWAY }}
+              containerAppName: ${{ env.GATEWAY_CONTAINER_APP }}
               environmentVariables: |
                 ASPNETCORE_ENVIRONMENT=Production            
 
@@ -167,7 +176,7 @@ jobs:
             with:
               imageToDeploy: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ vars.CONTAINER_APP_AUTH }}:${{ github.sha }}
               resourceGroup: ${{ env.RESOURCE_GROUP }}
-              containerAppName: ${{ vars.CONTAINER_APP_AUTH }}
+              containerAppName: ${{ env.AUTH_CONTAINER_APP }}
               environmentVariables: |
                 ASPNETCORE_ENVIRONMENT=Production 
 
@@ -176,7 +185,7 @@ jobs:
             with:
               imageToDeploy: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ vars.CONTAINER_APP_BASKET }}:${{ github.sha }}
               resourceGroup: ${{ env.RESOURCE_GROUP }}
-              containerAppName: ${{ vars.CONTAINER_APP_BASKET }}
+              containerAppName: ${{ env.BASKET_CONTAINER_APP }}
               environmentVariables: |
                 ASPNETCORE_ENVIRONMENT=Production 
 
@@ -185,7 +194,7 @@ jobs:
             with:
               imageToDeploy: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ vars.CONTAINER_APP_BILLING }}:${{ github.sha }}
               resourceGroup: ${{ env.RESOURCE_GROUP }}
-              containerAppName: ${{ vars.CONTAINER_APP_BILLING }}
+              containerAppName: ${{ env.BILLING_CONTAINER_APP }}
               environmentVariables: |
                 ASPNETCORE_ENVIRONMENT=Production 
 
@@ -194,7 +203,7 @@ jobs:
             with:
               imageToDeploy: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ vars.CONTAINER_APP_DISCOUNT }}:${{ github.sha }}
               resourceGroup: ${{ env.RESOURCE_GROUP }}
-              containerAppName: ${{ vars.CONTAINER_APP_DISCOUNT }}
+              containerAppName: ${{ env.DISCOUNT_CONTAINER_APP }}
               environmentVariables: |
                 ASPNETCORE_ENVIRONMENT=Production 
 
@@ -203,7 +212,7 @@ jobs:
             with:
               imageToDeploy: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ vars.CONTAINER_APP_ORDER }}:${{ github.sha }}
               resourceGroup: ${{ env.RESOURCE_GROUP }}
-              containerAppName: ${{ vars.CONTAINER_APP_ORDER }}
+              containerAppName: ${{ env.ORDER_CONTAINER_APP }}
               environmentVariables: |
                 ASPNETCORE_ENVIRONMENT=Production 
 
@@ -212,6 +221,6 @@ jobs:
             with:
               imageToDeploy: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ vars.CONTAINER_APP_PRODUCT }}:${{ github.sha }}
               resourceGroup: ${{ env.RESOURCE_GROUP }}
-              containerAppName: ${{ vars.CONTAINER_APP_PRODUCT }}
+              containerAppName: ${{ env.PRODUCT_CONTAINER_APP }}
               environmentVariables: |
                 ASPNETCORE_ENVIRONMENT=Production 
