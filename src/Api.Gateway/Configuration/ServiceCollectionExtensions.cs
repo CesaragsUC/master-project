@@ -31,7 +31,7 @@ public static class ServiceCollectionExtensions
             .AddJsonFile($"ocelot.{environment}.json", optional: false, reloadOnChange: true)
             .AddEnvironmentVariables();
 
-        Console.WriteLine($"Api.Gateway Environment: {environment}");
+        Console.WriteLine($"Api Gateway Environment: {environment}");
 
         // Adiciona o HttpClient personalizado para ignorar erros de SSL
         services.AddHttpClient("OcelotClient")
