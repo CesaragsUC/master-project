@@ -79,49 +79,49 @@ jobs:
             uses: docker/build-push-action@v6
             with:
               push: true
-              tags: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_APP_CATALOG }}:${{ github.sha }}
+              tags: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ vars.CONTAINER_APP_CATALOG }}:${{ github.sha }}
               file: ./src/Api.Catalogo/Dockerfile
 
           - name: Build and push container Gateway
             uses: docker/build-push-action@v6
             with:
                 push: true
-                tags: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_APP_API_GATEWAY }}:${{ github.sha }}
+                tags: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ vars.CONTAINER_APP_API_GATEWAY }}:${{ github.sha }}
                 file: ./src/Api.Gateway/Dockerfile              
             
           - name: Build and push container Auth
             uses: docker/build-push-action@v6
             with:
                 push: true
-                tags: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_APP_AUTH }}:${{ github.sha }}
+                tags: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ vars.CONTAINER_APP_AUTH }}:${{ github.sha }}
                 file: ./src/Auth.Api/Dockerfile 
 
           - name: Build and push container Basket
             uses: docker/build-push-action@v6
             with:
                  push: true
-                 tags: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_APP_BASKET }}:${{ github.sha }}
+                 tags: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ vars.CONTAINER_APP_BASKET }}:${{ github.sha }}
                  file: ./src/Basket.Api/Dockerfile 
 
           - name: Build and push container Billing
             uses: docker/build-push-action@v6
             with:
                   push: true
-                  tags: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_APP_BILLING }}:${{ github.sha }}
+                  tags: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ vars.CONTAINER_APP_BILLING }}:${{ github.sha }}
                   file: ./src/Billing.Api/Dockerfile     
 
           - name: Build and push container Discount
             uses: docker/build-push-action@v6
             with:
                   push: true
-                  tags: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_APP_DISCOUNT }}:${{ github.sha }}
+                  tags: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ vars.CONTAINER_APP_DISCOUNT }}:${{ github.sha }}
                   file: ./src/Discount.Api/Dockerfile    
 
           - name: Build and push container Product
             uses: docker/build-push-action@v6
             with:
                   push: true
-                  tags: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_APP_PRODUCT }}:${{ github.sha }}
+                  tags: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ vars.CONTAINER_APP_PRODUCT }}:${{ github.sha }}
                   file: ./src/Payment.Api/Dockerfile    
 
 
@@ -129,7 +129,7 @@ jobs:
             uses: docker/build-push-action@v6
             with:
                   push: true
-                  tags: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_APP_ORDER }}:${{ github.sha }}
+                  tags: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ vars.CONTAINER_APP_ORDER }}:${{ github.sha }}
                   file: ./src/Api.Gateway/Dockerfile    
 
           - name: Azure Login
@@ -140,71 +140,71 @@ jobs:
           - name: Deploy to Azure Container CATALOG
             uses: azure/container-apps-deploy-action@v1
             with:
-              imageToDeploy: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_APP_CATALOG }}:${{ github.sha }}
+              imageToDeploy: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ vars.CONTAINER_APP_CATALOG }}:${{ github.sha }}
               resourceGroup: ${{ env.RESOURCE_GROUP }}
-              containerAppName: ${{ env.CONTAINER_APP_CATALOG }}
+              containerAppName: ${{ vars.CONTAINER_APP_CATALOG }}
               environmentVariables: |
                 ASPNETCORE_ENVIRONMENT=Production  
 
           - name: Deploy to Azure Container GATEWAY
             uses: azure/container-apps-deploy-action@v1
             with:
-              imageToDeploy: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_APP_API_GATEWAY }}:${{ github.sha }}
+              imageToDeploy: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ vars.CONTAINER_APP_API_GATEWAY }}:${{ github.sha }}
               resourceGroup: ${{ env.RESOURCE_GROUP }}
-              containerAppName: ${{ env.CONTAINER_APP_API_GATEWAY }}
+              containerAppName: ${{ vars.CONTAINER_APP_API_GATEWAY }}
               environmentVariables: |
                 ASPNETCORE_ENVIRONMENT=Production            
 
           - name: Deploy to Azure Container AUTH
             uses: azure/container-apps-deploy-action@v1
             with:
-              imageToDeploy: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_APP_AUTH }}:${{ github.sha }}
+              imageToDeploy: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ vars.CONTAINER_APP_AUTH }}:${{ github.sha }}
               resourceGroup: ${{ env.RESOURCE_GROUP }}
-              containerAppName: ${{ env.CONTAINER_APP_AUTH }}
+              containerAppName: ${{ vars.CONTAINER_APP_AUTH }}
               environmentVariables: |
                 ASPNETCORE_ENVIRONMENT=Production 
 
           - name: Deploy to Azure Container BASKET
             uses: azure/container-apps-deploy-action@v1
             with:
-              imageToDeploy: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_APP_BASKET }}:${{ github.sha }}
+              imageToDeploy: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ vars.CONTAINER_APP_BASKET }}:${{ github.sha }}
               resourceGroup: ${{ env.RESOURCE_GROUP }}
-              containerAppName: ${{ env.CONTAINER_APP_BASKET }}
+              containerAppName: ${{ vars.CONTAINER_APP_BASKET }}
               environmentVariables: |
                 ASPNETCORE_ENVIRONMENT=Production 
 
           - name: Deploy to Azure Container BILLING
             uses: azure/container-apps-deploy-action@v1
             with:
-              imageToDeploy: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_APP_BILLING }}:${{ github.sha }}
+              imageToDeploy: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ vars.CONTAINER_APP_BILLING }}:${{ github.sha }}
               resourceGroup: ${{ env.RESOURCE_GROUP }}
-              containerAppName: ${{ env.CONTAINER_APP_BILLING }}
+              containerAppName: ${{ vars.CONTAINER_APP_BILLING }}
               environmentVariables: |
                 ASPNETCORE_ENVIRONMENT=Production 
 
           - name: Deploy to Azure Container DISCOUNT
             uses: azure/container-apps-deploy-action@v1
             with:
-              imageToDeploy: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_APP_DISCOUNT }}:${{ github.sha }}
+              imageToDeploy: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ vars.CONTAINER_APP_DISCOUNT }}:${{ github.sha }}
               resourceGroup: ${{ env.RESOURCE_GROUP }}
-              containerAppName: ${{ env.CONTAINER_APP_DISCOUNT }}
+              containerAppName: ${{ vars.CONTAINER_APP_DISCOUNT }}
               environmentVariables: |
                 ASPNETCORE_ENVIRONMENT=Production 
 
           - name: Deploy to Azure Container ORDER
             uses: azure/container-apps-deploy-action@v1
             with:
-              imageToDeploy: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_APP_ORDER }}:${{ github.sha }}
+              imageToDeploy: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ vars.CONTAINER_APP_ORDER }}:${{ github.sha }}
               resourceGroup: ${{ env.RESOURCE_GROUP }}
-              containerAppName: ${{ env.CONTAINER_APP_ORDER }}
+              containerAppName: ${{ vars.CONTAINER_APP_ORDER }}
               environmentVariables: |
                 ASPNETCORE_ENVIRONMENT=Production 
 
           - name: Deploy to Azure Container PRODUCT
             uses: azure/container-apps-deploy-action@v1
             with:
-              imageToDeploy: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CONTAINER_APP_PRODUCT }}:${{ github.sha }}
+              imageToDeploy: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ vars.CONTAINER_APP_PRODUCT }}:${{ github.sha }}
               resourceGroup: ${{ env.RESOURCE_GROUP }}
-              containerAppName: ${{ env.CONTAINER_APP_PRODUCT }}
+              containerAppName: ${{ vars.CONTAINER_APP_PRODUCT }}
               environmentVariables: |
                 ASPNETCORE_ENVIRONMENT=Production 
