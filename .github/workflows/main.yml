@@ -78,6 +78,7 @@ jobs:
           - name: Build and push container Catalog
             uses: docker/build-push-action@v6
             with:
+              context: ./src
               push: true
               tags: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ vars.CONTAINER_APP_CATALOG }}:${{ github.sha }}
               file: ./src/Api.Catalogo/Dockerfile
@@ -85,6 +86,7 @@ jobs:
           - name: Build and push container Gateway
             uses: docker/build-push-action@v6
             with:
+                context: ./src
                 push: true
                 tags: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ vars.CONTAINER_APP_API_GATEWAY }}:${{ github.sha }}
                 file: ./src/Api.Gateway/Dockerfile              
@@ -92,6 +94,7 @@ jobs:
           - name: Build and push container Auth
             uses: docker/build-push-action@v6
             with:
+                context: ./src
                 push: true
                 tags: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ vars.CONTAINER_APP_AUTH }}:${{ github.sha }}
                 file: ./src/Auth.Api/Dockerfile 
@@ -99,6 +102,7 @@ jobs:
           - name: Build and push container Basket
             uses: docker/build-push-action@v6
             with:
+                 context: ./src
                  push: true
                  tags: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ vars.CONTAINER_APP_BASKET }}:${{ github.sha }}
                  file: ./src/Basket.Api/Dockerfile 
@@ -106,6 +110,7 @@ jobs:
           - name: Build and push container Billing
             uses: docker/build-push-action@v6
             with:
+                  context: ./src
                   push: true
                   tags: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ vars.CONTAINER_APP_BILLING }}:${{ github.sha }}
                   file: ./src/Billing.Api/Dockerfile     
@@ -113,6 +118,7 @@ jobs:
           - name: Build and push container Discount
             uses: docker/build-push-action@v6
             with:
+                  context: ./src
                   push: true
                   tags: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ vars.CONTAINER_APP_DISCOUNT }}:${{ github.sha }}
                   file: ./src/Discount.Api/Dockerfile    
@@ -120,6 +126,7 @@ jobs:
           - name: Build and push container Product
             uses: docker/build-push-action@v6
             with:
+                  context: ./src
                   push: true
                   tags: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ vars.CONTAINER_APP_PRODUCT }}:${{ github.sha }}
                   file: ./src/Payment.Api/Dockerfile    
@@ -128,6 +135,7 @@ jobs:
           - name: Build and push container Order
             uses: docker/build-push-action@v6
             with:
+                  context: ./src
                   push: true
                   tags: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ vars.CONTAINER_APP_ORDER }}:${{ github.sha }}
                   file: ./src/Api.Gateway/Dockerfile    
