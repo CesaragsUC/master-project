@@ -121,7 +121,15 @@ jobs:
                   context: ./src
                   push: true
                   tags: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ vars.CONTAINER_APP_DISCOUNT }}:${{ github.sha }}
-                  file: ./src/Discount.Api/Dockerfile    
+                  file: ./src/Discount.Api/Dockerfile   
+                   
+          - name: Build and push container Order
+            uses: docker/build-push-action@v6
+            with:
+                  context: ./src
+                  push: true
+                  tags: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ vars.CONTAINER_APP_ORDER }}:${{ github.sha }}
+                  file: ./src/Order.Api/Dockerfile  
 
           - name: Build and push container Product
             uses: docker/build-push-action@v6
@@ -129,16 +137,7 @@ jobs:
                   context: ./src
                   push: true
                   tags: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ vars.CONTAINER_APP_PRODUCT }}:${{ github.sha }}
-                  file: ./src/Payment.Api/Dockerfile    
-
-
-          - name: Build and push container Order
-            uses: docker/build-push-action@v6
-            with:
-                  context: ./src
-                  push: true
-                  tags: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ vars.CONTAINER_APP_ORDER }}:${{ github.sha }}
-                  file: ./src/Api.Gateway/Dockerfile    
+                  file: ./src/Api.Produto/Dockerfile      
 
           - name: Azure Login
             uses: azure/login@v2
