@@ -1,4 +1,4 @@
-﻿namespace Product.Infrastructure.RabbitMq;
+﻿namespace Product.Application.Abstractions;
 
 public interface IQueueService
 {

@@ -1,7 +1,6 @@
-﻿using HybridRepoNet.Abstractions;
-using Infrastructure;
-using MediatR;
+﻿using MediatR;
 using Product.Application.Queries.Product;
+using Product.Domain.Abstractions;
 using Product.Domain.Exceptions;
 using System.Diagnostics.CodeAnalysis;
 
@@ -13,16 +12,16 @@ public class ProdutoQueryHandler :
     IRequestHandler<ProductByIdQuery, Domain.Models.Product>
 {
 
-    private readonly IUnitOfWork<ProductDbContext> _unitOfWork;
+    private readonly IProductRepository _productRepository;
 
-    public ProdutoQueryHandler(IUnitOfWork<ProductDbContext> unitOfWork)
+    public ProdutoQueryHandler(IProductRepository productRepository)
     {
-        _unitOfWork = unitOfWork;
+        _productRepository = productRepository;
     }
 
     public async Task<IEnumerable<Domain.Models.Product?>> Handle(ProductQuery request, CancellationToken cancellationToken)
     {
-        return await _unitOfWork.Repository<Domain.Models.Product>().GetAllAsync();
+        return await _productRepository.GetAllAsync();
     }
 
     public async Task<Domain.Models.Product?> Handle(ProductByIdQuery request, CancellationToken cancellationToken)
@@ -32,7 +31,7 @@ public class ProdutoQueryHandler :
             throw new ProductNotFoundException("Product Id couldn't empty");
         }
 
-        var produto = _unitOfWork.Repository<Domain.Models.Product>().FindOne(x => x.Id == request.Id);
+        var produto = _productRepository.FindOne(request.Id);
 
         if (produto == null) throw new ProductNotFoundException(request.Id); 
 

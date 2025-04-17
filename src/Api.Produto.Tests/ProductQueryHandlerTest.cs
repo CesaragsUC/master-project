@@ -1,10 +1,9 @@
-﻿using HybridRepoNet.Abstractions;
-using HybridRepoNet.Repository;
-using Infrastructure;
+﻿using HybridRepoNet.Repository;
 using MediatR;
 using Moq;
 using Product.Application.Handlers.Product;
 using Product.Application.Queries.Product;
+using Product.Domain.Abstractions;
 using System.Linq.Expressions;
 
 namespace Product.Api.Tests;
@@ -12,16 +11,16 @@ namespace Product.Api.Tests;
 public class ProductQueryHandlerTest : BaseConfig
 {
 
-    private readonly Mock<IUnitOfWork<ProductDbContext>> _unitOfWork;
+    private readonly Mock<IProductRepository> _productRepository;
     private readonly Mock<IMediator> _mediator;
     private ProdutoQueryHandler _handler;
     public ProductQueryHandlerTest()
     {
         InitializeMediatrService();
 
-        _unitOfWork = new Mock<IUnitOfWork<ProductDbContext>>();
+        _productRepository = new Mock<IProductRepository>();
         _mediator = new Mock<IMediator>();
-        _handler = new ProdutoQueryHandler(_unitOfWork.Object);
+        _handler = new ProdutoQueryHandler(_productRepository.Object);
     }
 
     [Fact(DisplayName = "Teste 01- - Rotornar lista com sucesso")]
@@ -30,7 +29,7 @@ public class ProductQueryHandlerTest : BaseConfig
     {
         var command = new ProductQuery();
 
-        _unitOfWork.Setup(r => r.Repository<Domain.Models.Product>().GetAllAsync()).ReturnsAsync(() =>
+        _productRepository.Setup(r => r.GetAllAsync()).ReturnsAsync(() =>
         {
             return new List<Domain.Models.Product>
             {
@@ -58,22 +57,16 @@ public class ProductQueryHandlerTest : BaseConfig
     {
         var command = new ProductByIdQuery { Id = Guid.NewGuid() };
 
-        _unitOfWork.Setup(r => r.Repository<Domain.Models.Product>().FindOne(It.IsAny<Expression<Func<Domain.Models.Product, bool>>>(), null))
-                   .Callback<Expression<Func<Domain.Models.Product, bool>>, FindOptions?>((predicate, options) =>
-                   { })
-                   .Returns<Expression<Func<Domain.Models.Product, bool>>, FindOptions?>((predicate, options) =>
-                   {
-                       var product = new Domain.Models.Product
-                       {
-                           Id = command.Id,
-                           Name = "Produtos Teste",
-                           Price = 20.00m,
-                           Active = true,
-                           CreatAt = DateTime.Now
-                       };
-                       return predicate.Compile().Invoke(product) ? product : null;
-                   });
+        var product = new Domain.Models.Product
+        {
+            Id = command.Id,
+            Name = "Produtos Teste",
+            Price = 20.00m,
+            Active = true,
+            CreatAt = DateTime.Now
+        };
 
+        _productRepository.Setup(r => r.FindOne(It.IsAny<Guid>())).Returns(product);
 
         var result = await _handler.Handle(command, CancellationToken.None);
 

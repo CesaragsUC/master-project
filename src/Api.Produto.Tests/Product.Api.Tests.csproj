@@ -15,6 +15,7 @@
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.1" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
 		<PackageReference Include="Moq" Version="4.20.72" />
+		<PackageReference Include="NetArchTest.Rules" Version="1.3.2" />
 		<PackageReference Include="xunit" Version="2.5.3" />
 		<PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
 		<PackageReference Include="MediatR" Version="12.4.1" />
@@ -24,6 +25,7 @@
 	  <ProjectReference Include="..\Messaging.Contracts\Messaging.Contracts.csproj" />
 	  <ProjectReference Include="..\Product.Application\Product.Application.csproj" />
 	  <ProjectReference Include="..\Product.Domain\Product.Domain.csproj" />
+	  <ProjectReference Include="..\Product.Infrastructure\Product.Infrastructure.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>

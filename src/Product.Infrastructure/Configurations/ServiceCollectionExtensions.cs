@@ -1,7 +1,9 @@
 ﻿using Azure.Storage.Blobs;
+using Domain.Interfaces;
 using EasyMongoNet.Exntesions;
 using HybridRepoNet.Configurations;
 using HybridRepoNet.Helpers;
+using Infrastructure.Services;
 using Keycloak.AuthServices.Authentication;
 using Keycloak.AuthServices.Authorization;
 using Microsoft.Extensions.Configuration;
@@ -23,6 +25,7 @@ public static class ServiceCollectionExtensions
     {
         var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
+        services.AddScoped<IBobStorageService, BobStorageService>();
         services.AddFluentMigrationConfig(configuration, typeof(Product.Infrastructure.Migrations.Inicio).Assembly);
         services.AddKeycloakServices(configuration);
         services.AddAzureBlobServices(configuration);

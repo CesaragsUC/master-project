@@ -1,5 +1,5 @@
-﻿using ResultNet;
-using MediatR;
+﻿using MediatR;
+using ResultNet;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Product.Application.Comands.Product;

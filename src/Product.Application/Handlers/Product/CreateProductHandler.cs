@@ -1,7 +1,5 @@
 ﻿using Domain.Interfaces;
 using FluentValidation;
-using HybridRepoNet.Abstractions;
-using Infrastructure;
 using MediatR;
 using Product.Application.Comands.Product;
 using Product.Application.Validation;
@@ -17,18 +15,18 @@ namespace Product.Application.Handlers.Product;
 [ExcludeFromCodeCoverage]
 public class CreateProductHandler : IRequestHandler<CreateProductCommand, Result<bool>>
 {
-    private readonly  IUnitOfWork<ProductDbContext> _unitOfWork;
+    private readonly IProductRepository _productRepository;
     private readonly IBobStorageService _bobStorageService;
     private readonly IProductService _productService;
 
     public CreateProductHandler(
         IBobStorageService bobStorageService,
         IProductService productService,
-        IUnitOfWork<ProductDbContext> unitOfWork)
+        IProductRepository productRepository)
     {
         _bobStorageService = bobStorageService;
         _productService = productService;
-        _unitOfWork = unitOfWork;
+        _productRepository = productRepository;
     }
 
     public async Task<Result<bool>> Handle(CreateProductCommand request, CancellationToken cancellationToken)
@@ -52,8 +50,8 @@ public class CreateProductHandler : IRequestHandler<CreateProductCommand, Result
 
             };
 
-            await _unitOfWork.Repository<Domain.Models.Product>().AddAsync(produto);
-            await _unitOfWork.Commit();
+            await _productRepository.AddAsync(produto);
+            await _productRepository.Commit();
 
             await _productService.PublishProductAddedEvent(new ProductAddedDomainEvent
             {

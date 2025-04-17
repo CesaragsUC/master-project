@@ -1,6 +1,4 @@
 using Domain.Interfaces;
-using HybridRepoNet.Abstractions;
-using Infrastructure;
 using Moq;
 using Product.Application.Comands.Product;
 using Product.Application.Handlers.Product;
@@ -12,7 +10,7 @@ namespace Product.Api.Tests;
 
 public class CreateProductHandlerTest : BaseConfig
 {
-    private readonly Mock<IUnitOfWork<ProductDbContext>> _unitOfWork;
+    private readonly Mock<IProductRepository> _productRepository;
     private readonly Mock<IProductService> _productService;
     private readonly Mock<IBobStorageService> _bobStorageService;
     private readonly CreateProductHandler _handler;
@@ -20,10 +18,10 @@ public class CreateProductHandlerTest : BaseConfig
     {
         InitializeMediatrService();
 
-        _unitOfWork = new Mock<IUnitOfWork<ProductDbContext>>();
+        _productRepository = new Mock<IProductRepository>();
         _productService = new Mock<IProductService>();
         _bobStorageService = new Mock<IBobStorageService>();
-        _handler = new CreateProductHandler(_bobStorageService.Object, _productService.Object, _unitOfWork.Object);
+        _handler = new CreateProductHandler(_bobStorageService.Object, _productService.Object, _productRepository.Object);
     }
 
     [Fact(DisplayName = "Teste 01 - Com sucesso")]
@@ -39,14 +37,14 @@ public class CreateProductHandlerTest : BaseConfig
             Active = true
         };
 
-        _unitOfWork.Setup(r => r.Repository<Domain.Models.Product>().AddAsync(It.IsAny<Domain.Models.Product>())).Returns(Task.CompletedTask);
+        _productRepository.Setup(r => r.AddAsync(It.IsAny<Domain.Models.Product>())).Returns(Task.CompletedTask);
 
         var result = await _handler.Handle(command, CancellationToken.None);
 
         // Act
         Assert.True(result.Succeeded);
 
-        _unitOfWork.Verify(r => r.Repository<Domain.Models.Product>().AddAsync(It.IsAny<Domain.Models.Product>()), Times.Once);
+        _productRepository.Verify(r => r.AddAsync(It.IsAny<Domain.Models.Product>()), Times.Once);
     }
 
     [Fact(DisplayName = "Teste 02 - Com Falha")]
@@ -61,6 +59,6 @@ public class CreateProductHandlerTest : BaseConfig
 
         // Act
         Assert.False(result.Succeeded);
-        _unitOfWork.Verify(r => r.Repository<Domain.Models.Product>().AddAsync(It.IsAny<Domain.Models.Product>()), Times.Never);
+        _productRepository.Verify(r => r.AddAsync(It.IsAny<Domain.Models.Product>()), Times.Never);
     }
 }

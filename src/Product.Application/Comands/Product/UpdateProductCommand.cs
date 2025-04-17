@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿
+using MediatR;
 using ResultNet;
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
