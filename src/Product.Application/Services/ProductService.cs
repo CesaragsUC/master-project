@@ -1,9 +1,8 @@
 ﻿using Message.Broker.Abstractions;
-using Message.Broker.Services;
 using Messaging.Contracts.Events.Product;
+using Product.Application.Abstractions;
 using Product.Domain.Abstractions;
 using Product.Domain.Events;
-using Product.Infrastructure.RabbitMq;
 using Serilog;
 
 namespace Product.Application.Services;

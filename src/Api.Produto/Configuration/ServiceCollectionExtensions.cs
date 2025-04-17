@@ -1,10 +1,8 @@
-﻿using Domain.Interfaces;
-using Infrastructure.Services;
-using Microsoft.OpenApi.Models;
+﻿using Microsoft.OpenApi.Models;
 using Product.Application.Configurations;
 using Product.Application.Services;
 using Product.Domain.Abstractions;
-using Product.Infrastructure.RabbitMq;
+using Product.Infrastructure.Repository;
 using ResultNet;
 
 namespace Product.Api.Configuration;
@@ -13,13 +11,11 @@ public static class ServiceCollectionExtensions
 {
     public static void AddServices(this IServiceCollection services,IConfiguration configuration)
     {
-        services.AddScoped<IBobStorageService, BobStorageService>();
+
         services.AddScoped(typeof(IResult<>), typeof(Result<>));
         services.AddProductServices(configuration);
         services.AddSwaggerServices();
         services.AddApplicationServices(configuration);
-        services.AddScoped<IQueueService, QueueService>();
-
     }
 
     public static void AddSwaggerServices(this IServiceCollection services)
@@ -64,6 +60,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddProductServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IProductService, ProductService>();
+        services.AddScoped<IProductRepository, ProductRepository>();
         return services;
     }
 }

@@ -1,7 +1,5 @@
 ﻿using Domain.Interfaces;
 using FluentValidation;
-using HybridRepoNet.Abstractions;
-using Infrastructure;
 using MediatR;
 using Product.Application.Comands.Product;
 using Product.Application.Validation;
@@ -18,17 +16,17 @@ namespace Product.Application.Handlers.Product;
 public class UpdateProductHandler : IRequestHandler<UpdateProductCommand, Result<bool>>
 {
     private readonly IProductService _productService;
-    private readonly IUnitOfWork<ProductDbContext> _unitOfWork;
+    private readonly IProductRepository _productRepository;
     private readonly IBobStorageService _bobStorageService;
 
     public UpdateProductHandler(
         IBobStorageService bobStorageService,
         IProductService productService,
-        IUnitOfWork<ProductDbContext> unitOfWork)
+       IProductRepository productRepository)
     {
         _bobStorageService = bobStorageService;
         _productService = productService;
-        _unitOfWork = unitOfWork;
+        _productRepository = productRepository;
     }
 
     public async Task<Result<bool>> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
@@ -42,7 +40,7 @@ public class UpdateProductHandler : IRequestHandler<UpdateProductCommand, Result
                 return await Result<bool>.FailureAsync(400, validationResponse?.Errors?.ToList());
             }
 
-            var produto = _unitOfWork.Repository<Domain.Models.Product>().FindOne(x => x.Id == request.Id);
+            var produto = _productRepository.FindOne(request.Id);
 
             if (produto == null) return await Result<bool>.FailureAsync(400, $"Product {request.Id} not find");
 
@@ -53,8 +51,8 @@ public class UpdateProductHandler : IRequestHandler<UpdateProductCommand, Result
             if (!string.IsNullOrEmpty(request.ImageBase64))
                 produto.ImageUri = await UploadImage(request.ImageBase64, produto.ImageUri);
 
-            _unitOfWork.Repository<Domain.Models.Product>().Update(produto);
-            await _unitOfWork.Commit();
+            _productRepository.Update(produto);
+            await _productRepository.Commit();
 
             await _productService.PublishProductUpdatedEvent(new ProductUpdatedDomainEvent
             {

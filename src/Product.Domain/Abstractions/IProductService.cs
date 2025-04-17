@@ -10,4 +10,3 @@ public interface IProductService
 
     Task PublishProductDeletedEvent(ProductDeletedDomainEvent product);
 }
-

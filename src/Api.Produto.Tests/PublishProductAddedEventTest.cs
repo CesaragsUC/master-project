@@ -2,10 +2,10 @@
 using Message.Broker.Abstractions;
 using Messaging.Contracts.Events.Product;
 using Moq;
+using Product.Application.Abstractions;
 using Product.Application.Services;
 using Product.Domain.Abstractions;
 using Product.Domain.Events;
-using Product.Infrastructure.RabbitMq;
 
 namespace Product.Api.Tests;
 

@@ -7,7 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace Shared.Kernel.CloudConfig;
 
 [ExcludeFromCodeCoverage]
-public static class AzureConfig
+public static class AzureKeyVaultConfiguration
 {
     public static void AzureKeyVaultConfig(this IServiceCollection service, 
         IHostApplicationBuilder builder,

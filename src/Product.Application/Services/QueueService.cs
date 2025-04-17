@@ -1,8 +1,9 @@
 ﻿using Message.Broker.RabbitMq;
 using Microsoft.Extensions.Options;
+using Product.Application.Abstractions;
 using System.Diagnostics.CodeAnalysis;
 
-namespace Product.Infrastructure.RabbitMq;
+namespace Product.Application.Services;
 
 [ExcludeFromCodeCoverage]
 public class QueueService : IQueueService

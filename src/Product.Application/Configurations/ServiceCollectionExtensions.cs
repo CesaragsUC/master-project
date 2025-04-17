@@ -1,5 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Product.Application.Abstractions;
+using Product.Application.Services;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
@@ -13,6 +15,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddApplicationServices(this IServiceCollection services,
         IConfiguration configuration)
     {
+        services.AddScoped<IQueueService, QueueService>();
         services.AddMediatrService();
         services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
