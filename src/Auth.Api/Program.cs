@@ -55,6 +55,8 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
+//TODO?
+//https://www.milanjovanovic.tech/blog/better-request-tracing-with-user-context-in-asp-net-core?utm_source=LinkedIn&utm_medium=social&utm_campaign=21.04.2025
 
 app.MapGet("users/me", (ClaimsPrincipal claimsPrincipal) =>
 {

@@ -1,8 +1,7 @@
-﻿using HybridRepoNet.Abstractions;
-using Order.Application.Abstractions;
+﻿using Order.Application.Abstractions;
 using Order.Application.Dto;
 using Order.Application.Extentions;
-using Order.Infrastructure;
+using Order.Domain.Abstraction;
 using ResultNet;
 using Serilog;
 using System.Diagnostics.CodeAnalysis;
@@ -12,9 +11,9 @@ namespace Order.Application.Service;
 [ExcludeFromCodeCoverage]
 public class OrderService : IOrderService
 {
-    private readonly IUnitOfWork<OrderDbContext> _unitOfWork;
+    private readonly IOrderRepository _unitOfWork;
 
-    public OrderService(IUnitOfWork<OrderDbContext> unitOfWork)
+    public OrderService(IOrderRepository unitOfWork)
     {
         _unitOfWork = unitOfWork;
     }
@@ -23,7 +22,7 @@ public class OrderService : IOrderService
     {
         try
         {
-            await _unitOfWork.Repository<Domain.Entities.Order>().AddAsync(orderDto.ToOrder());
+            await _unitOfWork.AddAsync(orderDto.ToOrder());
             await _unitOfWork.Commit();
 
             return await Result<bool>.SuccessAsync(true);
@@ -40,13 +39,13 @@ public class OrderService : IOrderService
     {
         try
         {
-            var entity = await _unitOfWork.Repository<Domain.Entities.Order>().FindAsync(x => x.Id == id);
+            var entity = await _unitOfWork.FindAsync(x => x.Id == id);
             if (entity is null)
             {
                 return await Result<bool>.FailureAsync("Order not found");
             }
 
-            _unitOfWork.Repository<Domain.Entities.Order>().SoftDelete(entity);
+            _unitOfWork.SoftDelete(entity);
             await _unitOfWork.Commit();
 
             return await Result<bool>.SuccessAsync(true);
@@ -63,7 +62,7 @@ public class OrderService : IOrderService
     {
         try
         {
-            var order = await _unitOfWork.Repository<Domain.Entities.Order>().GetAllAsync(x => x.CustomerId == custumerId, o => o.Items);
+            var order = await _unitOfWork.GetAllAsync(x => x.CustomerId == custumerId, o => o.Items!);
 
             if (order is null)
             {
@@ -85,7 +84,7 @@ public class OrderService : IOrderService
     {
         try
         {
-            var order = await _unitOfWork.Repository<Domain.Entities.Order>().FindAsync(
+            var order = await _unitOfWork.FindAsync(
                 x => x.Id == orderId 
                 && x.CustomerId == customerId,
                 i => i.Items!);
@@ -109,7 +108,7 @@ public class OrderService : IOrderService
     {
         try
         {
-            var list = await _unitOfWork.Repository<Domain.Entities.Order>().GetAllAsync(1, 2, x => x.Items!);
+            var list = await _unitOfWork.GetAllAsync(1, 2, x => x.Items!);
 
             if (list is null)
             {
@@ -131,7 +130,7 @@ public class OrderService : IOrderService
     {
         try
         {
-            var order = await _unitOfWork.Repository<Domain.Entities.Order>().FindAsync(x => x.Id == orderDto.Id);
+            var order = await _unitOfWork.FindAsync(x => x.Id == orderDto.Id);
 
             if (order is null)
             {
@@ -142,7 +141,7 @@ public class OrderService : IOrderService
             order.Items = orderDto?.Items?.Select(x => x.ToOrderItem(order.Id));
             order.Status = orderDto!.Status;
 
-            _unitOfWork.Repository<Domain.Entities.Order>().Update(order);
+            _unitOfWork.Update(order);
 
             return await Result<bool>.SuccessAsync(true);
         }

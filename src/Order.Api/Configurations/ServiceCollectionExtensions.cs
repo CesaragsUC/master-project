@@ -1,6 +1,7 @@
 ﻿using Microsoft.OpenApi.Models;
 using Order.Application.Configurations;
-using Order.Infrastructure.RabbitMq;
+using Order.Order.Application.Abstractions;
+using Order.Order.Application.Services;
 
 namespace Order.Api.Configurations;
 
