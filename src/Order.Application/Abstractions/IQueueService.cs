@@ -1,4 +1,4 @@
-﻿namespace Order.Infrastructure.RabbitMq;
+﻿namespace Order.Order.Application.Abstractions;
 
 public interface IQueueService
 {

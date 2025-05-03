@@ -1,9 +1,8 @@
-﻿using HybridRepoNet.Abstractions;
-using MediatR;
+﻿using MediatR;
 using Message.Broker.Abstractions;
 using Messaging.Contracts.Events.Orders;
-using Order.Infrastructure;
-using Order.Infrastructure.RabbitMq;
+using Order.Domain.Abstraction;
+using Order.Order.Application.Abstractions;
 using Serilog;
 using Shared.Kernel.Core.Enuns;
 using System.Diagnostics.CodeAnalysis;
@@ -14,11 +13,11 @@ namespace Order.Application.Handlers.Events;
 public class OrderUpdateEventHandler :
     IRequestHandler<OrderUpdateddEvent, bool>
 {
-    private readonly IUnitOfWork<OrderDbContext> _unitOfWork;
+    private readonly IOrderRepository _unitOfWork;
     private readonly IRabbitMqService _rabbitMqService;
     private readonly IQueueService _queueService;
 
-    public OrderUpdateEventHandler(IUnitOfWork<OrderDbContext> unitOfWork,
+    public OrderUpdateEventHandler(IOrderRepository unitOfWork,
         IRabbitMqService rabbitMqService,
         IQueueService queueService)
     {
@@ -31,7 +30,7 @@ public class OrderUpdateEventHandler :
     {
         try
         {
-            var order = await _unitOfWork.Repository<Domain.Entities.Order>().FindAsync(x => x.Id == request.OrderId);
+            var order = await _unitOfWork.FindAsync(x => x.Id == request.OrderId);
 
             if (order is null)
             {
@@ -41,7 +40,7 @@ public class OrderUpdateEventHandler :
 
             order.Status = request.Status;
 
-            _unitOfWork.Repository<Domain.Entities.Order>().Update(order);
+            _unitOfWork.Update(order);
             await _unitOfWork.Commit();
 
             Log.Information("OrderId: {Id} - updated status to: {Status} - At: {Date}", order.Id, request.Status, DateTime.Now);

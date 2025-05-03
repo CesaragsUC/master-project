@@ -9,7 +9,6 @@
 		<PackageReference Include="HybridRepoNet" Version="3.0.6" />
 	</ItemGroup>
 	<ItemGroup>
-		<Folder Include="Abstraction\" />
 		<Folder Include="Validator\" />
 		<Folder Include="ValueObject\" />
 	</ItemGroup>

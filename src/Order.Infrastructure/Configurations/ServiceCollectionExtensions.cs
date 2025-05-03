@@ -4,6 +4,8 @@ using Keycloak.AuthServices.Authentication;
 using Keycloak.AuthServices.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Order.Domain.Abstraction;
+using Order.Infrastructure.Repository;
 using Product.Consumer.Configurations;
 using Shared.Kernel.FluentMigrator;
 using Shared.Kernel.Opentelemetry;
@@ -26,6 +28,8 @@ public static class ServiceCollectionExtensions
             (int)HealthCheck.Active,
             FluentMigrationConfig.LoadConnectionString(configuration, environment));
         services.AddKeycloakServices(configuration);
+
+        services.AddScoped<IOrderRepository, OrderRepository>();
     }
 
     public static void AddKeycloakServices(this IServiceCollection services, IConfiguration configuration)
