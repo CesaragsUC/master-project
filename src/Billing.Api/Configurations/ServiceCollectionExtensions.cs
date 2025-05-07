@@ -1,5 +1,6 @@
 ﻿using Billing.Application.Configurations;
-using Billing.Infrastructure.Configurations.RabbitMq;
+using Billing.Application.Service;
+using Billing.Domain.Abstractions;
 using Microsoft.OpenApi.Models;
 
 namespace Billing.Api.Configurations;

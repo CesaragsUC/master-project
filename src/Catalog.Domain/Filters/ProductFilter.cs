@@ -1,7 +1,9 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 
-namespace Catalog.Application.Filters;
+namespace Catalog.Domain.Filters;
 
+[ExcludeFromCodeCoverage]
 public class ProductFilter
 {
 

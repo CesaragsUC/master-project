@@ -1,5 +1,5 @@
-﻿using Catalog.Application.Abstractions;
-using Catalog.Application.Filters;
+﻿using Catalog.Domain.Abstractions;
+using Catalog.Domain.Filters;
 using Catalog.Domain.Models;
 using EasyMongoNet.Abstractions;
 using EasyMongoNet.Utils;

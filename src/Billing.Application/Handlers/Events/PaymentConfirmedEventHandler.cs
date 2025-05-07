@@ -1,7 +1,6 @@
-﻿using AutoMapper;
+﻿using Billing.Application.Service;
+using Billing.Domain.Abstractions;
 using Billing.Domain.Entities;
-using Billing.Infrastructure;
-using Billing.Infrastructure.Configurations.RabbitMq;
 using HybridRepoNet.Abstractions;
 using MediatR;
 using Message.Broker.Abstractions;
@@ -18,12 +17,12 @@ public class PaymentConfirmedEventHandler :
     IRequestHandler<PaymentConfirmedEvent, bool>
 {
 
-    private readonly IUnitOfWork<BillingContext> _unitOfWork;
+    private readonly IPaymentRepository _unitOfWork;
     private readonly IQueueService _queueService;
     private readonly IRabbitMqService _rabbitMqService;
 
     public PaymentConfirmedEventHandler(
-        IUnitOfWork<BillingContext> unitOfWork,
+        IPaymentRepository unitOfWork,
         IQueueService queueService,
         IRabbitMqService rabbitMqService)
     {
@@ -36,13 +35,13 @@ public class PaymentConfirmedEventHandler :
     {
         try
         {
-            var payment = await _unitOfWork.Repository<Payment>().FindAsync(x => x.OrderId == request.OrderId);
+            var payment = await _unitOfWork.FindAsync(x => x.OrderId == request.OrderId);
 
             if (payment is not null)
             {
                 payment.Status = (int)PaymentStatus.Completed;
 
-                _unitOfWork.Repository<Payment>().Update(payment);
+                _unitOfWork.Update(payment);
                 await _unitOfWork.Commit();
 
                 var orderUpdateMessage = new OrderUpdateddEvent()

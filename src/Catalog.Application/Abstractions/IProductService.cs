@@ -1,5 +1,5 @@
 ﻿using Catalog.Application.Dtos;
-using Catalog.Application.Filters;
+using Catalog.Domain.Filters;
 using Catalog.Domain.Models;
 
 namespace Catalog.Application.Abstractions;
