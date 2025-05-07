@@ -1,10 +1,12 @@
 ﻿using Billing.Domain.Abstractions;
 using Billing.Domain.Entities;
 using HybridRepoNet.Abstractions;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq.Expressions;
 
 namespace Billing.Infrastructure.Repository;
 
+[ExcludeFromCodeCoverage]
 public class PaymentRepository : IPaymentRepository
 {
     public readonly IUnitOfWork<BillingContext> _unitOfWork;
