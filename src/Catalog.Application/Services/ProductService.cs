@@ -1,8 +1,9 @@
 ﻿using AutoMapper;
 using Catalog.Application.Abstractions;
 using Catalog.Application.Dtos;
-using Catalog.Application.Filters;
 using Catalog.Application.Validation;
+using Catalog.Domain.Abstractions;
+using Catalog.Domain.Filters;
 using Catalog.Domain.Models;
 using EasyMongoNet.Abstractions;
 using FluentValidation;

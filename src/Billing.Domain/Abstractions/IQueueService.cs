@@ -1,4 +1,4 @@
-﻿namespace Billing.Infrastructure.Configurations.RabbitMq;
+﻿namespace Billing.Domain.Abstractions;
 
 public interface IQueueService
 {

@@ -1,13 +1,9 @@
 using AutoMapper;
-using AutoMapper.QueryableExtensions;
 using Billing.Application.Abstractions;
 using Billing.Application.Dtos;
 using Billing.Application.Service;
+using Billing.Domain.Abstractions;
 using Billing.Domain.Entities;
-using Billing.Infrastructure;
-using Billing.Infrastructure.Configurations.RabbitMq;
-using HybridRepoNet.Abstractions;
-using HybridRepoNet.Repository;
 using Message.Broker.Abstractions;
 using Moq;
 using Refit;
@@ -23,7 +19,7 @@ public class PaymentServiceTest
 {
 
     private readonly Mock<IMapper> _mapperMock;
-    private readonly Mock<IUnitOfWork<BillingContext>> _unitOfWorkMock;
+    private readonly Mock<IPaymentRepository> _unitOfWorkMock;
     private readonly Mock<IQueueService> _queueServiceMock;
     private readonly Mock<IOderApi> _oderApiMock;
     private readonly Mock<IRabbitMqService> _rabbitMqServiceMock;
@@ -31,7 +27,7 @@ public class PaymentServiceTest
 
     public PaymentServiceTest()
     {
-        _unitOfWorkMock = new Mock<IUnitOfWork<BillingContext>>();
+        _unitOfWorkMock = new Mock<IPaymentRepository>();
         _queueServiceMock = new Mock<IQueueService>();
         _oderApiMock = new Mock<IOderApi>();
         _rabbitMqServiceMock = new Mock<IRabbitMqService>();
@@ -79,7 +75,7 @@ public class PaymentServiceTest
 
         _oderApiMock.Setup(x => x.GetOrderAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(apiResponse);
 
-        _unitOfWorkMock.Setup(x => x.Repository<Payment>().AddAsync(It.IsAny<Payment>())).Returns(Task.CompletedTask);
+        _unitOfWorkMock.Setup(x => x.AddAsync(It.IsAny<Payment>())).Returns(Task.CompletedTask);
 
         _queueServiceMock.Setup(x => x.PaymentCreatedMessage).Returns(new Uri("queue:PaymentCreated"));
 
@@ -109,7 +105,7 @@ public class PaymentServiceTest
 
         _oderApiMock.Setup(x => x.GetOrderAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(apiResponse);
 
-        _unitOfWorkMock.Setup(x => x.Repository<Payment>().AddAsync(It.IsAny<Payment>())).
+        _unitOfWorkMock.Setup(x => x.AddAsync(It.IsAny<Payment>())).
             ThrowsAsync(new Exception("Error on create payment"));
 
         _queueServiceMock.Setup(x => x.PaymentCreatedMessage).Returns(new Uri("queue:PaymentCreated"));
@@ -125,18 +121,21 @@ public class PaymentServiceTest
         // Arrange
         var transactionId = "PAY-20250208224655442-f8a439d460ec4609ae77757e7f1fc22e";
 
-        _unitOfWorkMock.Setup(uow => uow.Repository<Payment>().SoftDeleteAsync(It.IsAny<Expression<Func<Payment, bool>>>()))
-            .Returns(Task.CompletedTask);
+        _unitOfWorkMock.Setup(uow => uow.SoftDelete(It.IsAny<Expression<Func<Payment, bool>>>()));
 
         // Act
         var result = await _paymentService.DeletePaymentAsync(transactionId);
+        // Fix for the CS1503 error: The issue is that the `SoftDelete` method is being called incorrectly. 
+        // It expects a `Payment` object, but an `Expression<Func<Payment, bool>>` is being passed instead. 
+        // The correct method to call is `SoftDeleteAsync`, which matches the provided argument type.
+
+        _unitOfWorkMock.Setup(uow => uow.SoftDelete(It.IsAny<Expression<Func<Payment, bool>>>()));
 
         // Assert
         Assert.True(result.Succeeded);
         Assert.Equal("Payment deleted", result!.Messages!.First());
 
-        _unitOfWorkMock.Verify(uow => uow.Repository<Payment>()
-        .SoftDeleteAsync(It.IsAny<Expression<Func<Payment, bool>>>()), Times.Once);
+        _unitOfWorkMock.Verify(uow => uow.SoftDelete(It.IsAny<Expression<Func<Payment, bool>>>()), Times.Once);
     }
 
     [Fact(DisplayName = "Test 04")]
@@ -147,14 +146,14 @@ public class PaymentServiceTest
         var transactionId = "PAY-20250208224655442-f8a439d460ec4609ae77757e7f1fc22e";
         var exception = new Exception("Error on delete payment");
 
-        _unitOfWorkMock.Setup(uow => uow.Repository<Payment>().SoftDeleteAsync(It.IsAny<Expression<Func<Payment, bool>>>()))
+        _unitOfWorkMock.Setup(uow => uow.SoftDelete(It.IsAny<Expression<Func<Payment, bool>>>()))
             .ThrowsAsync(exception);
 
         // Act & Assert
         var ex = await Assert.ThrowsAsync<Exception>(async () => await _paymentService.DeletePaymentAsync(transactionId));
         Assert.Equal(exception.Message, ex.Message);
 
-        _unitOfWorkMock.Verify(uow => uow.Repository<Payment>().SoftDeleteAsync(It.IsAny<Expression<Func<Payment, bool>>>()), Times.Once);
+        _unitOfWorkMock.Verify(uow => uow.SoftDelete(It.IsAny<Expression<Func<Payment, bool>>>()), Times.Once);
         _unitOfWorkMock.Verify(uow => uow.Commit(), Times.Never);
     }
 
@@ -171,7 +170,7 @@ public class PaymentServiceTest
 
         var paymentDtos = payments.Select(p => new PaymentDto { Id = p.Id, Amount = p.Amount }).ToList();
 
-        _unitOfWorkMock.Setup(x => x.Repository<Payment>().GetAllAsync()).ReturnsAsync(payments);
+        _unitOfWorkMock.Setup(x => x.GetAllAsync()).ReturnsAsync(payments);
         _mapperMock.Setup(x => x.Map<IEnumerable<PaymentDto>>(It.IsAny<IEnumerable<Payment>>())).Returns(paymentDtos);
 
         // Act
@@ -192,7 +191,7 @@ public class PaymentServiceTest
         var payment = new Payment { Id = Guid.NewGuid(), TransactionId = transactionId, Amount = 100 };
         var paymentDto = new PaymentDto { Id = payment.Id, TransactionId = payment.TransactionId, Amount = payment.Amount };
 
-        _unitOfWorkMock.Setup(x => x.Repository<Payment>().FindAsync(It.IsAny<Expression<Func<Payment, bool>>>())).ReturnsAsync(payment);
+        _unitOfWorkMock.Setup(x => x.FindAsync(It.IsAny<Expression<Func<Payment, bool>>>())).ReturnsAsync(payment);
         _mapperMock.Setup(x => x.Map<PaymentDto>(It.IsAny<Payment>())).Returns(paymentDto);
 
         // Act
@@ -222,7 +221,7 @@ public class PaymentServiceTest
 
         _oderApiMock.Setup(x => x.GetOrderAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(apiResponse);
 
-        _unitOfWorkMock.Setup(x => x.Repository<Payment>().AddAsync(It.IsAny<Payment>())).Returns(Task.CompletedTask);
+        _unitOfWorkMock.Setup(x => x.AddAsync(It.IsAny<Payment>())).Returns(Task.CompletedTask);
 
         _queueServiceMock.Setup(x => x.PaymentCreatedMessage).Returns(new Uri("queue:PaymentCreated"));
 
@@ -279,8 +278,8 @@ public class PaymentServiceTest
 
         _oderApiMock.Setup(x => x.GetOrderAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(apiResponse);
 
-        _unitOfWorkMock.Setup(x => x.Repository<Payment>().AddAsync(It.IsAny<Payment>())).Returns(Task.CompletedTask);
-        _unitOfWorkMock.Setup(x => x.Repository<Payment>().FindAsync(It.IsAny<Expression<Func<Payment, bool>>>())).ReturnsAsync(payment);
+        _unitOfWorkMock.Setup(x => x.AddAsync(It.IsAny<Payment>())).Returns(Task.CompletedTask);
+        _unitOfWorkMock.Setup(x => x.FindAsync(It.IsAny<Expression<Func<Payment, bool>>>())).ReturnsAsync(payment);
 
         _queueServiceMock.Setup(x => x.PaymentCreatedMessage).Returns(new Uri("queue:PaymentCreated"));
 
@@ -337,8 +336,8 @@ public class PaymentServiceTest
 
         _oderApiMock.Setup(x => x.GetOrderAsync(It.IsAny<Guid>(), It.IsAny<Guid>())).ReturnsAsync(apiResponse);
 
-        _unitOfWorkMock.Setup(x => x.Repository<Payment>().AddAsync(It.IsAny<Payment>())).Returns(Task.CompletedTask);
-        _unitOfWorkMock.Setup(x => x.Repository<Payment>().FindAsync(It.IsAny<Expression<Func<Payment, bool>>>())).ReturnsAsync(payment);
+        _unitOfWorkMock.Setup(x => x.AddAsync(It.IsAny<Payment>())).Returns(Task.CompletedTask);
+        _unitOfWorkMock.Setup(x => x.FindAsync(It.IsAny<Expression<Func<Payment, bool>>>())).ReturnsAsync(payment);
 
         _queueServiceMock.Setup(x => x.PaymentCreatedMessage).Returns(new Uri("queue:PaymentCreated"));
 

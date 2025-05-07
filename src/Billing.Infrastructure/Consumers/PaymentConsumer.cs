@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
+using Billing.Domain.Abstractions;
 using Billing.Domain.Execeptions;
-using Billing.Infrastructure.Configurations.RabbitMq;
 using MassTransit;
 using Message.Broker.Abstractions;
 using Message.Broker.RabbitMq;

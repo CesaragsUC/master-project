@@ -1,7 +1,7 @@
 ﻿using Bogus;
 using Catalog.Application.Abstractions;
 using Catalog.Application.Dtos;
-using Catalog.Application.Filters;
+using Catalog.Domain.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics.CodeAnalysis;

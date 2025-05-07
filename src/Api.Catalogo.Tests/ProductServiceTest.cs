@@ -1,9 +1,9 @@
 using Api.Catalogo.Mapping;
 using AutoMapper;
-using Catalog.Application.Abstractions;
 using Catalog.Application.Dtos;
-using Catalog.Application.Filters;
 using Catalog.Application.Services;
+using Catalog.Domain.Abstractions;
+using Catalog.Domain.Filters;
 using Catalog.Domain.Models;
 using Catalogo.Api.Tests;
 using EasyMongoNet.Abstractions;

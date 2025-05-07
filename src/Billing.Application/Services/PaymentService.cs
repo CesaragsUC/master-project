@@ -2,10 +2,8 @@
 using Billing.Application.Abstractions;
 using Billing.Application.Dtos;
 using Billing.Application.Extentions;
+using Billing.Domain.Abstractions;
 using Billing.Domain.Entities;
-using Billing.Infrastructure;
-using Billing.Infrastructure.Configurations.RabbitMq;
-using HybridRepoNet.Abstractions;
 using Message.Broker.Abstractions;
 using Messaging.Contracts.Events.Payments;
 using ResultNet;
@@ -18,14 +16,14 @@ namespace Billing.Application.Service;
 
 public class PaymentService : IPaymentService
 {
-    private readonly IUnitOfWork<BillingContext> _unitOfWork;
+    private readonly IPaymentRepository _unitOfWork;
     private readonly IQueueService _queueService;
     private readonly IOderApi _oderApi;
     private readonly IRabbitMqService _rabbitMqService;
     private readonly IMapper _mapper;
 
     public PaymentService(
-       IUnitOfWork<BillingContext> unitOfWork,
+       IPaymentRepository unitOfWork,
        IQueueService queueService,
         IOderApi oderApi,
         IRabbitMqService rabbitMqService,
@@ -52,8 +50,7 @@ public class PaymentService : IPaymentService
                 return await Result<bool>.FailureAsync(orderResult.Messages!);
             }
 
-            payment = await _unitOfWork.Repository<Payment>()
-                                       .FindAsync(x => x.OrderId == paymentDto.OrderId &&
+            payment = await _unitOfWork.FindAsync(x => x.OrderId == paymentDto.OrderId &&
                                                   x.CustomerId == paymentDto.CustomerId);
 
             if (payment is not null && 
@@ -71,7 +68,7 @@ public class PaymentService : IPaymentService
             {
                 payment = CreatePaymentEntity(paymentDto, orderResult!.Data!.ToOrder()!);
 
-                await _unitOfWork.Repository<Payment>().AddAsync(payment);
+                await _unitOfWork.AddAsync(payment);
                 await _unitOfWork.Commit();
 
                 paymentEvent = NewPaymentCreatedEvent(payment, orderResult!.Data!.ToOrder()!, paymentDto);
@@ -157,7 +154,7 @@ public class PaymentService : IPaymentService
     {
         try
         {
-            await _unitOfWork.Repository<Payment>().SoftDeleteAsync(x => x.TransactionId == transactionId);
+            await _unitOfWork.SoftDelete(x => x.TransactionId == transactionId);
             await _unitOfWork.Commit();
 
             return await Result<bool>.SuccessAsync("Payment deleted");
@@ -172,7 +169,7 @@ public class PaymentService : IPaymentService
 
     public async Task<Result<IEnumerable<PaymentDto>>> GetAllPaymentAsync()
     {
-        var result = await _unitOfWork.Repository<Payment>().GetAllAsync();
+        var result = await _unitOfWork.GetAllAsync();
 
         var listDto = _mapper.Map<IEnumerable<PaymentDto>>(result.Where(x => !x.IsDeleted).ToList());
 
@@ -181,7 +178,7 @@ public class PaymentService : IPaymentService
 
     public async Task<Result<PaymentDto>> GetPaymentAsync(string transactionId)
     {
-        var result = await _unitOfWork.Repository<Payment>().FindAsync(x => x.TransactionId == transactionId);
+        var result = await _unitOfWork.FindAsync(x => x.TransactionId == transactionId);
 
         var paymentDto = _mapper.Map<PaymentDto>(result);
 

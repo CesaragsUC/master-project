@@ -1,10 +1,10 @@
-﻿using Catalog.Application.Filters;
-using Catalog.Domain.Models;
-using EasyMongoNet.Utils;
+﻿//using Catalog.Application.Filters;
+//using Catalog.Domain.Models;
+//using EasyMongoNet.Utils;
 
-namespace Catalog.Application.Abstractions;
+//namespace Catalog.Application.Abstractions;
 
-public interface IProductRepository
-{
-    Task<PagedResult<Products>> GetAll(ProductFilter filter);
-}
+//public interface IProductRepository
+//{
+//    Task<PagedResult<Products>> GetAll(ProductFilter filter);
+//}

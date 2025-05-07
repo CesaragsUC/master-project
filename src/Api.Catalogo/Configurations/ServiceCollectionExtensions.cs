@@ -11,6 +11,7 @@ using Microsoft.OpenApi.Models;
 using Shared.Kernel.Opentelemetry;
 using ResultNet;
 using System.Reflection;
+using Catalog.Domain.Abstractions;
 
 namespace Catalogo.Api.Configurations;
 
