@@ -1,4 +1,6 @@
-﻿using Billing.Infrastructure.Consumers;
+﻿using Billing.Domain.Abstractions;
+using Billing.Infrastructure.Consumers;
+using Billing.Infrastructure.Repository;
 using HybridRepoNet.Configurations;
 using HybridRepoNet.Helpers;
 using Keycloak.AuthServices.Authentication;
@@ -36,7 +38,7 @@ public static class ServiceCollectionExtensions
         services.AddGrafanaSetup(configuration);
         services.AddKeycloakServices(configuration);
         services.AddFluentMigrationConfig(configuration, typeof(Migrations.CreateTablePayment).Assembly);
-
+        services.AddScoped<IPaymentRepository, PaymentRepository>();
         return services;
     }
     public static void AddKeycloakServices(this IServiceCollection services, IConfiguration configuration)
