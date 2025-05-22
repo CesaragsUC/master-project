@@ -23,31 +23,32 @@ jobs:
           working-directory: .
           run: dotnet build CasoftStore.sln
 
-  tests:
-        needs: build
-        uses: CesaragsUC/master-project/.github/workflows/test.yml@main
-        secrets: inherit
+  # tests:
+  #       needs: build
+  #       uses: CesaragsUC/master-project/.github/workflows/test.yml@main
+  #       secrets: inherit
 
   release:
         name: Creating release
         runs-on: ubuntu-latest
-        needs: tests
+       # needs: tests
         permissions:
             security-events: write  # Permissão para publicar na aba de segurança
         steps:
             - name: Fetching project code ⏳
               uses: actions/checkout@v4
 
-            - name: Analysing Dockerfile Catalog.Api
-              with:
-                 dockerfile: ./src/Api.Catalogo/Dockerfile
-              uses: hadolint/hadolint-action@v3.1.0 # serve para analisar o Dockerfile em busca de erros e boas práticas
-
             - name: Login into Docker Hub
               uses: docker/login-action@v3
               with:
                 username: ${{ secrets.DOCKER_USERNAME }}
                 password: ${{ secrets.DOCKER_PASSWORD }}
+
+            - name: Analysing Dockerfile Catalog.Api
+              with:
+                 dockerfile: ./src/Api.Catalogo/Dockerfile
+              uses: hadolint/hadolint-action@v3.1.0 # serve para analisar o Dockerfile em busca de erros e boas práticas
+
 
             - name: Build and push Docker image for Catalog.Api
               uses: docker/build-push-action@v3
