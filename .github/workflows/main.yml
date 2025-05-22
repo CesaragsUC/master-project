@@ -241,7 +241,7 @@ jobs:
                   sarif_file: trivy-results.sarif
 #--------------------------------------------------------------------------------------                  
   
-  deploy:
-        needs: release
-        uses: CesaragsUC/master-project/.github/workflows/deploy.yml@main
-        secrets: inherit
+  # deploy:
+  #       needs: release
+  #       uses: CesaragsUC/master-project/.github/workflows/deploy.yml@main
+  #       secrets: inherit
