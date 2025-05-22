@@ -68,10 +68,10 @@ jobs:
                 output: 'trivy-results.sarif'
                 severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'
 
-            - name: Upload Trivy scan results to GitHub Security tab
+            - name: Upload Catalog Trivy scan results to GitHub Security tab
               uses: github/codeql-action/upload-sarif@v3
               with:
-                  sarif_file: trivy-results.sarif                  
+                  sarif_file: catalog-results.sarif                  
 #--------------------------------------------------------------------------------------
   
             - name: Analysing Dockerfile Product.Api
@@ -94,10 +94,10 @@ jobs:
               with:
                 image-ref: ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-product:v${{ github.run_number }}
                 format: sarif
-                output: 'trivy-results.sarif'
+                output: 'product-results.sarif'
                 severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'         
                 
-            - name: Upload Trivy scan results to GitHub Security tab
+            - name: Upload Product Trivy scan results to GitHub Security tab
               uses: github/codeql-action/upload-sarif@v3
               with:
                   sarif_file: trivy-results.sarif  
@@ -122,10 +122,10 @@ jobs:
               with:
                 image-ref: ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-order:v${{ github.run_number }}
                 format: sarif
-                output: 'trivy-results.sarif'
+                output: 'order-results.sarif'
                 severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'         
 
-            - name: Upload Trivy scan results to GitHub Security tab
+            - name: Upload Order Trivy scan results to GitHub Security tab
               uses: github/codeql-action/upload-sarif@v3
               with:
                   sarif_file: trivy-results.sarif                  
@@ -150,10 +150,10 @@ jobs:
               with:
                 image-ref: ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-discount:v${{ github.run_number }}
                 format: sarif
-                output: 'trivy-results.sarif'
+                output: 'discount-results.sarif'
                 severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'
 
-            - name: Upload Trivy scan results to GitHub Security tab
+            - name: Upload Discount Trivy scan results to GitHub Security tab
               uses: github/codeql-action/upload-sarif@v3
               with:
                   sarif_file: trivy-results.sarif                  
@@ -178,11 +178,11 @@ jobs:
               with:
                 image-ref: ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-billing:v${{ github.run_number }}
                 format: sarif
-                output: 'trivy-results.sarif'
+                output: 'payment-results.sarif'
                 severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'                
 
 
-            - name: Upload Trivy scan results to GitHub Security tab
+            - name: Upload Payment Trivy scan results to GitHub Security tab
               uses: github/codeql-action/upload-sarif@v3
               with:
                   sarif_file: trivy-results.sarif  
@@ -207,10 +207,10 @@ jobs:
               with:
                 image-ref: ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-basket:v${{ github.run_number }}
                 format: sarif
-                output: 'trivy-results.sarif'
+                output: 'basket-results.sarif'
                 severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'                 
 
-            - name: Upload Trivy scan results to GitHub Security tab
+            - name: Upload Basket Trivy scan results to GitHub Security tab
               uses: github/codeql-action/upload-sarif@v3
               with:
                   sarif_file: trivy-results.sarif                  
@@ -235,10 +235,10 @@ jobs:
               with:
                 image-ref: ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-auth:v${{ github.run_number }}
                 format: sarif
-                output: 'trivy-results.sarif'
+                output: 'auth-results.sarif'
                 severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'
 
-            - name: Upload Trivy scan results to GitHub Security tab
+            - name: Upload Auth Trivy scan results to GitHub Security tab
               uses: github/codeql-action/upload-sarif@v3
               with:
                   sarif_file: trivy-results.sarif                  
@@ -263,10 +263,10 @@ jobs:
               with:
                 image-ref: ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-api-gateway:v${{ github.run_number }}
                 format: sarif
-                output: 'trivy-results.sarif'
+                output: 'gateway-results.sarif'
                 severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'
 
-            - name: Upload Trivy scan results to GitHub Security tab
+            - name: Upload Gateway Trivy scan results to GitHub Security tab
               uses: github/codeql-action/upload-sarif@v3
               with:
                   sarif_file: trivy-results.sarif
