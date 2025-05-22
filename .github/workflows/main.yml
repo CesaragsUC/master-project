@@ -20,7 +20,7 @@ jobs:
           with:
               dotnet-version: 8.0.300
         - name: Executing dotnet build
-          working-directory: ./src
+          working-directory: .
           run: dotnet build CasoftStore.sln
 
   tests:
