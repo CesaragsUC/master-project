@@ -71,7 +71,8 @@ jobs:
             - name: Upload Catalog Trivy scan results to GitHub Security tab
               uses: github/codeql-action/upload-sarif@v3
               with:
-                  sarif_file: catalog-results.sarif                  
+                  sarif_file: catalog-results.sarif 
+                  category: catalog                                   
 #--------------------------------------------------------------------------------------
   
             - name: Analysing Dockerfile Product.Api
@@ -101,6 +102,7 @@ jobs:
               uses: github/codeql-action/upload-sarif@v3
               with:
                   sarif_file: product-results.sarif  
+                  category: product                     
 #--------------------------------------------------------------------------------------
             - name: Analysing Dockerfile Order.Api
               with:
@@ -128,7 +130,8 @@ jobs:
             - name: Upload Order Trivy scan results to GitHub Security tab
               uses: github/codeql-action/upload-sarif@v3
               with:
-                  sarif_file: order-results.sarif                  
+                  sarif_file: order-results.sarif     
+                  category: order                                  
 #--------------------------------------------------------------------------------------
             - name: Analysing Dockerfile Discount.Api
               with:
@@ -156,7 +159,8 @@ jobs:
             - name: Upload Discount Trivy scan results to GitHub Security tab
               uses: github/codeql-action/upload-sarif@v3
               with:
-                  sarif_file: discount-results.sarif                  
+                  sarif_file: discount-results.sarif      
+                  category: discount            
 #--------------------------------------------------------------------------------------
             - name: Analysing Dockerfile Payment.Api
               with:
@@ -186,6 +190,7 @@ jobs:
               uses: github/codeql-action/upload-sarif@v3
               with:
                   sarif_file: payment-result.sarif  
+                  category: payment
 #--------------------------------------------------------------------------------------
             - name: Analysing Dockerfile Basket.Api
               with:
@@ -213,7 +218,8 @@ jobs:
             - name: Upload Basket Trivy scan results to GitHub Security tab
               uses: github/codeql-action/upload-sarif@v3
               with:
-                  sarif_file: basket-results.sarif                  
+                  sarif_file: basket-results.sarif        
+                  category: basket          
 #--------------------------------------------------------------------------------------
             - name: Analysing Dockerfile Auth.Api
               with:
@@ -241,7 +247,8 @@ jobs:
             - name: Upload Auth Trivy scan results to GitHub Security tab
               uses: github/codeql-action/upload-sarif@v3
               with:
-                  sarif_file: auth-results.sarif                  
+                  sarif_file: auth-results.sarif   
+                  category: auth               
 #--------------------------------------------------------------------------------------
             - name: Analysing Dockerfile Api.Gateway
               with:
@@ -270,6 +277,7 @@ jobs:
               uses: github/codeql-action/upload-sarif@v3
               with:
                   sarif_file: gateway-results.sarif
+                  category: gateway
 #--------------------------------------------------------------------------------------                  
   
   # deploy:
