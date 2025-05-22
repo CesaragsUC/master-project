@@ -1,29 +1,9 @@
-name: Code Quality and Deploy
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    types: [opened, synchronize, reopened]
 
-env:
-    DOTNET_VERSION: '8.0.x'
+name : Executing Tests
+on:
+    workflow_call:
 
 jobs:
-
-  build:
-    name: Executing build
-    runs-on: ubuntu-latest
-    steps:
-        - name: Fetching project code ⏳
-          uses: actions/checkout@v4
-        - name: Setup dotnet
-          uses: actions/setup-dotnet@v4
-          with:
-              dotnet-version: env.DOTNET_VERSION
-        - name: Executing dotnet build
-          working-directory: ./src
-          run: dotnet build CasoftStore.sln
 
   tests:
     name: Quality Gate ⚙️
