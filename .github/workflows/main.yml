@@ -7,7 +7,7 @@ on:
     types: [opened, synchronize, reopened]
 
 env:
-    DOTNET_VERSION: '8.0.x'
+    DOTNET_VERSION: '8.0.300'
 
 jobs:
 
@@ -20,7 +20,7 @@ jobs:
         - name: Setup dotnet
           uses: actions/setup-dotnet@v4
           with:
-              dotnet-version: env.DOTNET_VERSION
+              dotnet-version:${{env.DOTNET_VERSION}}
         - name: Executing dotnet build
           working-directory: ./src
           run: dotnet build CasoftStore.sln
