@@ -24,42 +24,224 @@ jobs:
           run: dotnet build CasoftStore.sln
 
   tests:
-    name: Quality Gate ⚙️
-    runs-on: ubuntu-latest
-    steps:
-      - name: Getting project code ⏳
-        uses: actions/checkout@v4
-      - name: Setup JDK
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'zulu'
-          java-version: '21'
+        needs: build
+        uses: CesaragsUC/master-project/.github/workflows/test.yml@main
+        secrets: inherit
 
-      - name: Setup dotnet
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 8.0.300   
+  release:
+        name: Creatin a release
+        runs-on: ubuntu-latest
+        needs: tests
+        permissions:
+            security-events: write  # Permissão para publicar na aba de segurança
+        steps:
+            - name: Fetching project code ⏳
+              uses: actions/checkout@v4
 
-      - name: Installing dotnet-coverage ⏳
-        run: dotnet tool install --global dotnet-coverage
+            - name: Analysing Dockerfile
+              with:
+                 dockerfile: ./src/Review-Filmes.Web/Dockerfile
+              uses: hadolint/hadolint-action@v3.1.0 # serve para analisar o Dockerfile em busca de erros e boas práticas
 
-      - name: Installing SonarQube ⏳
-        run: dotnet tool install --global dotnet-sonarscanner   
+            - name: Login into Docker Hub
+              uses: docker/login-action@v3
+              with:
+                username: ${{ secrets.DOCKER_USERNAME }}
+                password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and Analysis  🛠️
-        run: |
-          dotnet sonarscanner begin /o:"cesaragsuc" /k:"CesaragsUC_master-project" /d:sonar.host.url="https://sonarcloud.io" /d:sonar.token="${{ secrets.SONAR_TOKEN }}" /d:sonar.cs.vscoveragexml.reportsPaths=coverage.xml
-          dotnet build --configuration Release
-          dotnet-coverage collect 'dotnet test' -f xml -o 'coverage.xml'
-          dotnet sonarscanner end /d:sonar.token="${{ secrets.SONAR_TOKEN }}"
-      
-      - name: Analysing Quality Gate 👀🐞🧐
-        uses: sonarsource/sonarqube-quality-gate-action@master
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}   
-        with:
-          scanMetadataReportFile: ./.sonarqube/out/.sonar/report-task.txt
+            - name: Build and push Docker image for Catalog.Api
+              uses: docker/build-push-action@v3
+              with:
+                context: ./src
+                file: ./src/Catalog.Api/Dockerfile
+                push: true
+                tags: |
+                    ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-catalog:latest
+                    ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-catalog:v${{ github.run_number }}
 
-      - name: "SonarQube Quality Gate Status:"
-        run: echo "The Quality Gate status is ${{ steps.sonarqube-quality-gate-check.outputs.quality-gate-status }}"
+            - name: Run Trivy vulnerability scanner on Docker image for Catalog.Api
+              uses: aquasecurity/trivy-action@0.28.0
+              with:
+                image-ref: ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-catalog:v${{ github.run_number }}
+                format: sarif
+                output: 'trivy-results.sarif'
+                severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'
+
+            - name: Upload Trivy scan results to GitHub Security tab
+              uses: github/codeql-action/upload-sarif@v3
+              with:
+                  sarif_file: trivy-results.sarif                  
+#--------------------------------------------------------------------------------------
+            - name: Build and push Docker image for Product.Api
+              uses: docker/build-push-action@v3
+              with:
+                context: ./src
+                file: ./src/Product.Api/Dockerfile
+                push: true
+                tags: |
+                    ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-product:latest
+                    ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-product:v${{ github.run_number }}
+
+            - name: Run Trivy vulnerability scanner on Docker image for Product.Api
+              uses: aquasecurity/trivy-action@0.28.0
+              with:
+                image-ref: ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-product:v${{ github.run_number }}
+                format: sarif
+                output: 'trivy-results.sarif'
+                severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'         
+                
+            - name: Upload Trivy scan results to GitHub Security tab
+              uses: github/codeql-action/upload-sarif@v3
+              with:
+                  sarif_file: trivy-results.sarif  
+#--------------------------------------------------------------------------------------
+
+            - name: Build and push Docker image for Order.Api
+              uses: docker/build-push-action@v3
+              with:
+                context: ./src
+                file: ./src/Order.Api/Dockerfile
+                push: true
+                tags: |
+                    ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-order:latest
+                    ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-order:v${{ github.run_number }}
+
+            - name: Run Trivy vulnerability scanner on Docker image for Order.Api
+              uses: aquasecurity/trivy-action@0.28.0
+              with:
+                image-ref: ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-order:v${{ github.run_number }}
+                format: sarif
+                output: 'trivy-results.sarif'
+                severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'         
+
+            - name: Upload Trivy scan results to GitHub Security tab
+              uses: github/codeql-action/upload-sarif@v3
+              with:
+                  sarif_file: trivy-results.sarif                  
+#--------------------------------------------------------------------------------------
+
+            - name: Build and push Docker image for Discount.Api
+              uses: docker/build-push-action@v3
+              with:
+                context: ./src
+                file: ./src/Discount.Api/Dockerfile
+                push: true
+                tags: |
+                    ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-discount:latest
+                    ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-discount:v${{ github.run_number }}
+
+            - name: Run Trivy vulnerability scanner on Docker image for Discount.Api
+              uses: aquasecurity/trivy-action@0.28.0
+              with:
+                image-ref: ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-discount:v${{ github.run_number }}
+                format: sarif
+                output: 'trivy-results.sarif'
+                severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'
+
+            - name: Upload Trivy scan results to GitHub Security tab
+              uses: github/codeql-action/upload-sarif@v3
+              with:
+                  sarif_file: trivy-results.sarif                  
+#--------------------------------------------------------------------------------------
+
+            - name: Build and push Docker image for Payment.Api
+              uses: docker/build-push-action@v3
+              with:
+                context: ./src
+                file: ./src/Payment.Api/Dockerfile
+                push: true
+                tags: |
+                    ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-billing:latest
+                    ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-billing:v${{ github.run_number }}
+
+            - name: Run Trivy vulnerability scanner on Docker image for Payment.Api
+              uses: aquasecurity/trivy-action@0.28.0
+              with:
+                image-ref: ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-billing:v${{ github.run_number }}
+                format: sarif
+                output: 'trivy-results.sarif'
+                severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'                
+
+
+            - name: Upload Trivy scan results to GitHub Security tab
+              uses: github/codeql-action/upload-sarif@v3
+              with:
+                  sarif_file: trivy-results.sarif  
+#--------------------------------------------------------------------------------------
+
+            - name: Build and push Docker image for Basket.Api
+              uses: docker/build-push-action@v3
+              with:
+                context: ./src
+                file: ./src/Basket.Api/Dockerfile
+                push: true
+                tags: |
+                    ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-basket:latest
+                    ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-basket:v${{ github.run_number }}
+
+            - name: Run Trivy vulnerability scanner on Docker image for Basket.Api
+              uses: aquasecurity/trivy-action@0.28.0
+              with:
+                image-ref: ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-basket:v${{ github.run_number }}
+                format: sarif
+                output: 'trivy-results.sarif'
+                severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'                 
+
+            - name: Upload Trivy scan results to GitHub Security tab
+              uses: github/codeql-action/upload-sarif@v3
+              with:
+                  sarif_file: trivy-results.sarif                  
+#--------------------------------------------------------------------------------------
+
+            - name: Build and push Docker image for Auth.Api
+              uses: docker/build-push-action@v3
+              with:
+                context: ./src
+                file: ./src/Auth.Api/Dockerfile
+                push: true
+                tags: |
+                    ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-auth:latest
+                    ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-auth:v${{ github.run_number }}
+
+            - name: Run Trivy vulnerability scanner on Docker image for Auth.Api
+              uses: aquasecurity/trivy-action@0.28.0
+              with:
+                image-ref: ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-auth:v${{ github.run_number }}
+                format: sarif
+                output: 'trivy-results.sarif'
+                severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'
+
+            - name: Upload Trivy scan results to GitHub Security tab
+              uses: github/codeql-action/upload-sarif@v3
+              with:
+                  sarif_file: trivy-results.sarif                  
+#--------------------------------------------------------------------------------------
+
+            - name: Build and push Docker image for Api.Gateway
+              uses: docker/build-push-action@v3
+              with:
+                context: ./src
+                file: ./src/Api.Gateway/Dockerfile
+                push: true
+                tags: |
+                    ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-api-gateway:latest
+                    ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-api-gateway:v${{ github.run_number }}
+
+            - name: Run Trivy vulnerability scanner on Docker image for Api.Gateway
+              uses: aquasecurity/trivy-action@0.28.0
+              with:
+                image-ref: ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-api-gateway:v${{ github.run_number }}
+                format: sarif
+                output: 'trivy-results.sarif'
+                severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'
+
+            - name: Upload Trivy scan results to GitHub Security tab
+              uses: github/codeql-action/upload-sarif@v3
+              with:
+                  sarif_file: trivy-results.sarif
+#--------------------------------------------------------------------------------------                  
+  
+  deploy:
+        needs: release
+        uses: CesaragsUC/master-project/.github/workflows/deploy.yml@main
+        secrets: inherit
