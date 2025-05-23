@@ -10,7 +10,11 @@ on:
     types: [opened, synchronize, reopened,edited]
     
   workflow_dispatch:
-
+    inputs:
+      version:
+        description: "New version for all projects"
+        required: true 
+        type: string
 
 jobs:
 
@@ -34,42 +38,40 @@ jobs:
         uses: CesaragsUC/master-project/.github/workflows/test.yml@main
         secrets: inherit
 
-  # release:
-  #       name: Creating release
-  #       runs-on: ubuntu-latest
-  #      # needs: tests
-  #       permissions:
-  #           security-events: write  # Permissão para publicar na aba de segurança
-  #       outputs:
-  #           clean_version: ${{ steps.clean_version.outputs.clean_version }}
-  #       steps:
-  #           - name: Checkout code
-  #             uses: actions/checkout@v4
-  #             with:
-  #               fetch-depth: 0
-  #               fetch-tags: true
-  #           - name: Checkout code
-  #             uses: actions/checkout@v3
-  #             with:
-  #               fetch-depth: 0
-  #               fetch-tags: true
-
-  #           - name: Calculate Semantic Version tag
-  #             id: semver-tag
-  #             uses: gandarez/semver-action@v2.0.0
-  #             with:
-  #               branching_model: "trunk-based"
-  #               main_branch_name: "main"
-  #               major_regex: "(?i)^(.+:)?(release/.+)"
-  #               minor_regex: "(?i)^(.+:)?(feature/.+)"
-  #               patch_regex: "(?i)^(.+:)?(hotfix/.+)"
-  #               debug: "true"
-
-  #           - name: 🔖 Create Git Tag
-  #             uses: rickstaa/action-create-tag@v1.7.2
-  #             with:
-  #               tag: ${{ steps.semver-tag.outputs.semver_tag }}
-
-  #           - name: New tag version
-  #             run: |
-  #               echo "tag:  ${{ env.VERSION }}"
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Bump version and push tag
+        id: version_bump
+        uses: anothrNick/github-tag-action@1.61.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEFAULT_BRANCH: main
+          DEFAULT_BUMP: patch
+          WITH_V: true
+      - if: steps.version_bump.outputs.new_tag != steps.version_bump.outputs.old_tag
+        name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+             username: ${{ secrets.DOCKER_USERNAME }}
+             password: ${{ secrets.DOCKER_PASSWORD }}
+      - if: steps.version_bump.outputs.new_tag != steps.version_bump.outputs.old_tag
+        name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: ./src
+          file: ./src/Api.Catalogo/Dockerfile
+          tags: |
+             ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-catalog:latest
+             ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-catalog:${{ steps.version_bump.outputs.new_tag }}
+          push: true
