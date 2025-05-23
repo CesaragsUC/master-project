@@ -39,31 +39,34 @@ jobs:
         secrets: inherit
 
   release:
-        name: Creating release
-        runs-on: ubuntu-latest
-       # needs: tests
-        permissions:
-            security-events: write  # Permissão para publicar na aba de segurança
-        outputs:
-            clean_version: ${{ steps.clean_version.outputs.clean_version }}
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v4
-              with:
-                fetch-depth: 0
-                fetch-tags: true
-
-
-            - name: Set project versions
-              id: update
-              uses: vers-one/dotnet-project-version-updater@v1.7
-              with:
-                file: "src/Api.Catalogo/Catalog.Api.csproj"
-                version: ${{ github.event.inputs.version }}
-
-            - run: |
-                git config user.name "CesaragsUC"
-                git config user.email "cesar_ags@users.noreply.github.com"
-                git add .
-                git commit -m "Update project versions to ${{ steps.release.outputs.newVersion }}"
-                git push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Bump version and push tag
+        id: version_bump
+        uses: anothrNick/github-tag-action@1.61.0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DEFAULT_BRANCH: main
+          DEFAULT_BUMP: patch
+          WITH_V: true
+      - if: steps.version_bump.outputs.new_tag != steps.version_bump.outputs.old_tag
+        name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - if: steps.version_bump.outputs.new_tag != steps.version_bump.outputs.old_tag
+        name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          platforms: linux/amd64,linux/arm64
+          tags: drpsychick/githubtraffic:${{ steps.version_bump.outputs.new_tag }}
+          push: true
