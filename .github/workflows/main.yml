@@ -15,13 +15,6 @@ jobs:
     name: Executing build
     runs-on: ubuntu-latest
     steps:
-
-        - name: PR Conventional Commit Validation
-          uses:  ytanikin/pr-conventional-commits@1.4.0
-          with:
-            task_types: '["feat","fix","docs","test","ci","refactor","perf","chore","revert"]'
-            add_label: 'false'
-
         - name: Fetching project code ⏳
           uses: actions/checkout@v4
         - name: Setup dotnet
@@ -59,21 +52,12 @@ jobs:
                 fetch-depth: 0
                 fetch-tags: true
 
-            - name: Calculate Semantic Version tag
-              id: semver-tag
-              uses: gandarez/semver-action@v2.0.0
-              with:
-                branching_model: "trunk-based"
-                main_branch_name: "main"
-                major_regex: "(?i)^(.+:)?(release/.+)"
-                minor_regex: "(?i)^(.+:)?(feature/.+)"
-                patch_regex: "(?i)^(.+:)?(hotfix/.+)"
-                debug: "true"
+            - name: calculate version
+              id: calculate-version
+              uses: bitshifted/git-auto-semver@v2
 
-            - name: 🔖 Create Git Tag
-              uses: rickstaa/action-create-tag@v1.7.2
-              with:
-                tag: ${{ steps.semver-tag.outputs.semver_tag }}
+            - name: Use version
+              run: 'echo "Calculated version: ${{ steps.calculate-version.outputs.version-string }}"'
 
             - name: New tag version
               run: |
