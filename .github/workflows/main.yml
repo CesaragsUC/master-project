@@ -305,7 +305,7 @@ jobs:
   
   deploy:
         needs: release
-        uses: CesaragsUC/master-project/.github/workflows/deploy.yml@9fbea8dd26d1317f496beb720d0c03f7ee349014
+        uses: CesaragsUC/master-project/.github/workflows/deploy.yml@12b485b62f907074c201be8df4bae6e93a825255
         with:
             version: ${{ needs.release.outputs.clean_version }}
         secrets: inherit
