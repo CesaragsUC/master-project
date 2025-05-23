@@ -23,10 +23,10 @@ jobs:
           working-directory: .
           run: dotnet build CasoftStore.sln
 
-  # tests:
-  #       needs: build
-  #       uses: CesaragsUC/master-project/.github/workflows/test.yml@main
-  #       secrets: inherit
+  tests:
+        needs: build
+        uses: CesaragsUC/master-project/.github/workflows/test.yml@main
+        secrets: inherit
 
   release:
         name: Creating release
