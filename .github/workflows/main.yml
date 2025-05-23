@@ -54,22 +54,18 @@ jobs:
                 fetch-depth: 0
                 fetch-tags: true
 
-            - name: Calculate Semantic Version tag
-              id: semver-tag
-              uses: gandarez/semver-action@v2.0.0
-              with:
-                branching_model: "trunk-based"
-                main_branch_name: "main"
-                major_regex: "(?i)^(.+:)?(release/.+)"
-                minor_regex: "(?i)^(.+:)?(feature/.+)"
-                patch_regex: "(?i)^(.+:)?(hotfix/.+)"
-                debug: "true"
 
-            - name: 🔖 Create Git Tag
-              uses: rickstaa/action-create-tag@v1.7.2
+            - name: Set project versions
+              id: update
+              uses: vers-one/dotnet-project-version-updater@v1.7
               with:
-                tag: ${{ steps.semver-tag.outputs.semver_tag }}
+                file: |
+                  "**/*.csproj", "**/*.nuspec", "**/AssemblyInfo.cs"
+                version: ${{ github.event.inputs.version }}
 
-            - name: New tag version
-              run: |
-                echo "tag:  ${{ env.VERSION }}"
+            - run: |
+                git config user.name "CesaragsUC"
+                git config user.email "cesar_ags@users.noreply.github.com"
+                git add .
+                git commit -m "Update project versions to ${{ steps.release.outputs.newVersion }}"
+                git push
