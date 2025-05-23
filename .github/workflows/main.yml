@@ -69,6 +69,9 @@ jobs:
         name: Build and push
         uses: docker/build-push-action@v4
         with:
-          platforms: linux/amd64,linux/arm64
-          tags: drpsychick/githubtraffic:${{ steps.version_bump.outputs.new_tag }}
+          context: ./src
+          file: ./src/Api.Catalogo/Dockerfile
+          tags: |
+             ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-catalog:latest
+             ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-catalog:${{ steps.version_bump.outputs.new_tag }}
           push: true
