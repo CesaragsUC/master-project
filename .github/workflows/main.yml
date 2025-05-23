@@ -46,8 +46,7 @@ jobs:
               uses: reecetech/version-increment@2024.10.1
               id: version
               with:
-                scheme: semver
-                increment: patch
+                use_api: true
 
              # remove "-pre.317001b" from version. ex: 1.0.1-pre.317001b to v1.0.1
             - name: Clean version (remove pre-release)
