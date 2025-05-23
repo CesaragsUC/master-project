@@ -189,7 +189,7 @@ jobs:
             - name: Upload Payment Trivy scan results to GitHub Security tab
               uses: github/codeql-action/upload-sarif@v3
               with:
-                  sarif_file: payment-result.sarif  
+                  sarif_file: payment-results.sarif  
                   category: payment
 #--------------------------------------------------------------------------------------
             - name: Analysing Dockerfile Basket.Api
