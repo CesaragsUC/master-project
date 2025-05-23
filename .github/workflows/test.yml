@@ -5,7 +5,7 @@ on:
 
 jobs:
 
-  tests:
+  unit-tests:
     name: Quality Gate ⚙️
     runs-on: ubuntu-latest
     steps:
