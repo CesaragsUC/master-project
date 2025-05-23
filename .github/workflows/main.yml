@@ -41,6 +41,7 @@ jobs:
         runs-on: ubuntu-latest
        # needs: tests
         permissions:
+            contents: write
             security-events: write 
         outputs:
           new_tag: ${{ steps.version_bump.outputs.new_tag }}
