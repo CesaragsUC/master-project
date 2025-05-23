@@ -58,7 +58,7 @@ jobs:
               id: update
               uses: vers-one/dotnet-project-version-updater@v1.7
               with:
-                file: "src/Api.Catalogo"
+                file: "src/Api.Catalogo/Catalog.Api.csproj"
                 version: ${{ github.event.inputs.version }}
 
             - run: |
