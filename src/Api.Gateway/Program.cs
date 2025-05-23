@@ -31,7 +31,7 @@ try
 
     builder.Services.AddSwaggerGen(cf =>
     {
-        cf.SwaggerDoc("v1", new OpenApiInfo { Title = "Api Gateway", Version = "v1" });
+        cf.SwaggerDoc("v1", new OpenApiInfo { Title = "Api Gateway", Version = "v2" });
     });
 
     builder.Services.AddOceloConfigurations(builder.Configuration);

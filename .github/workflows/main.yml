@@ -61,41 +61,41 @@ jobs:
               run: |
                 echo "tag:  ${{ env.VERSION }}"
 
-            - name: Login into Docker Hub
-              uses: docker/login-action@v3
-              with:
-                username: ${{ secrets.DOCKER_USERNAME }}
-                password: ${{ secrets.DOCKER_PASSWORD }}
+            # - name: Login into Docker Hub
+            #   uses: docker/login-action@v3
+            #   with:
+            #     username: ${{ secrets.DOCKER_USERNAME }}
+            #     password: ${{ secrets.DOCKER_PASSWORD }}
 
-            - name: Analysing Dockerfile Catalog.Api
-              with:
-                 dockerfile: ./src/Api.Catalogo/Dockerfile
-              uses: hadolint/hadolint-action@v3.1.0 # serve para analisar o Dockerfile em busca de erros e boas práticas
+            # - name: Analysing Dockerfile Catalog.Api
+            #   with:
+            #      dockerfile: ./src/Api.Catalogo/Dockerfile
+            #   uses: hadolint/hadolint-action@v3.1.0 # serve para analisar o Dockerfile em busca de erros e boas práticas
 
 
-            - name: Build and push Docker image for Catalog.Api
-              uses: docker/build-push-action@v3
-              with:
-                context: ./src
-                file: ./src/Api.Catalogo/Dockerfile
-                push: true
-                tags: |
-                    ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-catalog:latest
-                    ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-catalog:${{ env.VERSION }}
+            # - name: Build and push Docker image for Catalog.Api
+            #   uses: docker/build-push-action@v3
+            #   with:
+            #     context: ./src
+            #     file: ./src/Api.Catalogo/Dockerfile
+            #     push: true
+            #     tags: |
+            #         ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-catalog:latest
+            #         ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-catalog:${{ env.VERSION }}
 
-            - name: Run Trivy vulnerability scanner on Docker image for Catalog.Api
-              uses: aquasecurity/trivy-action@0.28.0
-              with:
-                image-ref: ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-catalog:${{ env.VERSION }}
-                format: sarif
-                output: 'catalog-results.sarif'
-                severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'
+            # - name: Run Trivy vulnerability scanner on Docker image for Catalog.Api
+            #   uses: aquasecurity/trivy-action@0.28.0
+            #   with:
+            #     image-ref: ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-catalog:${{ env.VERSION }}
+            #     format: sarif
+            #     output: 'catalog-results.sarif'
+            #     severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'
 
-            - name: Upload Catalog Trivy scan results to GitHub Security tab
-              uses: github/codeql-action/upload-sarif@v3
-              with:
-                  sarif_file: catalog-results.sarif 
-                  category: catalog                                   
+            # - name: Upload Catalog Trivy scan results to GitHub Security tab
+            #   uses: github/codeql-action/upload-sarif@v3
+            #   with:
+            #       sarif_file: catalog-results.sarif 
+            #       category: catalog                                   
 # #--------------------------------------------------------------------------------------
   
 #             - name: Analysing Dockerfile Product.Api
