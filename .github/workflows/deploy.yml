@@ -1,6 +1,11 @@
 name : Deploy on ACA
 on:
     workflow_call:
+          inputs:
+            version:
+                required: true
+                type: string
+                description: 'version of the app to deploy'
 env:
     RESOURCE_GROUP: casoft
 
