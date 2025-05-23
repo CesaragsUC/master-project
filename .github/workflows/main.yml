@@ -42,8 +42,7 @@ jobs:
               uses: reecetech/version-increment@2024.10.1
               id: version
               with:
-                scheme: semver
-                increment: patch
+                release_branch: publish
 
             - name: Login into Docker Hub
               uses: docker/login-action@v3
