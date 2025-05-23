@@ -8,7 +8,13 @@ on:
     
   workflow_dispatch:
 
+permissions:
+  contents: read
 
+concurrency:
+  group: "${{ github.ref }}-${{ github.workflow }}"
+  cancel-in-progress: true
+  
 jobs:
 
   build:
@@ -55,6 +61,10 @@ jobs:
             - name: calculate version
               id: calculate-version
               uses: bitshifted/git-auto-semver@v2
+              with:
+                main_branch: master
+                create_tag: true
+                tag_prefix: 'tags'              
 
             - name: Use version
               run: 'echo "Calculated version: ${{ steps.calculate-version.outputs.version-string }}"'
