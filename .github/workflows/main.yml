@@ -23,278 +23,280 @@ jobs:
           working-directory: .
           run: dotnet build CasoftStore.sln
 
-  tests:
-        needs: build
-        uses: CesaragsUC/master-project/.github/workflows/test.yml@main
-        secrets: inherit
-
-  release:
-        name: Creating release
-        runs-on: ubuntu-latest
-       # needs: tests
-        permissions:
-            security-events: write  # Permissão para publicar na aba de segurança
-        steps:
-            - name: Fetching project code ⏳
-              uses: actions/checkout@v4
-
-            - name: Get next version
-              uses: reecetech/version-increment@2024.10.1
-              id: version
-              with:
-                scheme: semver
-                increment: patch
-
-            - name: Clean version (remove pre-release)
-              run: |
-                echo "VERSION=$(echo ${{ steps.version.outputs.version }} | cut -d'-' -f1)" >> $GITHUB_ENV
-            - name: New tag version
-              run: |
-                echo "tag:  ${{ env.VERSION }}"
-
-            - name: Login into Docker Hub
-              uses: docker/login-action@v3
-              with:
-                username: ${{ secrets.DOCKER_USERNAME }}
-                password: ${{ secrets.DOCKER_PASSWORD }}
-
-            - name: Analysing Dockerfile Catalog.Api
-              with:
-                 dockerfile: ./src/Api.Catalogo/Dockerfile
-              uses: hadolint/hadolint-action@v3.1.0 # serve para analisar o Dockerfile em busca de erros e boas práticas
-
-
-            - name: Build and push Docker image for Catalog.Api
-              uses: docker/build-push-action@v3
-              with:
-                context: ./src
-                file: ./src/Api.Catalogo/Dockerfile
-                push: true
-                tags: |
-                    ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-catalog:latest
-                    ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-catalog:${{ env.VERSION }}
-
-            - name: Run Trivy vulnerability scanner on Docker image for Catalog.Api
-              uses: aquasecurity/trivy-action@0.28.0
-              with:
-                image-ref: ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-catalog:${{ env.VERSION }}
-                format: sarif
-                output: 'catalog-results.sarif'
-                severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'
-
-            - name: Upload Catalog Trivy scan results to GitHub Security tab
-              uses: github/codeql-action/upload-sarif@v3
-              with:
-                  sarif_file: catalog-results.sarif 
-                  category: catalog                                   
-#--------------------------------------------------------------------------------------
-  
-            - name: Analysing Dockerfile Product.Api
-              with:
-                 dockerfile: ./src/Api.Produto/Dockerfile
-              uses: hadolint/hadolint-action@v3.1.0 
-
-            - name: Build and push Docker image for Product.Api
-              uses: docker/build-push-action@v3
-              with:
-                context: ./src
-                file: ./src/Api.Produto/Dockerfile
-                push: true
-                tags: |
-                    ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-product:latest
-                    ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-product:${{ env.VERSION }}
-
-            - name: Run Trivy vulnerability scanner on Docker image for Product.Api
-              uses: aquasecurity/trivy-action@0.28.0
-              with:
-                image-ref: ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-product:${{ env.VERSION }}
-                format: sarif
-                output: 'product-results.sarif'
-                severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'         
-                
-            - name: Upload Product Trivy scan results to GitHub Security tab
-              uses: github/codeql-action/upload-sarif@v3
-              with:
-                  sarif_file: product-results.sarif  
-                  category: product                     
-#--------------------------------------------------------------------------------------
-            - name: Analysing Dockerfile Order.Api
-              with:
-                 dockerfile: ./src/Order.Api/Dockerfile
-              uses: hadolint/hadolint-action@v3.1.0 
-
-            - name: Build and push Docker image for Order.Api
-              uses: docker/build-push-action@v3
-              with:
-                context: ./src
-                file: ./src/Order.Api/Dockerfile
-                push: true
-                tags: |
-                    ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-order:latest
-                    ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-order:${{ env.VERSION }}
-
-            - name: Run Trivy vulnerability scanner on Docker image for Order.Api
-              uses: aquasecurity/trivy-action@0.28.0
-              with:
-                image-ref: ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-order:${{ env.VERSION }}
-                format: sarif
-                output: 'order-results.sarif'
-                severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'         
-
-            - name: Upload Order Trivy scan results to GitHub Security tab
-              uses: github/codeql-action/upload-sarif@v3
-              with:
-                  sarif_file: order-results.sarif     
-                  category: order                                  
-#--------------------------------------------------------------------------------------
-            - name: Analysing Dockerfile Discount.Api
-              with:
-                 dockerfile: ./src/Discount.Api/Dockerfile
-              uses: hadolint/hadolint-action@v3.1.0 
-
-            - name: Build and push Docker image for Discount.Api
-              uses: docker/build-push-action@v3
-              with:
-                context: ./src
-                file: ./src/Discount.Api/Dockerfile
-                push: true
-                tags: |
-                    ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-discount:latest
-                    ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-discount:${{ env.VERSION }}
-
-            - name: Run Trivy vulnerability scanner on Docker image for Discount.Api
-              uses: aquasecurity/trivy-action@0.28.0
-              with:
-                image-ref: ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-discount:${{ env.VERSION }}
-                format: sarif
-                output: 'discount-results.sarif'
-                severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'
-
-            - name: Upload Discount Trivy scan results to GitHub Security tab
-              uses: github/codeql-action/upload-sarif@v3
-              with:
-                  sarif_file: discount-results.sarif      
-                  category: discount            
-#--------------------------------------------------------------------------------------
-            - name: Analysing Dockerfile Payment.Api
-              with:
-                 dockerfile: ./src/Billing.Api/Dockerfile
-              uses: hadolint/hadolint-action@v3.1.0 
-
-            - name: Build and push Docker image for Payment.Api
-              uses: docker/build-push-action@v3
-              with:
-                context: ./src
-                file: ./src/Billing.Api/Dockerfile
-                push: true
-                tags: |
-                    ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-billing:latest
-                    ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-billing:${{ env.VERSION }}
-
-            - name: Run Trivy vulnerability scanner on Docker image for Payment.Api
-              uses: aquasecurity/trivy-action@0.28.0
-              with:
-                image-ref: ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-billing:${{ env.VERSION }}
-                format: sarif
-                output: 'payment-results.sarif'
-                severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'                
-
-
-            - name: Upload Payment Trivy scan results to GitHub Security tab
-              uses: github/codeql-action/upload-sarif@v3
-              with:
-                  sarif_file: payment-results.sarif  
-                  category: payment
-#--------------------------------------------------------------------------------------
-            - name: Analysing Dockerfile Basket.Api
-              with:
-                 dockerfile: ./src/Basket.Api/Dockerfile
-              uses: hadolint/hadolint-action@v3.1.0 
-
-            - name: Build and push Docker image for Basket.Api
-              uses: docker/build-push-action@v3
-              with:
-                context: ./src
-                file: ./src/Basket.Api/Dockerfile
-                push: true
-                tags: |
-                    ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-basket:latest
-                    ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-basket:${{ env.VERSION }}
-
-            - name: Run Trivy vulnerability scanner on Docker image for Basket.Api
-              uses: aquasecurity/trivy-action@0.28.0
-              with:
-                image-ref: ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-basket:${{ env.VERSION }}
-                format: sarif
-                output: 'basket-results.sarif'
-                severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'                 
-
-            - name: Upload Basket Trivy scan results to GitHub Security tab
-              uses: github/codeql-action/upload-sarif@v3
-              with:
-                  sarif_file: basket-results.sarif        
-                  category: basket          
-#--------------------------------------------------------------------------------------
-            - name: Analysing Dockerfile Auth.Api
-              with:
-                 dockerfile: ./src/Auth.Api/Dockerfile
-              uses: hadolint/hadolint-action@v3.1.0 
-
-            - name: Build and push Docker image for Auth.Api
-              uses: docker/build-push-action@v3
-              with:
-                context: ./src
-                file: ./src/Auth.Api/Dockerfile
-                push: true
-                tags: |
-                    ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-auth:latest
-                    ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-auth:${{ env.VERSION }}
-
-            - name: Run Trivy vulnerability scanner on Docker image for Auth.Api
-              uses: aquasecurity/trivy-action@0.28.0
-              with:
-                image-ref: ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-auth:${{ env.VERSION }}
-                format: sarif
-                output: 'auth-results.sarif'
-                severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'
-
-            - name: Upload Auth Trivy scan results to GitHub Security tab
-              uses: github/codeql-action/upload-sarif@v3
-              with:
-                  sarif_file: auth-results.sarif   
-                  category: auth               
-#--------------------------------------------------------------------------------------
-            - name: Analysing Dockerfile Api.Gateway
-              with:
-                 dockerfile: ./src/Api.Gateway/Dockerfile
-              uses: hadolint/hadolint-action@v3.1.0 
-
-            - name: Build and push Docker image for Api.Gateway
-              uses: docker/build-push-action@v3
-              with:
-                context: ./src
-                file: ./src/Api.Gateway/Dockerfile
-                push: true
-                tags: |
-                    ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-api-gateway:latest
-                    ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-api-gateway:${{ env.VERSION }}
-
-            - name: Run Trivy vulnerability scanner on Docker image for Api.Gateway
-              uses: aquasecurity/trivy-action@0.28.0
-              with:
-                image-ref: ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-api-gateway:${{ env.VERSION }}
-                format: sarif
-                output: 'gateway-results.sarif'
-                severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'
-
-            - name: Upload Gateway Trivy scan results to GitHub Security tab
-              uses: github/codeql-action/upload-sarif@v3
-              with:
-                  sarif_file: gateway-results.sarif
-                  category: gateway
-#--------------------------------------------------------------------------------------                  
-  
-  # deploy:
-  #       needs: release
-  #       uses: CesaragsUC/master-project/.github/workflows/deploy.yml@main
+  # tests:
+  #       needs: build
+  #       uses: CesaragsUC/master-project/.github/workflows/test.yml@main
   #       secrets: inherit
+
+#   release:
+#         name: Creating release
+#         runs-on: ubuntu-latest
+#        # needs: tests
+#         permissions:
+#             security-events: write  # Permissão para publicar na aba de segurança
+#         steps:
+#             - name: Fetching project code ⏳
+#               uses: actions/checkout@v4
+
+#             - name: Get next version
+#               uses: reecetech/version-increment@2024.10.1
+#               id: version
+#               with:
+#                 scheme: semver
+#                 increment: patch
+
+#             - name: Clean version (remove pre-release)
+#               run: |
+#                 echo "VERSION=$(echo ${{ steps.version.outputs.version }} | cut -d'-' -f1)" >> $GITHUB_ENV
+#             - name: New tag version
+#               run: |
+#                 echo "tag:  ${{ env.VERSION }}"
+
+#             - name: Login into Docker Hub
+#               uses: docker/login-action@v3
+#               with:
+#                 username: ${{ secrets.DOCKER_USERNAME }}
+#                 password: ${{ secrets.DOCKER_PASSWORD }}
+
+#             - name: Analysing Dockerfile Catalog.Api
+#               with:
+#                  dockerfile: ./src/Api.Catalogo/Dockerfile
+#               uses: hadolint/hadolint-action@v3.1.0 # serve para analisar o Dockerfile em busca de erros e boas práticas
+
+
+#             - name: Build and push Docker image for Catalog.Api
+#               uses: docker/build-push-action@v3
+#               with:
+#                 context: ./src
+#                 file: ./src/Api.Catalogo/Dockerfile
+#                 push: true
+#                 tags: |
+#                     ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-catalog:latest
+#                     ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-catalog:${{ env.VERSION }}
+
+#             - name: Run Trivy vulnerability scanner on Docker image for Catalog.Api
+#               uses: aquasecurity/trivy-action@0.28.0
+#               with:
+#                 image-ref: ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-catalog:${{ env.VERSION }}
+#                 format: sarif
+#                 output: 'catalog-results.sarif'
+#                 severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'
+
+#             - name: Upload Catalog Trivy scan results to GitHub Security tab
+#               uses: github/codeql-action/upload-sarif@v3
+#               with:
+#                   sarif_file: catalog-results.sarif 
+#                   category: catalog                                   
+# #--------------------------------------------------------------------------------------
+  
+#             - name: Analysing Dockerfile Product.Api
+#               with:
+#                  dockerfile: ./src/Api.Produto/Dockerfile
+#               uses: hadolint/hadolint-action@v3.1.0 
+
+#             - name: Build and push Docker image for Product.Api
+#               uses: docker/build-push-action@v3
+#               with:
+#                 context: ./src
+#                 file: ./src/Api.Produto/Dockerfile
+#                 push: true
+#                 tags: |
+#                     ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-product:latest
+#                     ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-product:${{ env.VERSION }}
+
+#             - name: Run Trivy vulnerability scanner on Docker image for Product.Api
+#               uses: aquasecurity/trivy-action@0.28.0
+#               with:
+#                 image-ref: ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-product:${{ env.VERSION }}
+#                 format: sarif
+#                 output: 'product-results.sarif'
+#                 severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'         
+                
+#             - name: Upload Product Trivy scan results to GitHub Security tab
+#               uses: github/codeql-action/upload-sarif@v3
+#               with:
+#                   sarif_file: product-results.sarif  
+#                   category: product                     
+# #--------------------------------------------------------------------------------------
+#             - name: Analysing Dockerfile Order.Api
+#               with:
+#                  dockerfile: ./src/Order.Api/Dockerfile
+#               uses: hadolint/hadolint-action@v3.1.0 
+
+#             - name: Build and push Docker image for Order.Api
+#               uses: docker/build-push-action@v3
+#               with:
+#                 context: ./src
+#                 file: ./src/Order.Api/Dockerfile
+#                 push: true
+#                 tags: |
+#                     ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-order:latest
+#                     ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-order:${{ env.VERSION }}
+
+#             - name: Run Trivy vulnerability scanner on Docker image for Order.Api
+#               uses: aquasecurity/trivy-action@0.28.0
+#               with:
+#                 image-ref: ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-order:${{ env.VERSION }}
+#                 format: sarif
+#                 output: 'order-results.sarif'
+#                 severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'         
+
+#             - name: Upload Order Trivy scan results to GitHub Security tab
+#               uses: github/codeql-action/upload-sarif@v3
+#               with:
+#                   sarif_file: order-results.sarif     
+#                   category: order                                  
+# #--------------------------------------------------------------------------------------
+#             - name: Analysing Dockerfile Discount.Api
+#               with:
+#                  dockerfile: ./src/Discount.Api/Dockerfile
+#               uses: hadolint/hadolint-action@v3.1.0 
+
+#             - name: Build and push Docker image for Discount.Api
+#               uses: docker/build-push-action@v3
+#               with:
+#                 context: ./src
+#                 file: ./src/Discount.Api/Dockerfile
+#                 push: true
+#                 tags: |
+#                     ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-discount:latest
+#                     ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-discount:${{ env.VERSION }}
+
+#             - name: Run Trivy vulnerability scanner on Docker image for Discount.Api
+#               uses: aquasecurity/trivy-action@0.28.0
+#               with:
+#                 image-ref: ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-discount:${{ env.VERSION }}
+#                 format: sarif
+#                 output: 'discount-results.sarif'
+#                 severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'
+
+#             - name: Upload Discount Trivy scan results to GitHub Security tab
+#               uses: github/codeql-action/upload-sarif@v3
+#               with:
+#                   sarif_file: discount-results.sarif      
+#                   category: discount            
+# #--------------------------------------------------------------------------------------
+#             - name: Analysing Dockerfile Payment.Api
+#               with:
+#                  dockerfile: ./src/Billing.Api/Dockerfile
+#               uses: hadolint/hadolint-action@v3.1.0 
+
+#             - name: Build and push Docker image for Payment.Api
+#               uses: docker/build-push-action@v3
+#               with:
+#                 context: ./src
+#                 file: ./src/Billing.Api/Dockerfile
+#                 push: true
+#                 tags: |
+#                     ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-billing:latest
+#                     ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-billing:${{ env.VERSION }}
+
+#             - name: Run Trivy vulnerability scanner on Docker image for Payment.Api
+#               uses: aquasecurity/trivy-action@0.28.0
+#               with:
+#                 image-ref: ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-billing:${{ env.VERSION }}
+#                 format: sarif
+#                 output: 'payment-results.sarif'
+#                 severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'                
+
+
+#             - name: Upload Payment Trivy scan results to GitHub Security tab
+#               uses: github/codeql-action/upload-sarif@v3
+#               with:
+#                   sarif_file: payment-results.sarif  
+#                   category: payment
+# #--------------------------------------------------------------------------------------
+#             - name: Analysing Dockerfile Basket.Api
+#               with:
+#                  dockerfile: ./src/Basket.Api/Dockerfile
+#               uses: hadolint/hadolint-action@v3.1.0 
+
+#             - name: Build and push Docker image for Basket.Api
+#               uses: docker/build-push-action@v3
+#               with:
+#                 context: ./src
+#                 file: ./src/Basket.Api/Dockerfile
+#                 push: true
+#                 tags: |
+#                     ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-basket:latest
+#                     ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-basket:${{ env.VERSION }}
+
+#             - name: Run Trivy vulnerability scanner on Docker image for Basket.Api
+#               uses: aquasecurity/trivy-action@0.28.0
+#               with:
+#                 image-ref: ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-basket:${{ env.VERSION }}
+#                 format: sarif
+#                 output: 'basket-results.sarif'
+#                 severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'                 
+
+#             - name: Upload Basket Trivy scan results to GitHub Security tab
+#               uses: github/codeql-action/upload-sarif@v3
+#               with:
+#                   sarif_file: basket-results.sarif        
+#                   category: basket          
+# #--------------------------------------------------------------------------------------
+#             - name: Analysing Dockerfile Auth.Api
+#               with:
+#                  dockerfile: ./src/Auth.Api/Dockerfile
+#               uses: hadolint/hadolint-action@v3.1.0 
+
+#             - name: Build and push Docker image for Auth.Api
+#               uses: docker/build-push-action@v3
+#               with:
+#                 context: ./src
+#                 file: ./src/Auth.Api/Dockerfile
+#                 push: true
+#                 tags: |
+#                     ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-auth:latest
+#                     ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-auth:${{ env.VERSION }}
+
+#             - name: Run Trivy vulnerability scanner on Docker image for Auth.Api
+#               uses: aquasecurity/trivy-action@0.28.0
+#               with:
+#                 image-ref: ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-auth:${{ env.VERSION }}
+#                 format: sarif
+#                 output: 'auth-results.sarif'
+#                 severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'
+
+#             - name: Upload Auth Trivy scan results to GitHub Security tab
+#               uses: github/codeql-action/upload-sarif@v3
+#               with:
+#                   sarif_file: auth-results.sarif   
+#                   category: auth               
+# #--------------------------------------------------------------------------------------
+#             - name: Analysing Dockerfile Api.Gateway
+#               with:
+#                  dockerfile: ./src/Api.Gateway/Dockerfile
+#               uses: hadolint/hadolint-action@v3.1.0 
+
+#             - name: Build and push Docker image for Api.Gateway
+#               uses: docker/build-push-action@v3
+#               with:
+#                 context: ./src
+#                 file: ./src/Api.Gateway/Dockerfile
+#                 push: true
+#                 tags: |
+#                     ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-api-gateway:latest
+#                     ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-api-gateway:${{ env.VERSION }}
+
+#             - name: Run Trivy vulnerability scanner on Docker image for Api.Gateway
+#               uses: aquasecurity/trivy-action@0.28.0
+#               with:
+#                 image-ref: ${{ secrets.DOCKER_NAMESPACE }}/casoft-store-api-gateway:${{ env.VERSION }}
+#                 format: sarif
+#                 output: 'gateway-results.sarif'
+#                 severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'
+
+#             - name: Upload Gateway Trivy scan results to GitHub Security tab
+#               uses: github/codeql-action/upload-sarif@v3
+#               with:
+#                   sarif_file: gateway-results.sarif
+#                   category: gateway
+# #--------------------------------------------------------------------------------------                  
+  
+  deploy:
+#         #needs: release
+        uses: CesaragsUC/master-project/.github/workflows/deploy.yml@main
+        #with:
+            #version: ${{ env.VERSION }}
+        secrets: inherit
