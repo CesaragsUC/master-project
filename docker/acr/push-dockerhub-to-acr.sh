@@ -3,7 +3,7 @@
 # Baixa as imagens do DockerHub para maquina local e envia para o ACR
 
 set -e  # Faz o script parar se qualquer comando falhar
-DOCKERHUB_ALIAS="cesarags"
+DOCKERHUB_ALIAS="casoftlabs"
 ACR_NAME="casoftregistry"
 ACR_LOGIN_SERVER="$ACR_NAME.azurecr.io"
 
