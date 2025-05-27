@@ -2,8 +2,9 @@
 using Api.Gateway.Services;
 using Ocelot.Cache.CacheManager;
 using Ocelot.DependencyInjection;
+using Shared.Kernel.KeyCloackConfig;
 using Shared.Kernel.Opentelemetry;
-using Shared.Kernel.Models;
+using Shared.Kernel.Utils;
 
 
 namespace Api.Gateway.Configuration;
@@ -18,10 +19,14 @@ public static class ServiceCollectionExtensions
         services.AddAuthServices(configuration);
         services.AddCors(configuration);
         services.AddGrafanaSetup(configuration);
+        services.AddKeycloakServices(configuration);
+
+        if (EnvironmentCheck.IsProduction())
+            services.ConfigureDownstreamHostAndPortsPlaceholders(configuration);
 
     }
 
-    public static IServiceCollection AddOceloConfigurations(this IServiceCollection services, ConfigurationManager configuration)
+    public static IServiceCollection AddOcelotGatewayConfig(this IServiceCollection services, ConfigurationManager configuration)
     {
         var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 

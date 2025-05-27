@@ -22,7 +22,7 @@ try
 
     builder.Services.AddServices(builder.Configuration);
     builder.Services.AddInfra(builder.Configuration);
-
+    OpenTelemetrySetup.GrafanaOpenTelemetrySetup();
     builder.Services.AddExceptionHandler<ProductInvalidExceptionHandler>();
     builder.Services.AddExceptionHandler<InvalidExceptionHandler>();
     builder.Services.AddExceptionHandler<ProductNotFoundExceptionHandler>();

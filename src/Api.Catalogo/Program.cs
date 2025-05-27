@@ -25,7 +25,7 @@ try
     builder.Services.AzureKeyVaultConfig(builder, builder.Configuration, environment);
 
     builder.Services.AddServices(builder.Configuration);
-
+    OpenTelemetrySetup.GrafanaOpenTelemetrySetup();
 
     var app = builder.Build();
 

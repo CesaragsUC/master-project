@@ -12,6 +12,7 @@ using Microsoft.Extensions.Options;
 using Product.Infrastructure.Configurations.Azure;
 using Product.Infrastructure.RabbitMq;
 using Shared.Kernel.FluentMigrator;
+using Shared.Kernel.KeyCloackConfig;
 using Shared.Kernel.Opentelemetry;
 using System.Diagnostics.CodeAnalysis;
 
@@ -39,31 +40,6 @@ public static class ServiceCollectionExtensions
 
         return services;
     }
-
-    public static void AddKeycloakServices(this IServiceCollection services, IConfiguration configuration)
-    {
-        var authenticationOptions = configuration
-                    .GetSection(KeycloakAuthenticationOptions.Section)
-                    .Get<KeycloakAuthenticationOptions>();
-
-        var keyCloakConfig = configuration.GetSection("Keycloak:MetadataAddress");
-
-        services.AddKeycloakAuthentication(authenticationOptions!, options =>
-        {
-            options.MetadataAddress = keyCloakConfig.Value!;
-            options.RequireHttpsMetadata = false;
-        });
-
-
-        var authorizationOptions = configuration
-                                    .GetSection(KeycloakProtectionClientOptions.Section)
-                                    .Get<KeycloakProtectionClientOptions>();
-
-        services.AddKeycloakAuthorization(authorizationOptions!);
-
-    }
-
-
     public static void AddAzureBlobServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<BlobContainers>(configuration.GetSection("BlobContainers"));
@@ -81,13 +57,5 @@ public static class ServiceCollectionExtensions
         services.AddEasyMongoNet(configuration);
 
         return services;
-    }
-
-    private static string? GetConnectionString(IConfiguration configuration)
-    {
-        var connectionString = configuration["ConnectionStrings:PostgresConnection"];
-        var dataBaseName = configuration["ConnectionStrings:DataBaseName"];
-
-        return connectionString?.Replace("@DatabaseName", dataBaseName);
     }
 }

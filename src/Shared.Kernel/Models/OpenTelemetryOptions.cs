@@ -25,6 +25,7 @@ public class Jaeger
 public class OtlExporter
 {
     public string? EndPoint { get; set; }
+    public string? Headers { get; set; }
 }
 
 [ExcludeFromCodeCoverage]

@@ -4,9 +4,11 @@ using Api.Gateway.Dtos;
 using Api.Gateway.Services;
 using Microsoft.OpenApi.Models;
 using Ocelot.Middleware;
+using Ocelot.Values;
 using Serilog;
 using Shared.Kernel.CloudConfig;
 using Shared.Kernel.Opentelemetry;
+using System.Configuration;
 
 try
 {
@@ -31,11 +33,12 @@ try
 
     builder.Services.AddSwaggerGen(cf =>
     {
-        cf.SwaggerDoc("v1", new OpenApiInfo { Title = "Api Gateway", Version = "v1" });
+        cf.SwaggerDoc("v1", new OpenApiInfo { Title = "Api Gateway", Version = "v1.0.9" });
     });
 
-    builder.Services.AddOceloConfigurations(builder.Configuration);
+    builder.Services.AddOcelotGatewayConfig(builder.Configuration);
     builder.Services.AddServices(builder.Configuration);
+    OpenTelemetrySetup.GrafanaOpenTelemetrySetup();
 
     var _fontUri = builder.Configuration.GetSection("FrontEndUri").Get<FrontEndUri>();
 

@@ -10,7 +10,7 @@
       "UpstreamHttpMethod": [ "GET" ],
       "DownstreamHostAndPorts": [
         {
-          "Host": "casoft-store-catalog.thankfulmushroom-fe2ec090.eastus2.azurecontainerapps.io" // container name api catalog
+          "Host": "{casoft-store-catalog}"
         }
       ],
       "RateLimitOptions": {
@@ -28,7 +28,7 @@
       "UpstreamHttpMethod": [ "POST", "PUT", "DELETE" ], //verbos permitidos
       "DownstreamHostAndPorts": [
         {
-          "Host": "casoft-store-product.thankfulmushroom-fe2ec090.eastus2.azurecontainerapps.io" // container name api product
+          "Host": "{casoft-store-product}"
         }
       ],
       "RateLimitOptions": {
@@ -46,7 +46,7 @@
       "UpstreamHttpMethod": [ "GET", "POST" ],
       "DownstreamHostAndPorts": [
         {
-          "Host": "casoft-store-auth.thankfulmushroom-fe2ec090.eastus2.azurecontainerapps.io" // container name api auth
+          "Host": "{casoft-store-auth}"
         }
       ]
     },
@@ -57,7 +57,7 @@
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
       "DownstreamHostAndPorts": [
         {
-          "Host": "casoft-store-basket.thankfulmushroom-fe2ec090.eastus2.azurecontainerapps.io" //host api Basket
+          "Host": "{casoft-store-basket}"
         }
       ]
     },
@@ -68,7 +68,7 @@
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
       "DownstreamHostAndPorts": [
         {
-          "Host": "casoft-store-billing.thankfulmushroom-fe2ec090.eastus2.azurecontainerapps.io" //host api Billing
+          "Host": "{casoft-store-billing}"
         }
       ],
       "RateLimitOptions": {
@@ -86,7 +86,7 @@
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
       "DownstreamHostAndPorts": [
         {
-          "Host": "casoft-store-discount.thankfulmushroom-fe2ec090.eastus2.azurecontainerapps.io" //host api Discount
+          "Host": "{casoft-store-discount}"
         }
       ],
       "RateLimitOptions": {
@@ -104,7 +104,7 @@
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
       "DownstreamHostAndPorts": [
         {
-          "Host": "casoft-store-order.thankfulmushroom-fe2ec090.eastus2.azurecontainerapps.io" //host api Order
+          "Host": "{casoft-store-order}"
         }
       ],
       "RateLimitOptions": {
