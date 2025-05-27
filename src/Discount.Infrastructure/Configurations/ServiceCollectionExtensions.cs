@@ -5,6 +5,7 @@ using Keycloak.AuthServices.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Shared.Kernel.FluentMigrator;
+using Shared.Kernel.KeyCloackConfig;
 using Shared.Kernel.Opentelemetry;
 using System.Diagnostics.CodeAnalysis;
 
@@ -27,29 +28,5 @@ public static class ServiceCollectionExtensions
         services.AddKeycloakServices(configuration);
 
         return services;
-    }
-
-
-    public static void AddKeycloakServices(this IServiceCollection services, IConfiguration configuration)
-    {
-        var authenticationOptions = configuration
-                    .GetSection(KeycloakAuthenticationOptions.Section)
-                    .Get<KeycloakAuthenticationOptions>();
-
-        var keyCloakConfig = configuration.GetSection("Keycloak:MetadataAddress");
-
-        services.AddKeycloakAuthentication(authenticationOptions!, options =>
-        {
-            options.MetadataAddress = keyCloakConfig.Value!;
-            options.RequireHttpsMetadata = false;
-        });
-
-
-        var authorizationOptions = configuration
-                                    .GetSection(KeycloakProtectionClientOptions.Section)
-                                    .Get<KeycloakProtectionClientOptions>();
-
-        services.AddKeycloakAuthorization(authorizationOptions!);
-
     }
 }

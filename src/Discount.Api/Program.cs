@@ -21,11 +21,9 @@ builder.Services.AzureKeyVaultConfig(builder, builder.Configuration, environment
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddServices();
-
 builder.Services.AddInfra(builder.Configuration);
-
+OpenTelemetrySetup.GrafanaOpenTelemetrySetup();
 builder.Services.AddScoped<ICouponService, CouponService>();
-
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
 var app = builder.Build();

@@ -12,6 +12,7 @@ using Shared.Kernel.Opentelemetry;
 using ResultNet;
 using System.Reflection;
 using Catalog.Domain.Abstractions;
+using Shared.Kernel.KeyCloackConfig;
 
 namespace Catalogo.Api.Configurations;
 
@@ -26,7 +27,6 @@ public static class ServiceCollectionExtensions
         services.AddAutoMapper(Assembly.GetExecutingAssembly());
         services.MongoDbService(configuration);
         services.AddGrafanaSetup(configuration);
-
         services.AddSwaggerServices();
         services.AddKeycloakServices(configuration);
         services.AddAzureBlobServices(configuration);
@@ -74,22 +74,6 @@ public static class ServiceCollectionExtensions
             });
         });
 
-    }
-
-    public static void AddKeycloakServices(this IServiceCollection services, IConfiguration configuration)
-    {
-        var authenticationOptions = configuration
-                    .GetSection(KeycloakAuthenticationOptions.Section)
-                    .Get<KeycloakAuthenticationOptions>();
-
-        services.AddKeycloakAuthentication(authenticationOptions!);
-
-
-        var authorizationOptions = configuration
-                                    .GetSection(KeycloakProtectionClientOptions.Section)
-                                    .Get<KeycloakProtectionClientOptions>();
-
-        services.AddKeycloakAuthorization(authorizationOptions!);
     }
 
     public static void AddAzureBlobServices(this IServiceCollection services, IConfiguration configuration)

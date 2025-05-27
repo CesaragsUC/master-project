@@ -23,7 +23,7 @@ builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddServices(builder.Configuration);
 builder.Services.AddInfra(builder.Configuration);
-
+OpenTelemetrySetup.GrafanaOpenTelemetrySetup();
 
 var app = builder.Build();
 

@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Grafana.OpenTelemetry;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -62,6 +64,17 @@ public static class OpenTelemetrySetup
         });
 
         return services;
+    }
+
+    public static void GrafanaOpenTelemetrySetup()
+    {
+        using var tracerProvider = Sdk.CreateTracerProviderBuilder()
+                .UseGrafana()
+                .Build();
+
+        using var meterProvider = Sdk.CreateMeterProviderBuilder()
+            .UseGrafana()
+            .Build();
     }
 
     public static void SetupLogging(WebApplicationBuilder builder, IConfiguration configuration)
