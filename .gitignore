@@ -280,3 +280,4 @@ __pycache__/
 /docker/grafana
 /docker/loki
 /docker/prometheus/data
+/docker/config.alloy
