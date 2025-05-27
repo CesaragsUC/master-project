@@ -30,6 +30,9 @@ builder.Services.AddScoped<IAuthKeyCloakService, KeycloakAuthService>();
 builder.Services.AddScoped(typeof(IResult<>), typeof(Result<>));
 
 builder.Services.AddGrafanaSetup(builder.Configuration);
+OpenTelemetrySetup.GrafanaOpenTelemetrySetup();
+
+
 builder.Services.AddKeycloakWebApiAuthentication(builder.Configuration, KeycloakAuthenticationOptions.Section);
 
 builder.Services.AddKeycloakAuthorization(builder.Configuration, KeycloakAuthenticationOptions.Section);

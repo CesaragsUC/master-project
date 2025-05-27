@@ -3,13 +3,14 @@
 # Baixa as imagens do DockerHub para maquina local e envia para o ACR
 
 set -e  # Faz o script parar se qualquer comando falhar
-DOCKERHUB_ALIAS="cesarags"
+DOCKERHUB_ALIAS="casoftlabs"
+TAG="v1.0.9"
 ACR_NAME="casoftregistry"
 ACR_LOGIN_SERVER="$ACR_NAME.azurecr.io"
 
 # Lista das imagens que deseja buscar do Docker Hub e enviar para o ACR
 IMAGES=(
-    "${DOCKERHUB_ALIAS}/projeto-caotico:v3"
+    "${DOCKERHUB_ALIAS}/projeto-caotico:${TAG}"
 )
 
 # Login no Azure ACR

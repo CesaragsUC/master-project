@@ -25,6 +25,9 @@ jobs:
      name: Deploy
      runs-on: ubuntu-latest
      steps:
+      - name: New version recived
+        run: echo "New version is ${{ inputs.version }}"
+        
       - name: Azure Login
         uses: azure/login@v2
         with:
@@ -33,7 +36,7 @@ jobs:
       - name: Deploy to Azure Container CATALOG
         uses: azure/container-apps-deploy-action@v1
         with:
-          imageToDeploy: ${{ env.DOCKER_NAMESPACE }}/${{ vars.CONTAINER_APP_CATALOG }}:${{ github.run_number }}
+          imageToDeploy: ${{ env.DOCKER_NAMESPACE }}/${{ vars.CONTAINER_APP_CATALOG }}:${{ inputs.version }}
           resourceGroup: ${{ env.RESOURCE_GROUP }}
           containerAppName: ${{ env.CATALOG_CONTAINER_APP }}
           environmentVariables: |
@@ -42,7 +45,7 @@ jobs:
       - name: Deploy to Azure Container GATEWAY
         uses: azure/container-apps-deploy-action@v1
         with:
-          imageToDeploy: ${{ env.DOCKER_NAMESPACE }}/${{ vars.CONTAINER_APP_API_GATEWAY }}:${{ github.run_number }}
+          imageToDeploy: ${{ env.DOCKER_NAMESPACE }}/${{ vars.CONTAINER_APP_API_GATEWAY }}:${{ inputs.version }}
           resourceGroup: ${{ env.RESOURCE_GROUP }}
           containerAppName: ${{ env.GATEWAY_CONTAINER_APP }}
           environmentVariables: |
@@ -51,7 +54,7 @@ jobs:
       - name: Deploy to Azure Container AUTH
         uses: azure/container-apps-deploy-action@v1
         with:
-          imageToDeploy: ${{ env.DOCKER_NAMESPACE }}/${{ vars.CONTAINER_APP_AUTH }}:${{ github.run_number }}
+          imageToDeploy: ${{ env.DOCKER_NAMESPACE }}/${{ vars.CONTAINER_APP_AUTH }}:${{ inputs.version }}
           resourceGroup: ${{ env.RESOURCE_GROUP }}
           containerAppName: ${{ env.AUTH_CONTAINER_APP }}
           environmentVariables: |
@@ -60,7 +63,7 @@ jobs:
       - name: Deploy to Azure Container BASKET
         uses: azure/container-apps-deploy-action@v1
         with:
-          imageToDeploy: ${{ env.DOCKER_NAMESPACE }}/${{ vars.CONTAINER_APP_BASKET }}:${{ github.run_number }}
+          imageToDeploy: ${{ env.DOCKER_NAMESPACE }}/${{ vars.CONTAINER_APP_BASKET }}:${{ inputs.version }}
           resourceGroup: ${{ env.RESOURCE_GROUP }}
           containerAppName: ${{ env.BASKET_CONTAINER_APP }}
           environmentVariables: |
@@ -69,7 +72,7 @@ jobs:
       - name: Deploy to Azure Container BILLING
         uses: azure/container-apps-deploy-action@v1
         with:
-          imageToDeploy: ${{ env.DOCKER_NAMESPACE }}/${{ vars.CONTAINER_APP_BILLING }}:${{ github.run_number }}
+          imageToDeploy: ${{ env.DOCKER_NAMESPACE }}/${{ vars.CONTAINER_APP_BILLING }}:${{ inputs.version }}
           resourceGroup: ${{ env.RESOURCE_GROUP }}
           containerAppName: ${{ env.BILLING_CONTAINER_APP }}
           environmentVariables: |
@@ -78,7 +81,7 @@ jobs:
       - name: Deploy to Azure Container DISCOUNT
         uses: azure/container-apps-deploy-action@v1
         with:
-          imageToDeploy: ${{ env.DOCKER_NAMESPACE }}/${{ vars.CONTAINER_APP_DISCOUNT }}:${{ github.run_number }}
+          imageToDeploy: ${{ env.DOCKER_NAMESPACE }}/${{ vars.CONTAINER_APP_DISCOUNT }}:${{ inputs.version }}
           resourceGroup: ${{ env.RESOURCE_GROUP }}
           containerAppName: ${{ env.DISCOUNT_CONTAINER_APP }}
           environmentVariables: |
@@ -87,7 +90,7 @@ jobs:
       - name: Deploy to Azure Container ORDER
         uses: azure/container-apps-deploy-action@v1
         with:
-          imageToDeploy: ${{ env.DOCKER_NAMESPACE }}/${{ vars.CONTAINER_APP_ORDER }}:${{ github.run_number }}
+          imageToDeploy: ${{ env.DOCKER_NAMESPACE }}/${{ vars.CONTAINER_APP_ORDER }}:${{ inputs.version }}
           resourceGroup: ${{ env.RESOURCE_GROUP }}
           containerAppName: ${{ env.ORDER_CONTAINER_APP }}
           environmentVariables: |
@@ -96,7 +99,7 @@ jobs:
       - name: Deploy to Azure Container PRODUCT
         uses: azure/container-apps-deploy-action@v1
         with:
-          imageToDeploy: ${{ env.DOCKER_NAMESPACE }}/${{ vars.CONTAINER_APP_PRODUCT }}:${{ github.run_number }}
+          imageToDeploy: ${{ env.DOCKER_NAMESPACE }}/${{ vars.CONTAINER_APP_PRODUCT }}:${{ inputs.version }}
           resourceGroup: ${{ env.RESOURCE_GROUP }}
           containerAppName: ${{ env.PRODUCT_CONTAINER_APP }}
           environmentVariables: |
