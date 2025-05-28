@@ -23,7 +23,7 @@ public static class ServiceCollectionExtensions
 
         services.AddSwaggerGen(cf =>
         {
-            cf.SwaggerDoc("v1", new OpenApiInfo { Title = "Product Api", Version = "v1" });
+            cf.SwaggerDoc("v1", new OpenApiInfo { Title = "Casoft Product Api", Version = "v1" });
 
             // Configuração do esquema de segurança JWT para o Swagger
             cf.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme

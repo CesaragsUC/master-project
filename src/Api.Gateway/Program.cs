@@ -33,7 +33,7 @@ try
 
     builder.Services.AddSwaggerGen(cf =>
     {
-        cf.SwaggerDoc("v1", new OpenApiInfo { Title = "Api Gateway", Version = "v1.0.9" });
+        cf.SwaggerDoc("v1", new OpenApiInfo { Title = "Casoft Api Gateway", Version = "v1.0.10" });
     });
 
     builder.Services.AddOcelotGatewayConfig(builder.Configuration);
