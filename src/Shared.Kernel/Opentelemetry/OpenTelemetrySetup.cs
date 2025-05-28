@@ -41,7 +41,7 @@ public static class OpenTelemetrySetup
             .AddOtlpExporter(otlpOptions =>
             {
                 otlpOptions.Endpoint = new Uri(openTelemetryOptions.OtlExporter!.EndPoint!);
-                otlpOptions.Headers = !string.IsNullOrEmpty(openTelemetryOptions?.OtlExporter?.Headers) ?
+                otlpOptions.Headers = !string.IsNullOrEmpty(openTelemetryOptions.OtlExporter.Headers) ?
                                             openTelemetryOptions?.OtlExporter?.Headers :
                                             string.Empty;
             })
@@ -65,8 +65,8 @@ public static class OpenTelemetrySetup
             tracing.AddOtlpExporter(otlpOptions =>
             {
                 otlpOptions.Endpoint = new Uri(openTelemetryOptions.OtlExporter!.EndPoint!);
-                otlpOptions.Headers = !string.IsNullOrEmpty(openTelemetryOptions?.OtlExporter?.Headers) ?
-                                                            openTelemetryOptions?.OtlExporter?.Headers :
+                otlpOptions.Headers = !string.IsNullOrEmpty(openTelemetryOptions.OtlExporter.Headers) ?
+                                                            openTelemetryOptions.OtlExporter.Headers :
                                                             string.Empty;
             });
         });
