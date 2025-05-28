@@ -107,7 +107,11 @@ scrape_configs:
          - 'casoft-store-product:5256'
         labels:
           team: casoft-store-product
-
+          
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: 
+         - 'node-exporter:9100'
 
 alerting:
   alertmanagers:
@@ -115,3 +119,4 @@ alerting:
     static_configs:
       - targets: 
           - 'alertmanager:9093'
+          

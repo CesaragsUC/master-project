@@ -19,7 +19,7 @@ public static class ServiceCollectionExtensions
         services.AddAuthServices(configuration);
         services.AddCors(configuration);
         services.AddGrafanaSetup(configuration);
-        services.AddKeycloakServices(configuration);
+
 
         if (EnvironmentCheck.IsProduction())
             services.ConfigureDownstreamHostAndPortsPlaceholders(configuration);

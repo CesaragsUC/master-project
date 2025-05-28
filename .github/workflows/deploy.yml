@@ -8,7 +8,7 @@ on:
                 description: 'version of the app to deploy'
 env:
     RESOURCE_GROUP: casoft
-
+    DOCKER_NAMESPACE: casoftlabs
     # Container Apps
     # Ned to create a container app in Azure with exactly the same name.
     CATALOG_CONTAINER_APP: casoft-store-catalog
@@ -25,8 +25,10 @@ jobs:
      name: Deploy
      runs-on: ubuntu-latest
      steps:
+
       - name: New version recived
-        run: echo "New version is ${{ inputs.version }}"
+        run: |
+          echo "New version is ${{ inputs.version }}"
         
       - name: Azure Login
         uses: azure/login@v2

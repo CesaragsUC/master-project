@@ -427,20 +427,6 @@ services:
     ports:
       - "9090:9090"
 
-  alloy:
-    image: grafana/alloy:v1.8.2
-    container_name: alloy
-    command:
-      - 'run'
-      - '--server.http.listen-addr=0.0.0.0:12345'
-      - '--storage.path=/var/lib/alloy/data'
-      - '/etc/alloy/config.alloy'
-    volumes:
-      - ./config.alloy:/etc/alloy/config.alloy
-    ports:
-        - "12345:12345"
-
-
   alertview:
     image: cesarags/webhookuc:v2
     container_name: alertview
@@ -476,15 +462,44 @@ services:
       - ./tmp/config.yml:/tmp/config.yml  
     restart: always   
       
-  mongo-exporter:
-    image: fabricioveronez/mongo_exporter:latest
-    container_name: mongo-exporter
+  # coleta da maquina cpu, memory, disk etc..    
+  # https://grafana.com/grafana/dashboards/1860-node-exporter-full/
+  node-exporter:
+    image: prom/node-exporter:v1.9.1
+    container_name: node-exporter
+    restart: unless-stopped
     ports:
-      - "9216:9216"   
-    environment:
-      MONGODB_URI: ${MONGO_SERVER_URL}
-    depends_on:
-      - casoft-store-mongodb 
+      - "9100:9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)'
+      
+  # alloy:
+    # image: grafana/alloy:v1.8.3
+    # container_name: alloy
+    # volumes:
+      # - ./configs/config.alloy:/etc/alloy/config.alloy
+      # - /var/run/docker.sock:/var/run/docker.sock
+    # environment:
+      # - GRAFANA_CLOUD_OTLP_ENDPOINT=https://otlp-gateway-prod-sa-east-1.grafana.net/otlp
+      # - GRAFANA_CLOUD_INSTANCE_ID=898019
+      # - GRAFANA_CLOUD_API_KEY=glc_eyJvIjoiMTA5MjU0MCIsIm4iOiJzdGFjay04OTgwMTktb3RlbC1vbmJvYXJkaW5nLWNhc29mdC1zeXN0ZW0iLCJrIjoiOTY1ZzFlS3RVMjV1dzA4eE91UU56NXEwIiwibSI6eyJyIjoicHJvZC1zYS1lYXN0LTEifX0%3D
+    # ports:
+      # - "12345:12345"
+      # - "4317:4317"
+      # - "4318:4318"
+    # command:
+      # - run
+      # - --server.http.listen-addr=0.0.0.0:12345
+      # - --storage.path=/var/lib/alloy/data
+      # - /etc/alloy/config.alloy
+
      
 
 volumes:
@@ -512,7 +527,7 @@ networks:
     name: casoft-network
 
 
-# docker compose --project-name casoft-store up -d
-# docker compose --project-name casoft-store up --build -d
+# docker compose --project-name docker up -d
+# docker compose --project-name docker up --build -d
 # build manual , rodar no nivel dentro da pasta "src" :
 #ex: docker build -t casoftlabs/casoft-store-api-gateway:v1.0.9 -f Api.Gateway/Dockerfile .

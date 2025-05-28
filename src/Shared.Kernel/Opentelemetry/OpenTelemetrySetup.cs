@@ -41,11 +41,16 @@ public static class OpenTelemetrySetup
             .AddOtlpExporter(otlpOptions =>
             {
                 otlpOptions.Endpoint = new Uri(openTelemetryOptions.OtlExporter!.EndPoint!);
+                otlpOptions.Headers = !string.IsNullOrEmpty(openTelemetryOptions.OtlExporter.Headers) ?
+                                            openTelemetryOptions?.OtlExporter?.Headers :
+                                            string.Empty;
             })
             // Metrics provider from OpenTelemetry
             .AddAspNetCoreInstrumentation()
-            .AddMeter(openTelemetryOptions.AppName!)
             .AddRuntimeInstrumentation()
+            .AddProcessInstrumentation()
+            .AddMeter(openTelemetryOptions.AppName!)
+            .AddHttpClientInstrumentation()
             // Metrics provides by ASP.NET Core in .NET 8
             .AddMeter("Microsoft.AspNetCore.Hosting")
             .AddMeter("Microsoft.AspNetCore.Server.Kestrel")
@@ -60,6 +65,9 @@ public static class OpenTelemetrySetup
             tracing.AddOtlpExporter(otlpOptions =>
             {
                 otlpOptions.Endpoint = new Uri(openTelemetryOptions.OtlExporter!.EndPoint!);
+                otlpOptions.Headers = !string.IsNullOrEmpty(openTelemetryOptions.OtlExporter.Headers) ?
+                                                            openTelemetryOptions.OtlExporter.Headers :
+                                                            string.Empty;
             });
         });
 
@@ -74,6 +82,8 @@ public static class OpenTelemetrySetup
 
         using var meterProvider = Sdk.CreateMeterProviderBuilder()
             .UseGrafana()
+            .AddProcessInstrumentation()
+            .AddPrometheusHttpListener()
             .Build();
     }
 
