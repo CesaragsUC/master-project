@@ -25,10 +25,13 @@ jobs:
      name: Deploy
      runs-on: ubuntu-latest
      steps:
+      - name: Print all envs
+        run: printenv | sort
+
       - name: New version recived
         run: |
           echo "New version is ${{ inputs.version }}"
-          echo "ex: ${{ env.DOCKER_NAMESPACE }}/${{ vars.CONTAINER_APP_CATALOG }}:${{ inputs.version }}"
+          echo "ex: ${{ env.DOCKER_NAMESPACE }}/${{ env.CATALOG_CONTAINER_APP }}:${{ inputs.version }}"
         
       - name: Azure Login
         uses: azure/login@v2
