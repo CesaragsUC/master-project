@@ -311,7 +311,7 @@ jobs:
   
   deploy:
         #needs: release
-        uses: CesaragsUC/master-project/.github/workflows/deploy.yml@bcf7abf78d1db4328e068e7817775edf2e53a92b
+        uses: CesaragsUC/master-project/.github/workflows/deploy.yml@1a5fa571666ba687ca67fff29ccd7c4e2c80726e
         with:
             version: v1.0.11
         secrets: inherit
