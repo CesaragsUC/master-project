@@ -41,7 +41,7 @@ jobs:
       - name: Deploy to Azure Container CATALOG
         uses: azure/container-apps-deploy-action@v1
         with:
-          imageToDeploy: ${{ env.DOCKER_NAMESPACE }}/${{ vars.CONTAINER_APP_CATALOG }}:${{ inputs.version }}
+          imageToDeploy: casoftlabs/${{ vars.CONTAINER_APP_CATALOG }}:${{ inputs.version }}
           resourceGroup: ${{ env.RESOURCE_GROUP }}
           containerAppName: ${{ env.CATALOG_CONTAINER_APP }}
           environmentVariables: |
