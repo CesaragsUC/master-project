@@ -21,6 +21,9 @@ jobs:
   build:
     name: Executing build
     runs-on: ubuntu-latest
+    concurrency:
+      group: example-group
+      cancel-in-progress: true    
     steps:
       
         - name: Fetching project code ⏳
@@ -38,9 +41,13 @@ jobs:
         uses: CesaragsUC/master-project/.github/workflows/test.yml@main
         secrets: inherit
 
+  # maybe add to run with deploy?
   release:
         name: Creating release
         runs-on: ubuntu-latest
+        concurrency:
+          group: example-group
+          cancel-in-progress: true        
         needs: tests
         permissions:
             contents: write
