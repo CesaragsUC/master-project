@@ -1,5 +1,12 @@
 name : Deploy on ACA
 on:
+    workflow_dispatch: 
+      inputs:
+        version:
+          required: true
+          type: string
+          description: 'version of the app to deploy'
+
     workflow_call:
           inputs:
             version:
@@ -24,6 +31,9 @@ jobs:
    deploy:
      name: Deploy
      runs-on: ubuntu-latest
+     if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+     environment:
+        name: production
      steps:
 
       - name: New version recived
