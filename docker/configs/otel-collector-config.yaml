@@ -1,36 +1,47 @@
+# receivers são componentes que recebem dados de telemetria (traces, metrics, logs) de aplicações ou agentes
 receivers:
   otlp:
     protocols:
       grpc:
-        endpoint: 0.0.0.0:4317
+        endpoint: 0.0.0.0:4317 # escuta na porta 4317 para receber dados via gRPC
       http:
-        endpoint: 0.0.0.0:4318
+        endpoint: 0.0.0.0:4318 # escuta na porta 4318 para receber dados via HTTP.
 
+# adicionam funcionalidades extras ao collector.
 extensions:
-  health_check: {}
+  health_check: {} #  habilita um endpoint de health check (verificação de saúde) para saber se o collector está rodando corretamente.
 
+# exporters enviam dados processados para outros sistemas.
 exporters:
   otlp:
-    endpoint: jaeger:4317
+    endpoint: jaeger:4317 # envia dados OTLP para outro sistema, neste caso, para um serviço chamado jaeger na porta 4317 (provavelmente um Jaeger Collector rodando em outro container).
     tls:
-      insecure: true
+      insecure: true #  não usa TLS, conexão insegura (útil para ambientes de teste).
   prometheus:
-    endpoint: "0.0.0.0:8889"
+    endpoint: "0.0.0.0:8889" # expõe métricas no endpoint HTTP 0.0.0.0:8889 para serem coletadas pelo Prometheus.
     resource_to_telemetry_conversion:
-      enabled: true
+      enabled: true # converte atributos de recursos em labels de métricas.
   debug:
 #    verbosity: detailed
 
+# processors manipulam ou processam dados antes de exportá-los
 processors:
-  batch:
+  batch: # batch agrupa dados em lotes antes de exportar, melhorando desempenho e eficiência.
 
 service:
   pipelines:
     traces:
-      receivers: [otlp]
-      processors: [batch]
-      exporters: [otlp]
+      receivers: [otlp] # Recebe traces via OTLP.
+      processors: [batch] # Processa com batch.
+      exporters: [otlp] # Exporta para o Jaeger (otlp exporter).
     metrics:
       receivers: [otlp]
       processors: [batch]
-      exporters: [debug, prometheus]
+      exporters: [debug, prometheus] # Exporta para o Prometheus e para o debug (log).
+      
+      
+# Resumo:
+# Seu collector recebe traces e métricas via OTLP (gRPC e HTTP).
+# Traces são enviados para o Jaeger.
+# Métricas são expostas para Prometheus e também logadas para debug.
+# Usa processamento em lote para eficiência.      

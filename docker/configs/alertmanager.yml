@@ -1,16 +1,16 @@
 route:
-  receiver: 'Default'
-  group_by: ['alertname', 'team', 'instance']
-  group_wait: 30s
-  group_interval: 30s
-  repeat_interval: 30s
+  receiver: 'Default' # O receptor padrão para alertas que não casam com nenhuma sub-rota.
+  group_by: ['alertname', 'team', 'instance'] # Agrupa alertas com os mesmos valores dessas labels em uma única notificação.
+  group_wait: 30s # Espera até 30 segundos antes de enviar o primeiro alerta de um novo grupo (útil para agrupar alertas que chegam juntos).
+  group_interval: 30s # Tempo mínimo entre notificações para o mesmo grupo de alertas.
+  repeat_interval: 30s # intervalo para reenviar alertas não resolvidos.
   routes:
 
     - receiver: AlertGatewayApi
-      group_wait: 10s
+      group_wait: 10s # Espera só 10 segundos antes de enviar o alerta para esse grupo.
       match:
-        team: "casoft-api-gateway"
-      continue: true    
+        team: "casoft-api-gateway" # Se o alerta tiver a label team: "casoft-api-gateway", ele será enviado para o receiver AlertGatewayApi.
+      continue: true    # Depois de processar essa rota, o Alertmanager continua avaliando as próximas rotas (útil se você quiser enviar o mesmo alerta para múltiplos receivers).
 
     - receiver: AlertApiAuth
       group_wait: 10s
@@ -54,13 +54,13 @@ route:
         team: "casoft-store-product"
       continue: true
 
-    - receiver: AlertProductApi2
+    - receiver: AlertProductApiHigh
       group_wait: 10s
       match:
         team: "casoft-store-product"
       continue: true
 
-    - receiver: AlertProductApi3
+    - receiver: AlertProductApiLow
       group_wait: 10s
       match:
         team: "casoft-store-product"
@@ -75,7 +75,7 @@ route:
 receivers:
   - name: Default
     webhook_configs:
-      - url: 'http://alertview:8181/webhook'
+      - url: 'http://alertview:8181/webhook' # Envia os alertas para o endpoint HTTP http://alertview:8181/webhook.
 
   - name: AlertGatewayApi
     webhook_configs:
@@ -108,14 +108,22 @@ receivers:
   - name: AlertProductApi
     webhook_configs:
       - send_resolved: true
-        url: 'http://alertview:8181/webhook' 
+        url: 'http://alertview:8181/webhook' # Também envia para o mesmo endpoint, mas com send_resolved: true, ou seja, envia notificações tanto quando o alerta dispara quanto quando ele é resolvido.
 
-  - name: 'AlertProductApi2'
+  - name: 'AlertProductApiHigh'
     webhook_configs:
       - send_resolved: true
-        url: 'http://promteams:2000/high_priority_channel'
+        url: 'http://promteams:2000/high_priority_channel' # Envia alertas para um canal de alta prioridade em http://promteams:2000/high_priority_channel.
 
-  - name: 'AlertProductApi3'
+  - name: 'AlertProductApiLow'
     webhook_configs:
       - send_resolved: true
         url: 'http://promteams:2000/low_priority_channel'                                                     
+        
+
+# Fluxo resumido:
+# O Alertmanager recebe alertas do Prometheus.
+# Ele agrupa os alertas conforme group_by.
+# Se o alerta tiver team: "casoft-api-gateway", vai para o receiver AlertGatewayApi.
+# Caso não case com nenhuma sub-rota, vai para o receiver Default.
+# Os receivers definem para onde os alertas serão enviados (webhooks ou outros canais).        
