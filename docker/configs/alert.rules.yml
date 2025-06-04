@@ -10,12 +10,14 @@ groups:
       summary: "Muitas consultas"
       description: "O {{ $labels.instance }} Gateway API received to many requests ({{ $value }})"
 
-
+ # Este alerta monitora a taxa de requisições recebidas pela API "Product.Api" em cada instância.
+ # Se qualquer instância receber, em média, mais de 10 requisições por segundo durante pelo menos 30 segundos, o alerta será disparado.
+ # Isso pode indicar uma sobrecarga, ataque ou aumento inesperado de uso, e o Alertmanager pode notificar a equipe responsável com as informações configuradas
 - name: ProductAPI
   rules:
   - alert: ProductApiAlert - To many requests
     expr: sum(rate(http_server_request_duration_seconds_count{appName="Product.Api"}[1m])) by (instance) > 10
-    for: 30s # perido de tempo para disparar o alerta
+    for: 30s # O alerta só será disparado se a condição acima se mantiver verdadeira por pelo menos 30
     labels:
       team: casoft-store-product # serve para o alertmanager rotear o alerta, usado no arquivo alertmanager.yml
     annotations:
@@ -27,7 +29,7 @@ groups:
   rules:
   - alert: BasketApiAlert - To many requests
     expr: sum(rate(http_server_request_duration_seconds_count{appName="Basket.Api"}[1m])) by (instance) > 10
-    for: 30s # perido de tempo para disparar o alerta
+    for: 30s # O alerta só será disparado se a condição acima se mantiver verdadeira por pelo menos 30
     labels:
       team: casoft-store-basket # serve para o alertmanager rotear o alerta, usado no arquivo alertmanager.yml
     annotations:
@@ -38,7 +40,7 @@ groups:
   rules:
   - alert: BillingApiAlert - To many requests
     expr: sum(rate(http_server_request_duration_seconds_count{appName="Billing.Api"}[1m])) by (instance) > 10
-    for: 30s # perido de tempo para disparar o alerta
+    for: 30s # O alerta só será disparado se a condição acima se mantiver verdadeira por pelo menos 30
     labels:
       team: casoft-store-billing # serve para o alertmanager rotear o alerta, usado no arquivo alertmanager.yml
     annotations:
@@ -49,7 +51,7 @@ groups:
   rules:
   - alert: CatalogApiAlert - To many requests
     expr: sum(rate(http_server_request_duration_seconds_count{appName="Catalog.Api"}[1m])) by (instance) > 10
-    for: 30s # perido de tempo para disparar o alerta
+    for: 30s # O alerta só será disparado se a condição acima se mantiver verdadeira por pelo menos 30
     labels:
       team: casoft-store-catalog # serve para o alertmanager rotear o alerta, usado no arquivo alertmanager.yml
     annotations:
@@ -60,7 +62,7 @@ groups:
   rules:
   - alert: DiscountApiAlert - To many requests
     expr: sum(rate(http_server_request_duration_seconds_count{appName="Discount.Api"}[1m])) by (instance) > 10
-    for: 30s # perido de tempo para disparar o alerta
+    for: 30s # O alerta só será disparado se a condição acima se mantiver verdadeira por pelo menos 30
     labels:
       team: casoft-discount-api # serve para o alertmanager rotear o alerta, usado no arquivo alertmanager.yml
     annotations:
@@ -71,7 +73,7 @@ groups:
   rules:
   - alert: OrderApiAlert - To many requests
     expr: sum(rate(http_server_request_duration_seconds_count{appName="Order.Api"}[1m])) by (instance) > 10
-    for: 30s # perido de tempo para disparar o alerta
+    for: 30s # O alerta só será disparado se a condição acima se mantiver verdadeira por pelo menos 30
     labels:
       team: casoft-order-api # serve para o alertmanager rotear o alerta, usado no arquivo alertmanager.yml
     annotations:
@@ -82,7 +84,7 @@ groups:
   rules:
   - alert: AuthApiAlert - To many requests
     expr: sum(rate(http_server_request_duration_seconds_count{appName="Auth.Api"}[1m])) by (instance) > 10
-    for: 30s # perido de tempo para disparar o alerta
+    for: 30s # O alerta só será disparado se a condição acima se mantiver verdadeira por pelo menos 30
     labels:
       team: casoft-api-auth # serve para o alertmanager rotear o alerta, usado no arquivo alertmanager.yml
     annotations:
