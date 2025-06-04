@@ -383,7 +383,7 @@ services:
     restart: unless-stopped
 
   otel-collector:
-    image: otel/opentelemetry-collector:0.122.0
+    image: otel/opentelemetry-collector-contrib:0.122.0
     container_name: otel-collector
     command: ["--config=/etc/otel-collector-config.yaml"]
     volumes:
@@ -411,7 +411,6 @@ services:
     ports:
       - "16686:16686"
     restart: unless-stopped 
-
 
     
   # caso de erro sincronização time: https://stackoverflow.com/questions/42200734/how-to-re-synchronize-the-prometheus-time  
@@ -481,26 +480,49 @@ services:
       - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)'
       
   # alloy:
-    # image: grafana/alloy:v1.8.3
-    # container_name: alloy
-    # volumes:
-      # - ./configs/config.alloy:/etc/alloy/config.alloy
-      # - /var/run/docker.sock:/var/run/docker.sock
-    # environment:
-      # - GRAFANA_CLOUD_OTLP_ENDPOINT=https://otlp-gateway-prod-sa-east-1.grafana.net/otlp
-      # - GRAFANA_CLOUD_INSTANCE_ID=898019
-      # - GRAFANA_CLOUD_API_KEY=glc_eyJvIjoiMTA5MjU0MCIsIm4iOiJzdGFjay04OTgwMTktb3RlbC1vbmJvYXJkaW5nLWNhc29mdC1zeXN0ZW0iLCJrIjoiOTY1ZzFlS3RVMjV1dzA4eE91UU56NXEwIiwibSI6eyJyIjoicHJvZC1zYS1lYXN0LTEifX0%3D
+    # image: grafana/alloy:v1.7.5
     # ports:
-      # - "12345:12345"
-      # - "4317:4317"
-      # - "4318:4318"
-    # command:
-      # - run
-      # - --server.http.listen-addr=0.0.0.0:12345
-      # - --storage.path=/var/lib/alloy/data
-      # - /etc/alloy/config.alloy
+      # - 12345:12345
+      # - 4318:4318
+      # - 4317:4317
+    # volumes:
+      # - ./config.alloy:/etc/alloy/config.alloy
+    # command: run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
+    # depends_on:
+      # - loki
 
-     
+  # Tempo
+  # Tempo runs as user 10001, and docker compose creates the volume as root.
+  # As such, we need to chown the volume in order for Tempo to start correctly.
+  init:
+    image: &tempoImage grafana/tempo:2.7.1
+    user: root
+    entrypoint:
+      - "chown"
+      - "10001:10001"
+      - "/var/tempo"
+    volumes:
+      - ./tempo-data:/var/tempo
+
+  memcached:
+    image: memcached:1.6.29
+    container_name: memcached
+    ports:
+      - "11211:11211"
+    environment:
+      - MEMCACHED_MAX_MEMORY=64m  # Set the maximum memory usage
+      - MEMCACHED_THREADS=4       # Number of threads to use
+
+  tempo:
+    image: *tempoImage
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    volumes:
+      - ./tempo.yaml:/etc/tempo.yaml
+    ports:
+      - "3200:3200"   # tempo
+    depends_on:
+      - init
+      - memcached     
 
 volumes:
   mongo_vol:

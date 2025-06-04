@@ -1,11 +1,11 @@
-auth_enabled: false
+auth_enabled: false # Desativa autenticação no Loki. Qualquer um pode acessar as APIs e endpoints do Loki sem precisar de autenticação.
 
 server:
   http_listen_port: 3100
-  http_server_read_timeout: 20m
-  http_server_write_timeout: 20m
-  grpc_server_max_recv_msg_size: 104857600
-  grpc_server_max_send_msg_size: 104857600
+  http_server_read_timeout: 20m # Tempo máximo que o servidor vai esperar para ler uma requisição (20 minutos).
+  http_server_write_timeout: 20m # Tempo máximo que o servidor vai esperar para escrever uma resposta (20 minutos).
+  grpc_server_max_recv_msg_size: 104857600 # Tamanho máximo de mensagem recebida via gRPC (100 MB).
+  grpc_server_max_send_msg_size: 104857600 # Tamanho máximo de mensagem enviada via gRPC (100 MB).
 #  cors:
 #    allowed_origins: ["*"]  # You can replace "*" with the specific domains you want to allow
 #    allowed_methods: ["GET", "POST", "OPTIONS", "DELETE", "PUT"]
@@ -14,28 +14,28 @@ server:
 #    allow_credentials: false
 
 common:
-  path_prefix: /loki
+  path_prefix: /loki # Define o prefixo de caminho onde os dados e arquivos do Loki serão armazenados.
   storage:
     filesystem:
-      chunks_directory: /loki/chunks
-      rules_directory: /loki/rules
-  replication_factor: 1
+      chunks_directory: /loki/chunks # Onde os arquivos de chunks (blocos de logs) serão salvos no disco.
+      rules_directory: /loki/rules # Onde as regras de alertas do Loki serão salvas.
+  replication_factor: 1 # Define o fator de replicação dos dados. Com valor 1, não há replicação (apenas uma cópia dos dados).
   ring:
     kvstore:
-      store: inmemory
+      store: inmemory # O anel de distribuição de dados (ring) usa armazenamento em memória para manter o estado. Isso é comum em ambientes de teste ou instâncias únicas (não recomendado para produção com alta disponibilidade).
 
 schema_config:
   configs:
-    - from: 2020-10-24
-      store: boltdb-shipper
-      object_store: filesystem
-      schema: v11
+    - from: 2020-10-24 # A partir dessa data, esta configuração de schema entra em vigor.
+      store: boltdb-shipper # O Loki usa o boltdb-shipper para armazenar índices localmente e sincronizá-los com o armazenamento de objetos.
+      object_store: filesystem # O armazenamento de objetos dos logs será no próprio sistema de arquivos, não em nuvem.
+      schema: v11 # Versão do schema usado para organizar os dados.
       index:
-        prefix: index_
-        period: 24h
+        prefix: index_ # Prefixo dos arquivos de índice.
+        period: 24h # Cria um novo índice a cada 24 horas.
 
 ruler:
-  alertmanager_url: http://localhost:9093
+  alertmanager_url: http://localhost:9093 # Endereço do Alertmanager para onde o Loki enviará alertas configurados nas regras.
 
 # By default, Loki will send anonymous, but uniquely-identifiable usage and configuration
 # analytics to Grafana Labs. These statistics are sent to https://stats.grafana.org/

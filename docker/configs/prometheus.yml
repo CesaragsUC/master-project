@@ -1,21 +1,21 @@
 global:
-  scrape_interval: 15s
-  scrape_timeout: 10s
-  evaluation_interval: 15s
+  scrape_interval: 15s # Prometheus coleta (scrape) as métricas dos targets a cada 15 segundos (padrão global).
+  scrape_timeout: 10s # Se a coleta demorar mais de 10 segundos, ela é cancelada.
+  evaluation_interval: 15s # As regras (alertas, gravações) são avaliadas a cada 15 segundos.
 
 rule_files:
-  - "/etc/prometheus/alert.rules.yml"
+  - "/etc/prometheus/alert.rules.yml" # Lista de arquivos de regras que o Prometheus irá carregar.
 
 scrape_configs:
-  - job_name: prometheus
+  - job_name: prometheus # Nome do job de scrape
     static_configs:
-    - targets: 
+    - targets:  # Prometheus coleta métricas dele mesmo, acessando o endpoint de métricas local.
         - 'localhost:9090'
 
-  - job_name: 'otel-collector'
-    scrape_interval: 5s
+  - job_name: 'otel-collector' # Nome do job para o OpenTelemetry Collector.
+    scrape_interval: 5s # Frequência de coleta para esse job é de 5 segundos (mais frequente que o global).
     static_configs:
-      - targets: ['otel-collector:8889']
+      - targets: ['otel-collector:8889'] # Prometheus coleta métricas do endpoint do otel-collector exposto na porta 8889 (conforme sua config anterior).
 
   - job_name: 'casoft-store-api-gateway'
     scheme: http
@@ -113,10 +113,18 @@ scrape_configs:
       - targets: 
          - 'node-exporter:9100'
 
+# Lista de endpoints do Alertmanager para onde o Prometheus enviará alertas.
 alerting:
   alertmanagers:
   - scheme: http
     static_configs:
       - targets: 
-          - 'alertmanager:9093'
-          
+          - 'alertmanager:9093' # O Alertmanager está disponível no endereço alertmanager:9093 (provavelmente outro container no mesmo ambiente).
+
+
+#Resumo:          
+# Prometheus coleta métricas dele mesmo e do otel-collector.
+# As regras de alerta estão em um arquivo externo.
+# Os alertas são enviados para um Alertmanager.
+# O otel-collector é monitorado com uma frequência maior (5s).
+# Configuração típica para um ambiente Docker Compose, Kubernetes ou testes locais.          
