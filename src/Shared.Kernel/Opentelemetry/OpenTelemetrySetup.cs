@@ -1,7 +1,10 @@
 ﻿using Grafana.OpenTelemetry;
+using MassTransit.Logging;
+using MassTransit.Monitoring;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -51,9 +54,10 @@ public static class OpenTelemetrySetup
             .AddProcessInstrumentation()
             .AddMeter(openTelemetryOptions.AppName!)
             .AddHttpClientInstrumentation()
-            // Metrics provides by ASP.NET Core in .NET 8
+            .AddNpgsqlInstrumentation()
             .AddMeter("Microsoft.AspNetCore.Hosting")
             .AddMeter("Microsoft.AspNetCore.Server.Kestrel")
+            .AddMeter(InstrumentationOptions.MeterName)
             .AddPrometheusExporter());
 
         // Add Tracing for ASP.NET Core and our custom ActivitySource and export to Jaeger
@@ -61,7 +65,11 @@ public static class OpenTelemetrySetup
         {
             tracing.AddAspNetCoreInstrumentation();
             tracing.AddHttpClientInstrumentation();
+            tracing.AddEntityFrameworkCoreInstrumentation();
+            tracing.AddNpgsql();
+            tracing.AddRedisInstrumentation();
             tracing.AddSource(openTelemetryOptions.AppName!);
+            tracing.AddSource(DiagnosticHeaders.DefaultListenerName);//MassTransit
             tracing.AddOtlpExporter(otlpOptions =>
             {
                 otlpOptions.Endpoint = new Uri(openTelemetryOptions.OtlExporter!.EndPoint!);

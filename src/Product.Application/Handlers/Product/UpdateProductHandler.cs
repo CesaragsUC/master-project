@@ -1,19 +1,21 @@
 ﻿using Domain.Interfaces;
-using FluentValidation;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Product.Application.Comands.Product;
 using Product.Application.Validation;
 using Product.Domain.Abstractions;
 using Product.Domain.Events;
-using Product.Domain.Models;
 using ResultNet;
 using Serilog;
+using Shared.Kernel.Validation;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Product.Application.Handlers.Product;
 
 [ExcludeFromCodeCoverage]
-public class UpdateProductHandler : IRequestHandler<UpdateProductCommand, Result<bool>>
+public class UpdateProductHandler :
+    CommandValidator,
+    IRequestHandler<UpdateProductCommand, Result<bool>>
 {
     private readonly IProductService _productService;
     private readonly IProductRepository _productRepository;
@@ -33,37 +35,28 @@ public class UpdateProductHandler : IRequestHandler<UpdateProductCommand, Result
     {
         try
         {
-            var validationResponse = await ProdutoValidacao(request, new UpdateProductCommandValidator());
+            var validationResponse = await Validator(request, new UpdateProductCommandValidator());
 
             if (!validationResponse.Success)
-            {
                 return await Result<bool>.FailureAsync(400, validationResponse?.Errors?.ToList());
-            }
 
-            var produto = _productRepository.FindOne(request.Id);
+            var existentProduct = _productRepository.FindOne(request.Id);
 
-            if (produto == null) return await Result<bool>.FailureAsync(400, $"Product {request.Id} not find");
+            if (existentProduct is null )
+                return await Result<bool>.FailureAsync(400, $"Product {request.Id} not find");
 
-            produto.Name = request.Name;
-            produto.Price = request.Price;
-            produto.Active = request.Active;
-
-            if (!string.IsNullOrEmpty(request.ImageBase64))
-                produto.ImageUri = await UploadImage(request.ImageBase64, produto.ImageUri);
-
-            _productRepository.Update(produto);
+            var product = await ToProduct(existentProduct!, request);
+            _productRepository.Update(product);
             await _productRepository.Commit();
 
-            await _productService.PublishProductUpdatedEvent(new ProductUpdatedDomainEvent
-            {
-                ProductId = produto.Id.ToString(),
-                Name = produto.Name,
-                Price = produto.Price,
-                Active = produto.Active,
-                ImageUri = produto.ImageUri
-            });
+            await SendMessage(product);
 
             return await Result<bool>.SuccessAsync($"Product {request.Id} updated successfuly");
+        }
+        catch (DbUpdateException ex)
+        {
+            Log.Error(ex, "Error while update product. {Message}", ex.Message);
+            return await Result<bool>.FailureAsync(500, ex.Message!);
         }
         catch (Exception ex)
         {
@@ -79,19 +72,28 @@ public class UpdateProductHandler : IRequestHandler<UpdateProductCommand, Result
             return string.Empty;
     }
 
-    private async Task<ResponseResult<bool>> ProdutoValidacao<T>(T obj, AbstractValidator<T> validator)
+    private async Task<Domain.Models.Product> ToProduct(Domain.Models.Product product,UpdateProductCommand request)
     {
-        var validationResult = validator.Validate(obj);
-        var result = new ResponseResult<bool>();
+        product.Name = request.Name;
+        product.Price = request.Price;
+        product.Active = request.Active;
 
-        if (!validationResult.IsValid)
+        if (!string.IsNullOrEmpty(request.ImageBase64))
+            product.ImageUri = await UploadImage(request.ImageBase64, product.ImageUri);
+
+        return product;
+    }
+
+    private async Task SendMessage(Domain.Models.Product product)
+    {
+        await _productService.PublishProductAddedEvent(new ProductAddedDomainEvent
         {
-            result.Success = false;
-            result.Errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray();
-            return result;
-        }
-
-        result.Success = true;
-        return result;
+            ProductId = product.Id.ToString(),
+            Name = product.Name,
+            Price = product.Price,
+            Active = product.Active,
+            CreatAt = product.CreatAt,
+            ImageUri = product.ImageUri
+        });
     }
 }

@@ -27,5 +27,6 @@
 	  <ProjectReference Include="..\Message.Broker\Message.Broker.csproj" />
 	  <ProjectReference Include="..\Messaging.Contracts\Messaging.Contracts.csproj" />
 	  <ProjectReference Include="..\Product.Domain\Product.Domain.csproj" />
+	  <ProjectReference Include="..\Shared.Kernel\Shared.Kernel.csproj" />
 	</ItemGroup>
 </Project>
