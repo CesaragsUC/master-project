@@ -49,7 +49,7 @@ jobs:
                  
   
   deploy:
-        needs: release
+        needs: create-release
         uses: CesaragsUC/master-project/.github/workflows/deploy.yml@1f239509f4c936595ba19a6ac5f635bfe7245f25
         with:
             version: ${{ needs.release.outputs.new_tag }}
