@@ -38,6 +38,7 @@ env:
 jobs:
 
   build:
+    if: github.event_name == 'pull_request' || github.ref_name != 'main'
     name: Executing build
     runs-on: ubuntu-latest
     concurrency:
@@ -56,6 +57,7 @@ jobs:
           run: dotnet build CasoftStore.sln
 
   tests:
+      if: github.event_name == 'pull_request' || github.ref_name != 'main'
       needs: build
       uses: CesaragsUC/master-project/.github/workflows/test.yml@main
       secrets: inherit
@@ -68,7 +70,7 @@ jobs:
         group: example-group
         cancel-in-progress: true        
       # This job will only run on the main branch
-      if: github.ref == 'refs/heads/main'          
+      if: github.event_name == 'push' && github.ref_name == 'main'         
       permissions:
           contents: write
           security-events: write 
@@ -356,6 +358,7 @@ jobs:
   #--------------------------------------------------------------------------------------   
 
   deploy:
+    if: github.event_name == 'push' && github.ref_name == 'main'
     needs: release
     uses: CesaragsUC/master-project/.github/workflows/deploy.yml@main
     with:
