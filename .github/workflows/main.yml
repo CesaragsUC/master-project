@@ -20,6 +20,21 @@ permissions:
   contents: write
   security-events: write
 
+env:
+    RESOURCE_GROUP: casoft
+    DOCKER_NAMESPACE: casoftlabs
+    AZURE_CONTAINER_REGISTRY: casoftregistry
+    # Container Apps
+    # Ned to create a container app in Azure with exactly the same name.
+    CATALOG_CONTAINER_APP: casoft-store-catalog
+    GATEWAY_CONTAINER_APP: casoft-store-api-gateway
+    AUTH_CONTAINER_APP: casoft-store-auth
+    BASKET_CONTAINER_APP: casoft-store-basket
+    BILLING_CONTAINER_APP: casoft-store-billing
+    DISCOUNT_CONTAINER_APP: casoft-store-discount
+    ORDER_CONTAINER_APP: casoft-store-order
+    PRODUCT_CONTAINER_APP: casoft-store-product   
+
 jobs:
 
   build:
