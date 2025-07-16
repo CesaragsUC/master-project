@@ -30,7 +30,6 @@ builder.Services.AddScoped<ICartService, CartService>();
 builder.Services.AddScoped<ICacheService, CacheService>();
 builder.Services.AddMemoryCache();
 builder.Services.AddInfra(builder.Configuration);
-OpenTelemetrySetup.GrafanaOpenTelemetrySetup();
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
 var app = builder.Build();

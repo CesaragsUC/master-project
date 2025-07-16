@@ -1,4 +1,4 @@
-﻿namespace Product.Domain.Models;
+﻿namespace Shared.Kernel.Common;
 
 public class ResponseResult<T>
 {

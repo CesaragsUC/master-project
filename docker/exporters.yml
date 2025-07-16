@@ -1,0 +1,59 @@
+services:
+
+  # coleta da maquina cpu, memory, disk etc..    
+  # https://grafana.com/grafana/dashboards/1860-node-exporter-full/
+  node-exporter:
+    image: prom/node-exporter:v1.9.1
+    container_name: node-exporter
+    restart: unless-stopped
+    ports:
+      - "9100:9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)'
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:v0.17.1
+    container_name: postgres-exporter
+    environment:
+      DATA_SOURCE_NAME: "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres-db:5432/${POSTGRES_DB}?sslmode=disable"
+    ports:
+      - "9187:9187"
+    depends_on:
+      - postgres-db
+
+  mongo-exporter:
+    image: percona/mongodb_exporter:0.44.0
+    container_name: mongodb-exporter
+    environment:
+      MONGODB_URI: "mongodb://${MONGO_USER}:${MONGO_PASS}@mongodb:27017"
+    command: ["--collect-all", "--compatible-mode", "--discovering-mode"]  
+    ports:
+      - "9216:9216"
+    depends_on:
+      - mongodb
+      
+
+  redis-exporter:
+    image: oliver006/redis_exporter:v1.74.0-alpine
+    ports:
+      - 9121:9121
+    command: ['--redis.addr=redis://redis:6379','--redis.password=slightly-locked']
+
+  rabbitmq-exporter:
+      image: kbudde/rabbitmq-exporter:1.0.0
+      container_name: rabbitmq_exporter
+      ports:
+        - "9419:9419"
+      environment:
+        RABBIT_URL: http://rabbitmq:15672
+        RABBIT_USER: guest
+        RABBIT_PASSWORD: guest
+      depends_on:
+        - rabbitmq

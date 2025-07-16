@@ -3,11 +3,11 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace Message.Broker.Extensions;
 
-[ExcludeFromCodeCoverage]
-public static class RabbitMqTransportOptionsExtension
-{
-    public static string Prefix(this RabbitMqTransportOptions transportOptions)
-    {
-        return string.Empty;
-    }
-}
+//[ExcludeFromCodeCoverage]
+//public static class RabbitMqTransportOptionsExtension
+//{
+//    public static string Prefix(this RabbitMqTransportOptions transportOptions)
+//    {
+//        return string.Empty;
+//    }
+//}

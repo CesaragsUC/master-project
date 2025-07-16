@@ -45,23 +45,34 @@ public static class FluentMigrationConfig
         runner.MigrateUp();
     }
 
+
     private static void EnsureDatabaseExists(IConfiguration configuration)
     {
         var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
         var defaultConnectionString = LoadConnectionString(configuration, environment);
 
-        using (var connection = new NpgsqlConnection(defaultConnectionString))
+        // Pega o nome do banco a ser criado
+        var dbName = new NpgsqlConnectionStringBuilder(defaultConnectionString).Database;
+
+        // Monta uma connection string para o banco 'postgres', que sempre existe
+        var adminConnStringBuilder = new NpgsqlConnectionStringBuilder(defaultConnectionString)
+        {
+            Database = "postgres"
+        };
+
+        using (var connection = new NpgsqlConnection(adminConnStringBuilder.ConnectionString))
         {
             connection.Open();
 
-            var dbName = new NpgsqlConnectionStringBuilder(defaultConnectionString).Database;
-
-            using (var command = new NpgsqlCommand($"SELECT 1 FROM pg_database WHERE datname = '{dbName}'", connection))
+            // Verifica se o banco já existe
+            using (var command = new NpgsqlCommand($"SELECT 1 FROM pg_database WHERE datname = @dbName", connection))
             {
+                command.Parameters.AddWithValue("dbName", dbName);
                 var exists = command.ExecuteScalar() != null;
 
                 if (!exists)
                 {
+                    // Cria o banco se não existir
                     using (var createCommand = new NpgsqlCommand($"CREATE DATABASE \"{dbName}\"", connection))
                     {
                         createCommand.ExecuteNonQuery();
@@ -70,6 +81,7 @@ public static class FluentMigrationConfig
             }
         }
     }
+
 
     public static string? LoadConnectionString(IConfiguration configuration, string environment)
     {

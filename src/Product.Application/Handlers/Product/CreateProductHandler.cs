@@ -1,6 +1,7 @@
 ﻿using Domain.Interfaces;
 using FluentValidation;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Product.Application.Comands.Product;
 using Product.Application.Validation;
 using Product.Domain.Abstractions;
@@ -8,12 +9,15 @@ using Product.Domain.Events;
 using Product.Domain.Models;
 using ResultNet;
 using Serilog;
+using Shared.Kernel.Validation;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Product.Application.Handlers.Product;
 
 [ExcludeFromCodeCoverage]
-public class CreateProductHandler : IRequestHandler<CreateProductCommand, Result<bool>>
+public class CreateProductHandler : 
+    CommandValidator,
+    IRequestHandler<CreateProductCommand, Result<bool>>
 {
     private readonly IProductRepository _productRepository;
     private readonly IBobStorageService _bobStorageService;
@@ -33,37 +37,22 @@ public class CreateProductHandler : IRequestHandler<CreateProductCommand, Result
     {
         try
         {
-            var validationResponse = await ProdutoValidation(request, new CreateProductCommandValidator());
+            var validationResponse = await Validator(request, new CreateProductCommandValidator());
 
             if (!validationResponse.Success)
-            {
-                return  await Result<bool>.FailureAsync(500, validationResponse.Errors?.ToList()!);
-            }
+                return  await Result<bool>.FailureAsync(400, validationResponse.Errors?.ToList()!);
 
-            var produto = new Domain.Models.Product
-            {
-                Name = request.Name,
-                Price = request.Price,
-                Active = request.Active,
-                CreatAt = DateTime.Now,
-                ImageUri =  await UploadImage(request.ImageBase64)
-
-            };
-
-            await _productRepository.AddAsync(produto);
+            var product = await ToProduct(request);
+            await _productRepository.AddAsync(product);
             await _productRepository.Commit();
 
-            await _productService.PublishProductAddedEvent(new ProductAddedDomainEvent
-            {
-                ProductId = produto.Id.ToString(),
-                Name = produto.Name,
-                Price = produto.Price,
-                Active = produto.Active,
-                CreatAt = produto.CreatAt,
-                ImageUri = produto.ImageUri
-            });
+            await SendMessage(product);
 
-
+        }
+        catch(DbUpdateException ex)
+        {
+            Log.Error(ex, "Error while saving product to database: {Message}", ex.Message);
+            return await Result<bool>.FailureAsync(500, ex.Message!);
         }
         catch (Exception ex)
         {
@@ -75,6 +64,19 @@ public class CreateProductHandler : IRequestHandler<CreateProductCommand, Result
         return await Result<bool>.SuccessAsync(); 
     }
 
+    private async Task<Domain.Models.Product> ToProduct(CreateProductCommand request)
+    {
+        return  new Domain.Models.Product
+        {
+            Name = request.Name,
+            Price = request.Price,
+            Active = request.Active,
+            CreatAt = DateTime.Now,
+            ImageUri = await UploadImage(request.ImageBase64)
+
+        };
+    }
+
     private async Task<string> UploadImage(string? base64Image)
     {
         if (!string.IsNullOrEmpty(base64Image))
@@ -83,19 +85,16 @@ public class CreateProductHandler : IRequestHandler<CreateProductCommand, Result
             return string.Empty;
     }
 
-    private async Task<ResponseResult<bool>> ProdutoValidation<T>(T obj, AbstractValidator<T> validator)
+    private async Task SendMessage(Domain.Models.Product product)
     {
-        var validationResult = validator.Validate(obj);
-        var result = new ResponseResult<bool>();
-
-        if (!validationResult.IsValid)
+        await _productService.PublishProductAddedEvent(new ProductAddedDomainEvent
         {
-            result.Success = false;
-            result.Errors = validationResult.Errors.Select(e => e.ErrorMessage).ToArray();
-            return result;
-        }
-
-        result.Success = true;
-        return result;
+            ProductId = product.Id.ToString(),
+            Name = product.Name,
+            Price = product.Price,
+            Active = product.Active,
+            CreatAt = product.CreatAt,
+            ImageUri = product.ImageUri
+        });
     }
 }

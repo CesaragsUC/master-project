@@ -24,7 +24,6 @@ builder.Services.AddScoped<IOrderService,OrderService>();
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 builder.Services.AddServices();
 builder.Services.AddInfra(builder.Configuration);
-OpenTelemetrySetup.GrafanaOpenTelemetrySetup();
 
 var app = builder.Build();
 

@@ -19,7 +19,6 @@ public static class KeycloaclConfiguration
         services.AddKeycloakAuthentication(authenticationOptions!, options =>
         {
             options.MetadataAddress = metadataConfig.Value!;
-            options.RequireHttpsMetadata = bool.Parse(requireHttpsMetadataOption?.Value!);
         });
 
 

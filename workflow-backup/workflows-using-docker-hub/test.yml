@@ -11,8 +11,6 @@ jobs:
     concurrency:
           group: example-group
           cancel-in-progress: true  
-    # This job will only run on no main branch
-    if: github.ref != 'refs/heads/main'            
     steps:
       - name: Getting project code ⏳
         uses: actions/checkout@v4

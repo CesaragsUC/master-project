@@ -282,3 +282,4 @@ __pycache__/
 /docker/loki
 /docker/prometheus/data
 /docker/config.alloy
+/docker/benchmarks/*.py

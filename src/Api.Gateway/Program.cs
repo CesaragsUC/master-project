@@ -38,7 +38,6 @@ try
 
     builder.Services.AddOcelotGatewayConfig(builder.Configuration);
     builder.Services.AddServices(builder.Configuration);
-    OpenTelemetrySetup.GrafanaOpenTelemetrySetup();
 
     var _fontUri = builder.Configuration.GetSection("FrontEndUri").Get<FrontEndUri>();
 
