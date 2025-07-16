@@ -45,16 +45,17 @@ jobs:
       - name: Deploy to Azure Container App CATALOG
         uses: azure/container-apps-deploy-action@v1
         with:
-          imageToDeploy: ${{ env.azure_container_registry }}.azurecr.io/${{ vars.CONTAINER_APP_CATALOG }}:${{ inputs.version }}
+          imageToDeploy: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CATALOG_CONTAINER_APP }}:${{ inputs.version }}
           resourceGroup: ${{ env.RESOURCE_GROUP }}
           containerAppName: ${{ env.CATALOG_CONTAINER_APP }}
           environmentVariables: |
             ASPNETCORE_ENVIRONMENT=Production
 
+
       - name: Deploy to Azure Container App GATEWAY
         uses: azure/container-apps-deploy-action@v1
         with:
-          imageToDeploy: ${{ env.azure_container_registry }}.azurecr.io/${{ vars.CONTAINER_APP_API_GATEWAY }}:${{ inputs.version }}
+          imageToDeploy: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.GATEWAY_CONTAINER_APP }}:${{ inputs.version }}
           resourceGroup: ${{ env.RESOURCE_GROUP }}
           containerAppName: ${{ env.GATEWAY_CONTAINER_APP }}
           environmentVariables: |
@@ -63,7 +64,7 @@ jobs:
       - name: Deploy to Azure Container App AUTH
         uses: azure/container-apps-deploy-action@v1
         with:
-          imageToDeploy: ${{ env.azure_container_registry }}.azurecr.io/${{ vars.container_app_auth }}:${{ inputs.version }}
+          imageToDeploy: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.AUTH_CONTAINER_APP }}:${{ inputs.version }}
           resourceGroup: ${{ env.RESOURCE_GROUP }}
           containerAppName: ${{ env.AUTH_CONTAINER_APP }}
           environmentVariables: |
@@ -72,7 +73,7 @@ jobs:
       - name: Deploy to Azure Container App BASKET
         uses: azure/container-apps-deploy-action@v1
         with:
-          imageToDeploy: ${{ env.azure_container_registry }}.azurecr.io/${{ vars.container_app_basket }}:${{ inputs.version }}
+          imageToDeploy: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.BASKET_CONTAINER_APP }}:${{ inputs.version }}
           resourceGroup: ${{ env.RESOURCE_GROUP }}
           containerAppName: ${{ env.BASKET_CONTAINER_APP }}
           environmentVariables: |
@@ -81,7 +82,7 @@ jobs:
       - name: Deploy to Azure Container App BILLING
         uses: azure/container-apps-deploy-action@v1
         with:
-          imageToDeploy: ${{ env.azure_container_registry }}.azurecr.io/${{ vars.container_app_billing }}:${{ inputs.version }}
+          imageToDeploy: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.BILLING_CONTAINER_APP }}:${{ inputs.version }}
           resourceGroup: ${{ env.RESOURCE_GROUP }}
           containerAppName: ${{ env.BILLING_CONTAINER_APP }}
           environmentVariables: |
@@ -90,7 +91,7 @@ jobs:
       - name: Deploy to Azure Container App DISCOUNT  
         uses: azure/container-apps-deploy-action@v1
         with:
-          imageToDeploy: ${{ env.azure_container_registry }}.azurecr.io/${{ vars.container_app_discount }}:${{ inputs.version }}
+          imageToDeploy: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.DISCOUNT_CONTAINER_APP }}:${{ inputs.version }}
           resourceGroup: ${{ env.RESOURCE_GROUP }}
           containerAppName: ${{ env.DISCOUNT_CONTAINER_APP }}
           environmentVariables: |
@@ -99,7 +100,7 @@ jobs:
       - name: Deploy to Azure Container App ORDER
         uses: azure/container-apps-deploy-action@v1
         with:
-          imageToDeploy: ${{ env.azure_container_registry }}.azurecr.io/${{ vars.container_app_order }}:${{ inputs.version }}
+          imageToDeploy: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.ORDER_CONTAINER_APP }}:${{ inputs.version }}
           resourceGroup: ${{ env.RESOURCE_GROUP }}
           containerAppName: ${{ env.ORDER_CONTAINER_APP }}
           environmentVariables: |
@@ -108,7 +109,7 @@ jobs:
       - name: Deploy to Azure Container App PRODUCT
         uses: azure/container-apps-deploy-action@v1
         with:
-          imageToDeploy: ${{ env.azure_container_registry }}.azurecr.io/${{ vars.container_app_product }}:${{ inputs.version }}
+          imageToDeploy: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.PRODUCT_CONTAINER_APP }}:${{ inputs.version }}
           resourceGroup: ${{ env.RESOURCE_GROUP }}
           containerAppName: ${{ env.PRODUCT_CONTAINER_APP }}
           environmentVariables: |
