@@ -9,6 +9,7 @@ on:
 env:
     RESOURCE_GROUP: casoft
     DOCKER_NAMESPACE: casoftlabs
+    AZURE_CONTAINER_REGISTRY: casoftregistry
     # Container Apps
     # Ned to create a container app in Azure with exactly the same name.
     CATALOG_CONTAINER_APP: casoft-store-catalog

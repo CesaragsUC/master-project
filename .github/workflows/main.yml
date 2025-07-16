@@ -1,12 +1,12 @@
 name: Code Quality and Deploy
 on:
-  push:
+  push: #Roda pipeline apenas quando houver commit novo na main — ou seja, após merge.
     branches:
       - main
-  pull_request:
+  pull_request: # Roda pipeline quando PR é aberto/sincronizado/reaberto/editado, para qualquer branch origem/destino.
     branches:
       - '**'
-  workflow_dispatch:
+  workflow_dispatch: # Permite rodar manualmente com ou sem input
 
 
 permissions:
@@ -53,28 +53,15 @@ jobs:
           run: dotnet build CasoftStore.sln
 
 
-  demo:
-    name: simple demo
-    runs-on: ubuntu-latest
-    needs: build
-    concurrency:
-      group: example-group
-      cancel-in-progress: true    
-    steps:
-        - name: Debug branch
-          run: |
-              echo 'Ref is: ${{ github.ref }}'
-
-  # tests:
-  #     if: github.event_name == 'pull_request' || github.ref_name != 'main'
-  #     needs: build
-  #     uses: CesaragsUC/master-project/.github/workflows/test.yml@main
-  #     secrets: inherit
+  tests:
+      if: github.event_name == 'pull_request' || github.ref_name != 'main'
+      needs: build
+      uses: CesaragsUC/master-project/.github/workflows/test.yml@main
+      secrets: inherit
 
   release:
       name: Creating new release
       runs-on: ubuntu-latest
-      #needs: tests
       concurrency:
         group: example-group
         cancel-in-progress: true        
@@ -86,6 +73,9 @@ jobs:
       outputs:
         new_tag: ${{ steps.version_bump.outputs.new_tag }}
       steps:
+          - name: Debug branch
+            run: |
+                echo 'Ref is: ${{ github.ref }}'        
           - name: Fetching project code ⏳
             uses: actions/checkout@v4
             with:
@@ -240,7 +230,7 @@ jobs:
                 sarif_file: discount-results.sarif      
                 category: discount            
   #------------------------------------------------------------------------------------
-          - name: Analysing Dockerfile Payment.Api
+          - name: Analysing Dockerfile Billing.Api
             with:
               dockerfile: ./src/Billing.Api/Dockerfile
             uses: hadolint/hadolint-action@v3.1.0 
