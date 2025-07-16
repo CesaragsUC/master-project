@@ -315,3 +315,10 @@ jobs:
               sarif_file: gateway-results.sarif
               category: gateway
 #--------------------------------------------------------------------------------------   
+
+  deploy:
+        needs: create-release
+        uses: CesaragsUC/master-project/.github/workflows/deploy.yml@main
+        with:
+            version: ${{ needs.release.outputs.new_tag }}
+        secrets: inherit
