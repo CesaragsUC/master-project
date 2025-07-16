@@ -59,7 +59,7 @@ jobs:
           name: LogIn to Azure ACR
           uses: docker/login-action@v3
           with:
-               registry: ${{ env.azure_container_registry }}.azurecr.io
+               registry: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io
                username: ${{ secrets.registry_username }}
                password: ${{ secrets.registry_password }}
 
@@ -77,15 +77,15 @@ jobs:
             file: ./src/Api.Catalogo/Dockerfile
             push: true
             tags: |
-                  ${{ env.azure_container_registry }}.azurecr.io/${{ vars.container_app_catalog }}:latest
-                  ${{ env.azure_container_registry }}.azurecr.io/${{ vars.container_app_catalog }}:${{ steps.version_bump.outputs.new_tag }}
+                  ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CATALOG_CONTAINER_APP }}:latest
+                  ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CATALOG_CONTAINER_APP }}:${{ steps.version_bump.outputs.new_tag }}
             cache-from: type=gha
             cache-to: type=gha,mode=max
 
         - name: Run Trivy vulnerability scanner on Docker image for Catalog.Api
           uses: aquasecurity/trivy-action@0.28.0
           with:
-            image-ref: ${{ env.azure_container_registry }}.azurecr.io/${{ vars.container_app_catalog }}:${{ steps.version_bump.outputs.new_tag }}
+            image-ref: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.CATALOG_CONTAINER_APP }}:${{ steps.version_bump.outputs.new_tag }}
             format: sarif
             output: 'catalog-results.sarif'
             severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'
@@ -109,15 +109,15 @@ jobs:
             file: ./src/Api.Produto/Dockerfile
             push: true
             tags: |
-                ${{ env.azure_container_registry }}.azurecr.io/${{ vars.container_app_product }}:latest
-                ${{ env.azure_container_registry }}.azurecr.io/${{ vars.container_app_product }}:${{ steps.version_bump.outputs.new_tag }}
+                ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.PRODUCT_CONTAINER_APP }}:latest
+                ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.PRODUCT_CONTAINER_APP }}:${{ steps.version_bump.outputs.new_tag }}
             cache-from: type=gha
             cache-to: type=gha,mode=max
 
         - name: Run Trivy vulnerability scanner on Docker image for Product.Api
           uses: aquasecurity/trivy-action@0.28.0
           with:
-            image-ref: ${{ env.azure_container_registry }}.azurecr.io/${{ vars.container_app_product }}:${{ steps.version_bump.outputs.new_tag }}
+            image-ref: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.PRODUCT_CONTAINER_APP }}:${{ steps.version_bump.outputs.new_tag }}
             format: sarif
             output: 'product-results.sarif'
             severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'         
@@ -140,15 +140,15 @@ jobs:
             file: ./src/Order.Api/Dockerfile
             push: true
             tags: |
-                ${{ env.azure_container_registry }}.azurecr.io/${{ vars.container_app_order }}:latest
-                ${{ env.azure_container_registry }}.azurecr.io/${{ vars.container_app_order }}:${{ steps.version_bump.outputs.new_tag }}
+                ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.ORDER_CONTAINER_APP }}:latest
+                ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.ORDER_CONTAINER_APP }}:${{ steps.version_bump.outputs.new_tag }}
             cache-from: type=gha
             cache-to: type=gha,mode=max
 
         - name: Run Trivy vulnerability scanner on Docker image for Order.Api
           uses: aquasecurity/trivy-action@0.28.0
           with:
-            image-ref: ${{ env.azure_container_registry }}.azurecr.io/${{ vars.container_app_order }}:${{ steps.version_bump.outputs.new_tag }}
+            image-ref: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.ORDER_CONTAINER_APP }}:${{ steps.version_bump.outputs.new_tag }}
             format: sarif
             output: 'order-results.sarif'
             severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'         
@@ -171,15 +171,15 @@ jobs:
             file: ./src/Discount.Api/Dockerfile
             push: true
             tags: |
-                ${{ env.azure_container_registry }}.azurecr.io/${{ vars.container_app_discount }}:latest
-                ${{ env.azure_container_registry }}.azurecr.io/${{ vars.container_app_discount }}:${{ steps.version_bump.outputs.new_tag }}
+                ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.DISCOUNT_CONTAINER_APP }}:latest
+                ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.DISCOUNT_CONTAINER_APP }}:${{ steps.version_bump.outputs.new_tag }}
             cache-from: type=gha
             cache-to: type=gha,mode=max
 
         - name: Run Trivy vulnerability scanner on Docker image for Discount.Api
           uses: aquasecurity/trivy-action@0.28.0
           with:
-            image-ref: ${{ env.azure_container_registry }}.azurecr.io/${{ vars.container_app_discount }}:${{ steps.version_bump.outputs.new_tag }}
+            image-ref: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.DISCOUNT_CONTAINER_APP }}:${{ steps.version_bump.outputs.new_tag }}
             format: sarif
             output: 'discount-results.sarif'
             severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'
@@ -202,15 +202,15 @@ jobs:
             file: ./src/Billing.Api/Dockerfile
             push: true
             tags: |
-                ${{ env.azure_container_registry }}.azurecr.io/${{ vars.container_app_billing }}:latest
-                ${{ env.azure_container_registry }}.azurecr.io/${{ vars.container_app_billing }}:${{ steps.version_bump.outputs.new_tag }}
+                ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.BILLING_CONTAINER_APP }}:latest
+                ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.BILLING_CONTAINER_APP }}:${{ steps.version_bump.outputs.new_tag }}
             cache-from: type=gha
             cache-to: type=gha,mode=max
 
         - name: Run Trivy vulnerability scanner on Docker image for Payment.Api
           uses: aquasecurity/trivy-action@0.28.0
           with:
-            image-ref: ${{ env.azure_container_registry }}.azurecr.io/${{ vars.container_app_billing }}:${{ steps.version_bump.outputs.new_tag }}
+            image-ref: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.BILLING_CONTAINER_APP }}:${{ steps.version_bump.outputs.new_tag }}
             format: sarif
             output: 'payment-results.sarif'
             severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'                
@@ -234,15 +234,15 @@ jobs:
             file: ./src/Basket.Api/Dockerfile
             push: true
             tags: |
-                ${{ env.azure_container_registry }}.azurecr.io/${{ vars.container_app_basket }}:latest
-                ${{ env.azure_container_registry }}.azurecr.io/${{ vars.container_app_basket }}:${{ steps.version_bump.outputs.new_tag }}
+                ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.BASKET_CONTAINER_APP }}:latest
+                ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.BASKET_CONTAINER_APP }}:${{ steps.version_bump.outputs.new_tag }}
             cache-from: type=gha
             cache-to: type=gha,mode=max
 
         - name: Run Trivy vulnerability scanner on Docker image for Basket.Api
           uses: aquasecurity/trivy-action@0.28.0
           with:
-            image-ref: ${{ env.azure_container_registry }}.azurecr.io/${{ vars.container_app_basket }}:${{ steps.version_bump.outputs.new_tag }}
+            image-ref: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.BASKET_CONTAINER_APP }}:${{ steps.version_bump.outputs.new_tag }}
             format: sarif
             output: 'basket-results.sarif'
             severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'                 
@@ -265,15 +265,15 @@ jobs:
             file: ./src/Auth.Api/Dockerfile
             push: true
             tags: |
-                ${{ env.azure_container_registry }}.azurecr.io/${{ vars.container_app_auth }}:latest
-                ${{ env.azure_container_registry }}.azurecr.io/${{ vars.container_app_auth }}:${{ steps.version_bump.outputs.new_tag }}
+                ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.AUTH_CONTAINER_APP }}:latest
+                ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.AUTH_CONTAINER_APP }}:${{ steps.version_bump.outputs.new_tag }}
             cache-from: type=gha
             cache-to: type=gha,mode=max
 
         - name: Run Trivy vulnerability scanner on Docker image for Auth.Api
           uses: aquasecurity/trivy-action@0.28.0
           with:
-            image-ref: ${{ env.azure_container_registry }}.azurecr.io/${{ vars.container_app_auth }}:${{ steps.version_bump.outputs.new_tag }}
+            image-ref: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.AUTH_CONTAINER_APP }}:${{ steps.version_bump.outputs.new_tag }}
             format: sarif
             output: 'auth-results.sarif'
             severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'
@@ -296,15 +296,15 @@ jobs:
             file: ./src/Api.Gateway/Dockerfile
             push: true
             tags: |
-                ${{ env.azure_container_registry }}.azurecr.io/${{ vars.container_app_api_gateway }}:latest
-                ${{ env.azure_container_registry }}.azurecr.io/${{ vars.container_app_api_gateway }}:${{ steps.version_bump.outputs.new_tag }}
+                ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.GATEWAY_CONTAINER_APP }}:latest
+                ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.GATEWAY_CONTAINER_APP }}:${{ steps.version_bump.outputs.new_tag }}
             cache-from: type=gha
             cache-to: type=gha,mode=max
 
         - name: Run Trivy vulnerability scanner on Docker image for Api.Gateway
           uses: aquasecurity/trivy-action@0.28.0
           with:
-            image-ref: ${{ env.azure_container_registry }}.azurecr.io/${{ vars.container_app_api_gateway }}:${{ steps.version_bump.outputs.new_tag }}
+            image-ref: ${{ env.AZURE_CONTAINER_REGISTRY }}.azurecr.io/${{ env.GATEWAY_CONTAINER_APP }}:${{ steps.version_bump.outputs.new_tag }}
             format: sarif
             output: 'gateway-results.sarif'
             severity: 'CRITICAL,HIGH,MEDIUM,LOW,UNKNOWN'
@@ -317,7 +317,7 @@ jobs:
 #--------------------------------------------------------------------------------------   
 
   deploy:
-        needs: create-release
+        needs: release
         uses: CesaragsUC/master-project/.github/workflows/deploy.yml@main
         with:
             version: ${{ needs.release.outputs.new_tag }}
