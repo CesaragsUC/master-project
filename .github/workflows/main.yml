@@ -53,18 +53,6 @@ jobs:
           run: dotnet build CasoftStore.sln
 
 
-  demo:
-    name: simple demo
-    runs-on: ubuntu-latest
-    needs: build
-    concurrency:
-      group: example-group
-      cancel-in-progress: true    
-    steps:
-        - name: Debug branch
-          run: |
-              echo 'Ref is: ${{ github.ref }}'
-
   # tests:
   #     if: github.event_name == 'pull_request' || github.ref_name != 'main'
   #     needs: build
@@ -86,6 +74,9 @@ jobs:
       outputs:
         new_tag: ${{ steps.version_bump.outputs.new_tag }}
       steps:
+          - name: Debug branch
+            run: |
+                echo 'Ref is: ${{ github.ref }}'        
           - name: Fetching project code ⏳
             uses: actions/checkout@v4
             with:
