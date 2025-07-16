@@ -43,15 +43,15 @@ jobs:
 
   create-release:
     needs: tests
-    uses: CesaragsUC/master-project/.github/workflows/release.yml@main
+    uses: CesaragsUC/master-project/.github/workflows/release.yml@761a2e4e7c8211206a5bba42978196cb604875cd
     secrets: inherit
 
-  deploy:
-    needs: create-release
-    uses: CesaragsUC/master-project/.github/workflows/deploy.yml@main
-    with:
-      version: ${{ needs.create-release.outputs.new_tag }}
-    secrets: inherit
+  # deploy:
+  #   needs: create-release
+  #   uses: CesaragsUC/master-project/.github/workflows/deploy.yml@main
+  #   with:
+  #     version: ${{ needs.create-release.outputs.new_tag }}
+  #   secrets: inherit
 
 # in case using Cursor IDE
 # ctrl+m+c  to comment
