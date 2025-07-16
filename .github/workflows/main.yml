@@ -41,19 +41,19 @@ jobs:
         uses: CesaragsUC/master-project/.github/workflows/test.yml@main
         secrets: inherit
 
-  # create-release:
-  #       needs: tests
-  #       uses: CesaragsUC/master-project/.github/workflows/release.yml@main
-  #       secrets: inherit
+  create-release:
+        needs: tests
+        uses: CesaragsUC/master-project/.github/workflows/release.yml@main
+        secrets: inherit
 
                  
   
-  # deploy:
-  #       needs: create-release
-  #       uses: CesaragsUC/master-project/.github/workflows/deploy.yml@1f239509f4c936595ba19a6ac5f635bfe7245f25
-  #       with:
-  #           version: ${{ needs.release.outputs.new_tag }}
-  #       secrets: inherit
+  deploy:
+        needs: create-release
+        uses: CesaragsUC/master-project/.github/workflows/deploy.yml@main
+        with:
+            version: ${{ needs.release.outputs.new_tag }}
+        secrets: inherit
 
 # in case using Cursor IDE
 # ctrl+m+c  to comment
