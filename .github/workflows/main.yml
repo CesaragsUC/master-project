@@ -16,6 +16,10 @@ on:
         required: true 
         type: string
 
+permissions:
+  contents: write
+  security-events: write
+
 jobs:
 
   build:
@@ -37,14 +41,13 @@ jobs:
           run: dotnet build CasoftStore.sln
 
   tests:
-        needs: build
-        uses: CesaragsUC/master-project/.github/workflows/test.yml@main
-        secrets: inherit
+      needs: build
+      uses: CesaragsUC/master-project/.github/workflows/test.yml@main
+      secrets: inherit
 
-  create-release:
-    needs: tests
-    uses: CesaragsUC/master-project/.github/workflows/release.yml@761a2e4e7c8211206a5bba42978196cb604875cd
-    secrets: inherit
+  call-release:
+      uses: CesaragsUC/master-project/.github/workflows/release.yml@main
+      secrets: inherit
 
   # deploy:
   #   needs: create-release

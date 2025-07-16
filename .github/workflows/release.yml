@@ -29,7 +29,6 @@ jobs:
       cancel-in-progress: true        
     # This job will only run on the main branch
     if: github.ref == 'refs/heads/main'          
-    needs: tests
     permissions:
         contents: write
         security-events: write 
