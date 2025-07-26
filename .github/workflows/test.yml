@@ -12,7 +12,16 @@ jobs:
           group: example-group
           cancel-in-progress: true  
     # This job will only run on no main branch
-    if: github.ref != 'refs/heads/main'            
+    if: github.ref != 'refs/heads/main'   
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: admin
+          POSTGRES_PASSWORD: Teste@123
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432         
     steps:
       - name: Getting project code ⏳
         uses: actions/checkout@v4
