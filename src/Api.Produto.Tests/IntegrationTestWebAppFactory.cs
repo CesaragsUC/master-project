@@ -17,7 +17,6 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
     private readonly PostgreSqlContainer _postgreSqlContainer = new PostgreSqlBuilder()
         .WithImage("postgres:16")
         .WithUsername("admin")
-        .WithName("integration-test-postgres")
         .WithPassword("Teste@123")
         .WithDatabase("Products") // Recomendo nome exclusivo pra testes
         .WithPortBinding(5432, true) // Deixe o sistema escolher a porta livre
