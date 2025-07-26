@@ -11,9 +11,6 @@
 		<PackageReference Include="HybridRepoNet" Version="3.1.7" />
 		<PackageReference Include="Azure.Storage.Blobs" Version="12.23.0" />
 		<PackageReference Include="Bogus" Version="35.6.2" />
-		<PackageReference Include="FluentMigrator" Version="6.0.0" />
-		<PackageReference Include="FluentMigrator.Extensions.Postgres" Version="6.0.0" />
-		<PackageReference Include="FluentMigrator.Runner" Version="6.0.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.1">
 			<PrivateAssets>all</PrivateAssets>

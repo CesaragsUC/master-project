@@ -15,7 +15,7 @@ try
     // IF ITS RUNING IN DEVELOPMENT OR DOCKER ENVIRONMENT, THE CONFIGURATION WILL BE LOADED FROM appsettings.Docker.json or appsettings.Development.json
     builder.Services.AzureKeyVaultConfig(builder, builder.Configuration, environment);
 
-    OpenTelemetrySetup.SetupLogging(builder, builder.Configuration);
+    OpenTelemetrySetup.SetupLoggingOtlp(builder, builder.Configuration);
 
     builder.Services.AddControllers();
 

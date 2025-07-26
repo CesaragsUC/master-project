@@ -4,6 +4,7 @@ using MassTransit.Monitoring;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Npgsql;
 using OpenTelemetry;
 using OpenTelemetry.Metrics;
@@ -20,13 +21,15 @@ namespace Shared.Kernel.Opentelemetry;
 [ExcludeFromCodeCoverage]
 public static class OpenTelemetrySetup
 {
-    public static IServiceCollection AddGrafanaSetup(this IServiceCollection services,
+    public static IServiceCollection OpenTelemetryConfig(this IServiceCollection services,
         IConfiguration configuration)
     {
         var openTelemetryOptions = new OpenTelemetryOptions();
         configuration.GetSection("OpenTelemetryOptions").Bind(openTelemetryOptions);
 
         // configure metrics for grafana
+        
+
         var otel = services.AddOpenTelemetry();
 
         // Configure OpenTelemetry Resources with the application name
@@ -58,6 +61,7 @@ public static class OpenTelemetrySetup
             .AddMeter("Microsoft.AspNetCore.Hosting")
             .AddMeter("Microsoft.AspNetCore.Server.Kestrel")
             .AddMeter(InstrumentationOptions.MeterName)
+            .AddConsoleExporter()
             .AddPrometheusExporter());
 
         // Add Tracing for ASP.NET Core and our custom ActivitySource and export to Jaeger
@@ -65,11 +69,20 @@ public static class OpenTelemetrySetup
         {
             tracing.AddAspNetCoreInstrumentation();
             tracing.AddHttpClientInstrumentation();
-            tracing.AddEntityFrameworkCoreInstrumentation();
+            tracing.AddEntityFrameworkCoreInstrumentation(opt => {
+                opt.SetDbStatementForText = true; // Set the SQL statement for text queries
+                opt.SetDbStatementForStoredProcedure = true; // Set the SQL statement for stored procedures
+                opt.EnrichWithIDbCommand = (activity, command) =>
+                {
+                    // Enrich the activity with the command text
+                    activity.SetTag("db.statement", command.CommandText);
+                };
+            });
             tracing.AddNpgsql();
             tracing.AddRedisInstrumentation();
             tracing.AddSource(openTelemetryOptions.AppName!);
             tracing.AddSource(DiagnosticHeaders.DefaultListenerName);//MassTransit
+            tracing.AddConsoleExporter();
             tracing.AddOtlpExporter(otlpOptions =>
             {
                 otlpOptions.Endpoint = new Uri(openTelemetryOptions.OtlExporter!.EndPoint!);
@@ -77,6 +90,7 @@ public static class OpenTelemetrySetup
                                                             openTelemetryOptions.OtlExporter.Headers :
                                                             string.Empty;
             });
+
         });
 
         return services;
@@ -94,6 +108,7 @@ public static class OpenTelemetrySetup
             .AddPrometheusHttpListener()
             .Build();
     }
+
 
     public static void SetupLogging(WebApplicationBuilder builder, IConfiguration configuration)
     {
@@ -123,6 +138,15 @@ public static class OpenTelemetrySetup
                 outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} level=[{Level:u3}] appId={ApplicationId} appName={ApplicationName} env={Environment} {Message:lj} {NewLine}{Exception}"
               );
             config.ReadFrom.Configuration(context.Configuration);
+        });
+    }
+
+    public static void SetupLoggingOtlp(WebApplicationBuilder builder, IConfiguration configuration)
+    {
+        builder.Logging.AddOpenTelemetry( logging =>
+        {
+            logging.IncludeScopes = true;
+            logging.IncludeFormattedMessage = true;
         });
     }
 }

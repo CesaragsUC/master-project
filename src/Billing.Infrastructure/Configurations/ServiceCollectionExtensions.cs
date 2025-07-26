@@ -36,8 +36,10 @@ public static class ServiceCollectionExtensions
             (int)HealthCheck.Active,
             FluentMigrationConfig.LoadConnectionString(configuration, environment));
 
-        services.AddGrafanaSetup(configuration);
-        services.AddFluentMigrationConfig(configuration, typeof(Migrations.CreateTablePayment).Assembly);
+        services.OpenTelemetryConfig(configuration);
+        services.AddFluentMigrationConfig(FluentMigrationConfig.LoadConnectionString(configuration, environment),
+            typeof(Migrations.CreateTablePayment).Assembly);
+
         services.AddScoped<IPaymentRepository, PaymentRepository>();
         services.AddKeycloakServices(configuration);
         return services;

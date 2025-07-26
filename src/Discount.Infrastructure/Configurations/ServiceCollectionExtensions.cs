@@ -23,8 +23,9 @@ public static class ServiceCollectionExtensions
             (int)HealthCheck.Active,
             FluentMigrationConfig.LoadConnectionString(configuration, environment));
 
-        services.AddFluentMigrationConfig(configuration, typeof(Migrations.CoupounTableCreate).Assembly);
-        services.AddGrafanaSetup(configuration);
+        services.AddFluentMigrationConfig(FluentMigrationConfig.LoadConnectionString(configuration, environment),
+            typeof(Migrations.CoupounTableCreate).Assembly);
+        services.OpenTelemetryConfig(configuration);
         services.AddKeycloakServices(configuration);
 
         return services;

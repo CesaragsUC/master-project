@@ -1,0 +1,168 @@
+services:
+
+  loki:
+    image: grafana/loki:2.9.2
+    container_name: loki
+    ports:
+      - "3100:3100"
+    restart: unless-stopped
+    command: -config.file=/etc/loki/loki.yaml -querier.engine.timeout=10m -querier.parallelise-shardable-queries=false -querier.query-timeout=10m -server.http-read-timeout=10m -server.http-write-timeout=10m
+    volumes:
+      - loki_data:/loki
+      - ./configs/loki.yaml:/etc/loki/loki.yaml 
+      
+      
+  # caso de erro sincronização time: https://stackoverflow.com/questions/42200734/how-to-re-synchronize-the-prometheus-time  
+  prometheus:
+    image: prom/prometheus:v3.2.1
+    container_name: prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    volumes:
+      - ./configs/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./configs/alert.rules.yml:/etc/prometheus/alert.rules.yml
+      - prometheus_data:/prometheus
+    ports:
+      - "9090:9090"
+
+  grafana:
+    image: grafana/grafana:12.0.2
+    container_name: grafana
+    environment:
+      - GF_INSTALL_PLUGINS=redis-datasource
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=Teste@123
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards   
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+    depends_on:
+      - prometheus    
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.122.0
+    container_name: otel-collector
+    command: ["--config=/etc/otel-collector-config.yaml"]
+    volumes:
+      - ./configs/otel-collector-config.yaml:/etc/otel-collector-config.yaml
+    restart: on-failure
+    ports:
+      - 1888:1888
+      - 8888:8888 # default
+      - 8889:8889
+      - 13133:13133
+      - 4317:4317
+      - 4318:4318
+      - 55679:55679
+      - "55670:55679" # zpages extension
+    depends_on:
+      - jaeger
+      - prometheus
+
+
+  jaeger:
+    image: jaegertracing/jaeger:2.2.0
+    container_name: jaeger
+    environment:
+      - LOG_LEVEL=debug
+    ports:
+      - "16686:16686"
+    restart: unless-stopped 
+
+   
+
+  alertview:
+    image: cesarags/webhookuc:v2
+    container_name: alertview
+    environment:
+      - ASPNETCORE_URLS=http://*:8181
+    ports:
+      - 8181:8181
+      
+  alertmanager:
+    image: prom/alertmanager:v0.28.0
+    container_name: alertmanager
+    volumes:
+      - ./configs/alertmanager.yml:/etc/alertmanager/alertmanager.yml
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+    ports:
+      - 9093:9093
+
+  #https://github.com/CesaragsUC/prometheus-msteams
+  promteams:
+    image: bzon/prometheus-msteams
+    container_name: promteams
+    ports:
+      - "2000:2000"
+    environment:
+      - TEAMS_INCOMING_WEBHOOK_URL=${TEAMS_WEBHOOK_URL}
+      - TEAMS_REQUEST_URI=${TEAMS_REQUEST_URI}
+      - PROMTEAMS_DEBUG=true
+      - CONFIG_FILE=/tmp/config.yml
+    depends_on:
+      - alertmanager
+    volumes:
+      - ./tmp/config.yml:/tmp/config.yml  
+    restart: always   
+
+  # coleta da maquina cpu, memory, disk etc..    
+  # https://grafana.com/grafana/dashboards/1860-node-exporter-full/
+  node-exporter:
+    image: prom/node-exporter:v1.9.1
+    container_name: node-exporter
+    restart: unless-stopped
+    ports:
+      - "9100:9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)'
+
+  postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:v0.17.1
+    container_name: postgres-exporter
+    environment:
+      DATA_SOURCE_NAME: ${POSTGRES_SERVER_URI}
+    ports:
+      - "9187:9187"
+    depends_on:
+      - postgres-db
+
+  mongo-exporter:
+    image: percona/mongodb_exporter:0.44.0
+    container_name: mongodb-exporter
+    environment:
+      MONGODB_URI: ${MONGO_SERVER_URI}
+    command: ["--collect-all", "--compatible-mode", "--discovering-mode"]  
+    ports:
+      - "9216:9216"
+    depends_on:
+      - mongodb
+      
+
+  redis-exporter:
+    image: oliver006/redis_exporter:v1.74.0-alpine
+    ports:
+      - 9121:9121
+    command: ['--redis.addr= ${REDIS_SERVER_URI}','--redis.password=slightly-locked']
+
+  rabbitmq-exporter:
+      image: kbudde/rabbitmq-exporter:1.0.0
+      container_name: rabbitmq_exporter
+      ports:
+        - "9419:9419"
+      environment:
+        RABBIT_URL:  ${RABBITMQ_SERVER_URI}
+        RABBIT_USER: ${RABBITMQ_USER}
+        RABBIT_PASSWORD: ${RABBITMQ_PASS}
+      depends_on:
+        - rabbitmq

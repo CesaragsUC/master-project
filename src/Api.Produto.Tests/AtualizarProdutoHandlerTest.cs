@@ -1,22 +1,20 @@
 ﻿using Domain.Interfaces;
-using HybridRepoNet.Repository;
 using Moq;
 using Product.Application.Comands.Product;
 using Product.Application.Handlers.Product;
 using Product.Domain.Abstractions;
-using System.Linq.Expressions;
 
 
 namespace Product.Api.Tests;
 
-public class AtualizarProdutoHandlerTest : BaseConfig
+public class AtualizarProdutoHandlerTest : BaseIntegrationTest
 {
 
     private readonly Mock<IProductRepository> _productRepository;
     private readonly Mock<IBobStorageService> _bobStorageService;
     private readonly Mock<IProductService> _productService;
     private readonly UpdateProductHandler _handler;
-    public AtualizarProdutoHandlerTest()
+    public AtualizarProdutoHandlerTest(IntegrationTestWebAppFactory factory) : base(factory)
     {
         InitializeMediatrService();
 
@@ -32,43 +30,37 @@ public class AtualizarProdutoHandlerTest : BaseConfig
     public async Task Test1()
     {
         // Arrange
-        var command = new UpdateProductCommand
+
+        var productCommand = new CreateProductCommand
         {
-            Id =  Guid.NewGuid(),
-            Name = "Produtos 01",
+            Name = "Nitendo",
+            Price = 20.00m,
+            Active = false,
+        };
+
+
+        var createResult = await Sender.Send(productCommand);
+
+        // Act
+        var productCreated = DbContext.Products.FirstOrDefault(p => p.Name.Equals(productCommand.Name));
+
+        var productUpdateCommand = new UpdateProductCommand
+        {
+            Id = productCreated.Id,
+            Name = "Plastation 5",
             Price = 10.5m,
             Active = true
         };
 
-        var product = new Domain.Models.Product
-        {
-            Id = command.Id,
-            Name = "Produtos Teste",
-            Price = 20.00m,
-            Active = true,
-            CreatAt = DateTime.Now
-        };
+        var updateResult = await Sender.Send(productUpdateCommand);
 
-        _productRepository.Setup(r => r.FindOne(It.IsAny<Guid>())).Returns(product);
-
-
-        _productRepository.Setup(r => r.Update(It.IsAny<Domain.Models.Product>()))
-            .Callback<Domain.Models.Product>((product) =>
-        {
-            // Se o produto for válido, retorne o produto
-            if (product != null)
-            {
-                return;
-            }
-        });
-
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var productUpdated = DbContext.Products.FirstOrDefault(p => p.Name.Equals(productUpdateCommand.Name));
 
         // Act
-        Assert.True(result.Succeeded);
+        Assert.False(productCreated.Name != productUpdated.Name);
+        Assert.True(createResult.Succeeded);
+        Assert.True(updateResult.Succeeded);
 
-        _productRepository.Verify(r => r.FindOne(It.IsAny<Guid>()), Times.Once);
-        _productRepository.Verify(r => r.Update(It.IsAny<Domain.Models.Product>()), Times.Once);
     }
 
     [Fact(DisplayName = "Teste 02 - Atualizar erro")]

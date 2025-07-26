@@ -18,7 +18,7 @@ public static class ServiceCollectionExtensions
         services.AddJwtServices(configuration);
         services.AddAuthServices(configuration);
         services.AddCors(configuration);
-        services.AddGrafanaSetup(configuration);
+        services.OpenTelemetryConfig(configuration);
 
 
         if (EnvironmentCheck.IsProduction())

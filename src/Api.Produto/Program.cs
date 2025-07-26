@@ -5,6 +5,7 @@ using Shared.Kernel.Opentelemetry;
 using Serilog;
 using Shared.Kernel.CloudConfig;
 
+
 try
 {
     var builder = WebApplication.CreateBuilder(args);
@@ -55,3 +56,5 @@ catch (Exception ex)
     Log.Error(ex, "Erro ao iniciar a aplicacao");
     throw;
 }
+
+public partial class Program{}

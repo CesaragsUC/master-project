@@ -12,7 +12,7 @@ public static class FluentMigrationConfig
 {
 
     public static ServiceProvider AddFluentMigrationConfig(this IServiceCollection services,
-        IConfiguration configuration, Assembly migrationsAssembly)
+        string connectionString, Assembly migrationsAssembly)
     {
 
         var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
@@ -20,21 +20,22 @@ public static class FluentMigrationConfig
         var migrationService = new ServiceCollection().AddFluentMigratorCore()
               .ConfigureRunner(rb => rb
               .AddPostgres15_0()
-              .WithGlobalConnectionString(LoadConnectionString(configuration, environment))
+              .WithGlobalConnectionString(connectionString)
               .ScanIn(migrationsAssembly).For.Migrations())
               .AddLogging(lb => lb.AddFluentMigratorConsole())
               .BuildServiceProvider(false);
 
-        UpdateDatabase(migrationService, configuration);
+        UpdateDatabase(migrationService, connectionString);
 
         return migrationService;
     }
 
 
-    private static void UpdateDatabase(IServiceProvider serviceProvider, IConfiguration configuration)
+    private static void UpdateDatabase(IServiceProvider serviceProvider, string connectionString)
     {
+
         // Garante que o banco de dados exista
-        EnsureDatabaseExists(configuration);
+        EnsureDatabaseExists(connectionString);
 
         // Instantiate the runner
         var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
@@ -43,25 +44,25 @@ public static class FluentMigrationConfig
 
         // Execute the migrations
         runner.MigrateUp();
+
+
     }
 
 
-    private static void EnsureDatabaseExists(IConfiguration configuration)
+    private static void EnsureDatabaseExists(string connectionString)
     {
-        var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-        var defaultConnectionString = LoadConnectionString(configuration, environment);
-
         // Pega o nome do banco a ser criado
-        var dbName = new NpgsqlConnectionStringBuilder(defaultConnectionString).Database;
+        var dbName = new NpgsqlConnectionStringBuilder(connectionString).Database;
 
         // Monta uma connection string para o banco 'postgres', que sempre existe
-        var adminConnStringBuilder = new NpgsqlConnectionStringBuilder(defaultConnectionString)
+        var adminConnStringBuilder = new NpgsqlConnectionStringBuilder(connectionString)
         {
             Database = "postgres"
         };
 
         using (var connection = new NpgsqlConnection(adminConnStringBuilder.ConnectionString))
         {
+
             connection.Open();
 
             // Verifica se o banco já existe
@@ -80,6 +81,9 @@ public static class FluentMigrationConfig
                 }
             }
         }
+
+
+
     }
 
 

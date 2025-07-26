@@ -29,7 +29,7 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IAuthKeyCloakService, KeycloakAuthService>();
 builder.Services.AddScoped(typeof(IResult<>), typeof(Result<>));
 
-builder.Services.AddGrafanaSetup(builder.Configuration);
+builder.Services.OpenTelemetryConfig(builder.Configuration);
 
 
 builder.Services.AddKeycloakWebApiAuthentication(builder.Configuration, KeycloakAuthenticationOptions.Section);
