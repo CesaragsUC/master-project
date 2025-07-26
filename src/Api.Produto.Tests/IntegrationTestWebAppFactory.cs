@@ -19,7 +19,7 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
         .WithUsername("admin")
         .WithPassword("Teste@123")
         .WithDatabase("Products") // Recomendo nome exclusivo pra testes
-        .WithPortBinding(5432, true) // Deixe o sistema escolher a porta livre
+        .WithPortBinding(0, true) // Deixe o sistema escolher a porta livre
         .Build();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -28,6 +28,9 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
         {
             using (var serviceProvider = services.BuildServiceProvider())
             {
+                var mappedPort = _postgreSqlContainer.GetMappedPublicPort(5432);
+                var connectionString = $"Host=localhost;Port={mappedPort};Database=Products;Username=admin;Password=Teste@123;";
+
                 var configuration = serviceProvider.GetRequiredService<IConfiguration>();
 
                 var descriptorType = typeof(DbContextOptions<ProductDbContext>);
@@ -44,7 +47,7 @@ public class IntegrationTestWebAppFactory : WebApplicationFactory<Program>, IAsy
                 // Add the PostgreSQL container connection string
                 services.AddDbContext<ProductDbContext>(options =>
                 {
-                    options.UseNpgsql(_postgreSqlContainer.GetConnectionString());
+                    options.UseNpgsql(connectionString);
                 });
 
                 services.AddFluentMigrationConfig(_postgreSqlContainer.GetConnectionString(),
