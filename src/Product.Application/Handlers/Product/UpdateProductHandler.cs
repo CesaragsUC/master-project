@@ -8,6 +8,7 @@ using Product.Domain.Events;
 using ResultNet;
 using Serilog;
 using Shared.Kernel.Validation;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Product.Application.Handlers.Product;
@@ -20,7 +21,7 @@ public class UpdateProductHandler :
     private readonly IProductService _productService;
     private readonly IProductRepository _productRepository;
     private readonly IBobStorageService _bobStorageService;
-
+    static readonly ActivitySource activitySource = new("Product.Api");
     public UpdateProductHandler(
         IBobStorageService bobStorageService,
         IProductService productService,
@@ -33,6 +34,9 @@ public class UpdateProductHandler :
 
     public async Task<Result<bool>> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
     {
+
+        using var activity = activitySource.StartActivity("UpdateProduct");
+
         try
         {
             var validationResponse = await Validator(request, new UpdateProductCommandValidator());
@@ -49,17 +53,31 @@ public class UpdateProductHandler :
             _productRepository.Update(product);
             await _productRepository.Commit();
 
+            if (activity != null)
+            {
+                activity.SetTag("productId", existentProduct.Id!);
+                activity.SetTag("productName", existentProduct.Name!);
+                activity.SetTag("price", existentProduct.Price);
+
+                activity.AddEvent(new ActivityEvent("ProductUpdated"));
+            }
+
+
             await SendMessage(product);
 
             return await Result<bool>.SuccessAsync($"Product {request.Id} updated successfuly");
         }
         catch (DbUpdateException ex)
         {
+            activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+            activity?.AddException(ex);
             Log.Error(ex, "Error while update product. {Message}", ex.Message);
             return await Result<bool>.FailureAsync(500, ex.Message!);
         }
         catch (Exception ex)
         {
+            activity?.SetStatus(ActivityStatusCode.Error, ex.Message);
+            activity?.AddException(ex);
             Log.Error(ex, "Fail to updated product");
             return await Result<bool>.FailureAsync(400, ex.Message);
         }

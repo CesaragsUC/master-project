@@ -15,7 +15,7 @@ public static class ServiceCollectionExtension
     {
         services.AddMongoDb(configuration);
         services.AddMessageBrokerSetup(configuration);
-        services.AddGrafanaSetup(configuration);
+        services.OpenTelemetryConfig(configuration);
         services.AddRedisConfiguration(configuration);
     }
 

@@ -1,10 +1,8 @@
 ﻿using Domain.Interfaces;
-using HybridRepoNet.Repository;
 using Moq;
 using Product.Application.Comands.Product;
 using Product.Application.Handlers.Product;
 using Product.Domain.Abstractions;
-using System.Linq.Expressions;
 
 
 namespace Product.Api.Tests;
@@ -34,7 +32,7 @@ public class AtualizarProdutoHandlerTest : BaseConfig
         // Arrange
         var command = new UpdateProductCommand
         {
-            Id =  Guid.NewGuid(),
+            Id = Guid.NewGuid(),
             Name = "Produtos 01",
             Price = 10.5m,
             Active = true
@@ -54,13 +52,13 @@ public class AtualizarProdutoHandlerTest : BaseConfig
 
         _productRepository.Setup(r => r.Update(It.IsAny<Domain.Models.Product>()))
             .Callback<Domain.Models.Product>((product) =>
-        {
-            // Se o produto for válido, retorne o produto
-            if (product != null)
             {
-                return;
-            }
-        });
+                // Se o produto for válido, retorne o produto
+                if (product != null)
+                {
+                    return;
+                }
+            });
 
         var result = await _handler.Handle(command, CancellationToken.None);
 

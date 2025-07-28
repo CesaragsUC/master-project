@@ -27,7 +27,8 @@ public static class ServiceCollectionExtensions
         var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
         services.AddScoped<IBobStorageService, BobStorageService>();
-        services.AddFluentMigrationConfig(configuration, typeof(Product.Infrastructure.Migrations.Inicio).Assembly);
+        services.AddFluentMigrationConfig(FluentMigrationConfig.LoadConnectionString(configuration, environment),
+            typeof(Product.Infrastructure.Migrations.Inicio).Assembly);
         services.AddKeycloakServices(configuration);
         services.AddAzureBlobServices(configuration);
         services.AddMessageBrokerSetup(configuration);
@@ -35,7 +36,7 @@ public static class ServiceCollectionExtensions
             DbType.PostgreSQL,
             (int)HealthCheck.Active,
             FluentMigrationConfig.LoadConnectionString(configuration, environment));
-        services.AddGrafanaSetup(configuration);
+        services.OpenTelemetryConfig(configuration);
         services.MongoDbService(configuration);
 
         return services;

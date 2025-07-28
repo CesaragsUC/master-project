@@ -21,9 +21,10 @@ public static class ServiceCollectionExtensions
     {
         var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 
-        services.AddFluentMigrationConfig(configuration, typeof(Migrations.CreateOrderTable).Assembly);
+        services.AddFluentMigrationConfig(FluentMigrationConfig.LoadConnectionString(configuration, environment),
+            typeof(Migrations.CreateOrderTable).Assembly);
         services.AddMessageBrokerSetup(configuration);
-        services.AddGrafanaSetup(configuration);
+        services.OpenTelemetryConfig(configuration);
         services.AddHybridRepoNet<OrderDbContext>(configuration,
             DbType.PostgreSQL,
             (int)HealthCheck.Active,

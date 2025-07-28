@@ -26,7 +26,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped(typeof(IResult<>), typeof(Result<>));
         services.AddAutoMapper(Assembly.GetExecutingAssembly());
         services.MongoDbService(configuration);
-        services.AddGrafanaSetup(configuration);
+        services.OpenTelemetryConfig(configuration);
         services.AddSwaggerServices();
         services.AddKeycloakServices(configuration);
         services.AddAzureBlobServices(configuration);

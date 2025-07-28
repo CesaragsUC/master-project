@@ -2,6 +2,7 @@
 using Product.Application.Queries.Product;
 using Product.Domain.Abstractions;
 using Product.Domain.Exceptions;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 
 namespace Product.Application.Handlers.Product;
@@ -13,7 +14,6 @@ public class ProdutoQueryHandler :
 {
 
     private readonly IProductRepository _productRepository;
-
     public ProdutoQueryHandler(IProductRepository productRepository)
     {
         _productRepository = productRepository;

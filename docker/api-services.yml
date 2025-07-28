@@ -1,7 +1,7 @@
 services:
   
   casoft-store-web:
-     image: casoftlabs/casoft-store-web:v1.1.3
+     image: casoftlabs/casoft-store-web:v1.1.4
      container_name: casoft-store-web
      ports:
       - "4200:80"
@@ -40,7 +40,7 @@ services:
       - casoft-store-product
       - casoft-store-catalog
       - casoft-store-auth
-      - keycloak
+      - casoft-store-keycloak
       
   casoft-store-auth:
     image: casoftlabs/casoft-store-auth:${TAG}
@@ -66,7 +66,7 @@ services:
     ports:
       - "5283:5283"
     depends_on:
-      - keycloak
+      - casoft-store-keycloak
     restart: always  
       
   
@@ -108,7 +108,7 @@ services:
       - "5289:5289"
     depends_on:
       - rabbitmq
-      - keycloak
+      - casoft-store-keycloak
     restart: always  
 
 
@@ -125,6 +125,7 @@ services:
       - KEYCLOAK__SSL_REQUIRED=${KEYCLOAK_SSL_REQUIRED}
       - KEYCLOAK__RESOURCE=${KEYCLOAK_CLIENT_ID}
       - KEYCLOAK__VERIFY_TOKEN_AUDIENCE=true
+      - KEYCLOAK__CREDENTIALS__SECRET=${KEYCLOAK_CLIENT_SECRET}
       - OPENTELEMETRYOPTIONS__ENVIRONMENT= ${OPENTELEMETRY_ENVIROMENT}
       - OPENTELEMETRYOPTIONS__APPNAME=Billing.Api
       - OPENTELEMETRYOPTIONS__OTLEXPORTER__ENDPOINT=${OTLEXPORTER_ENDPOINT}
@@ -145,7 +146,7 @@ services:
     depends_on:
       - postgres-db
       - rabbitmq
-      - keycloak
+      - casoft-store-keycloak
     restart: always  
       
       
@@ -172,7 +173,7 @@ services:
       - "5294:5294"
     depends_on:
       - mongodb
-      - keycloak
+      - casoft-store-keycloak
     restart: always  
       
   casoft-store-discount:
@@ -201,7 +202,7 @@ services:
     depends_on:
       - postgres-db
       - rabbitmq
-      - keycloak
+      - casoft-store-keycloak
     restart: always  
   
   casoft-store-order:
@@ -237,7 +238,7 @@ services:
     depends_on:
       - postgres-db
       - rabbitmq
-      - keycloak
+      - casoft-store-keycloak
     restart: always  
 
       
@@ -277,5 +278,5 @@ services:
     depends_on:
       - postgres-db
       - rabbitmq
-      - keycloak
+      - casoft-store-keycloak
     restart: always  
