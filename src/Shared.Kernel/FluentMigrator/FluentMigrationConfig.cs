@@ -51,6 +51,7 @@ public static class FluentMigrationConfig
 
     private static void EnsureDatabaseExists(string connectionString)
     {
+
         // Pega o nome do banco a ser criado
         var dbName = new NpgsqlConnectionStringBuilder(connectionString).Database;
 

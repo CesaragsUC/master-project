@@ -1,33 +1,86 @@
-﻿using Infrastructure;
+﻿using Domain.Interfaces;
+using Infrastructure;
+using Infrastructure.Services;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Moq;
 using Product.Application.Handlers.Product;
+using Product.Application.Services;
+using Product.Domain.Abstractions;
+using Product.Infrastructure.Repository;
+using Shared.Kernel.FluentMigrator;
+using Testcontainers.PostgreSql;
 
-namespace Product.Api.Tests;
-
-public class BaseIntegrationTest : IClassFixture<IntegrationTestWebAppFactory>, IDisposable
+public abstract class BaseIntegrationTest : IAsyncLifetime
 {
-    private readonly IServiceScope _scope;
-    protected readonly ISender Sender;
-    protected readonly ProductDbContext DbContext;
+    protected ISender Sender;
+    protected ProductDbContext DbContext;
 
-    public BaseIntegrationTest(IntegrationTestWebAppFactory factory)
+    private ServiceProvider _serviceProvider;
+    private PostgreSqlContainer _postgreSqlContainer;
+    private IBobStorageService _bobStorageService;
+
+    public async Task InitializeAsync()
     {
-        _scope = factory.Services.CreateScope();
+        // Starta o container
+        _postgreSqlContainer = new PostgreSqlBuilder()
+            .WithImage("postgres:16")
+            .WithUsername("admin")
+            .WithPassword("Teste@123")
+            .WithDatabase("Products")
+            .WithPortBinding(0, true)
+            .Build();
 
-        Sender = _scope.ServiceProvider.GetRequiredService<ISender>();
+        await _postgreSqlContainer.StartAsync();
 
-        DbContext = _scope.ServiceProvider.GetRequiredService<ProductDbContext>();
+
+        // Monta a connection string dinâmica com base na porta exposta
+        var connectionString = _postgreSqlContainer.GetConnectionString();
+
+        // Configura os serviços
+        var services = new ServiceCollection();
+
+        // Remover o contexto existente
+        var descriptor = services.SingleOrDefault(
+            d => d.ServiceType == typeof(DbContextOptions<ProductDbContext>));
+
+        if (descriptor != null)
+            services.Remove(descriptor);
+
+        services.AddScoped<IBobStorageService, BobStorageService>();
+
+        services.AddDbContext<ProductDbContext>(options =>
+        {
+            options.UseNpgsql(connectionString);
+        });
+
+
+        // Cria a base no banco (caso precise rodar migrations aqui)
+        services.AddFluentMigrationConfig(connectionString,
+                typeof(Product.Infrastructure.Migrations.Inicio).Assembly);
+
+        _serviceProvider = services.BuildServiceProvider();
+
+        // Resolve os serviços
+        var scope = _serviceProvider.CreateScope();
+        DbContext = scope.ServiceProvider.GetRequiredService<ProductDbContext>();
+        Sender = scope.ServiceProvider.GetRequiredService<ISender>();
+
+
     }
 
-    public void Dispose()
+    public async Task DisposeAsync()
     {
-        DbContext?.Dispose();
-        _scope?.Dispose();
+        await _postgreSqlContainer.DisposeAsync();
+        if (_serviceProvider is IDisposable d)
+        {
+            d.Dispose();
+        }
     }
 
-    //https://goatreview-com.cdn.ampproject.org/c/s/goatreview.com/mediatr-quickly-test-handlers-with-unit-tests/amp/
-    public void InitializeMediatrService()
+    protected void InitializeMediatrService()
     {
         var services = new ServiceCollection();
         var serviceProvider = services
