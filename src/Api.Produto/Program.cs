@@ -48,7 +48,7 @@ try
     app.MapControllers();
 
 
-    app.Run();
+    app.RunAsync();
 
 }
 catch (Exception ex)
