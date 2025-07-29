@@ -6,7 +6,7 @@ on:
 jobs:
 
   unit-tests:
-    name: Quality Gate ⚙️
+    name: Test code quality 🧪
     runs-on: ubuntu-latest
     concurrency:
           group: example-group

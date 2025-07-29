@@ -118,7 +118,11 @@ public class IntegrationTestWebAppFactory
 
     private void SetRabbitMqEnvironmentVariables()
     {
-        Environment.SetEnvironmentVariable("RabbitMqTransportOptions:Host", _rabbitMqContainer.Hostname);
+        var host = _rabbitMqContainer.Hostname;
+        var port = _rabbitMqContainer.GetMappedPublicPort(5672).ToString();// Porta padrão do AMQP
+        var connectionString = $"amqp://guest:guest@{host}:{port}/";
+
+        Environment.SetEnvironmentVariable("RabbitMqTransportOptions:Host", connectionString);
         Environment.SetEnvironmentVariable("RabbitMqTransportOptions:Port", _rabbitMqContainer.GetMappedPublicPort(5672).ToString());
         Environment.SetEnvironmentVariable("RabbitMqTransportOptions:User", "guest");
         Environment.SetEnvironmentVariable("RabbitMqTransportOptions:Pass", "guest");
