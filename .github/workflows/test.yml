@@ -8,6 +8,10 @@ jobs:
   unit-tests:
     name: Test code quality 🧪
     runs-on: ubuntu-latest
+        # Add this to properly support Testcontainers
+    env:
+      TESTCONTAINERS_RYUK_DISABLED: "true"
+      DOTNET_SYSTEM_NET_HTTP_SOCKETSHTTPHANDLER_HTTP2UNENCRYPTEDSUPPORT: "true"
     concurrency:
           group: example-group
           cancel-in-progress: true  
@@ -23,6 +27,11 @@ jobs:
         ports:
           - 5432:5432         
     steps:
+    
+      # Install Docker to support Testcontainers
+      - name: Install Docker
+        uses: docker/setup-buildx-action@v3
+        
       - name: Getting project code ⏳
         uses: actions/checkout@v4
       - name: Setup JDK

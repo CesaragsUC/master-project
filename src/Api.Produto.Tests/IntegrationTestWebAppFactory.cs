@@ -35,7 +35,7 @@ public class IntegrationTestWebAppFactory
         .WithUsername("guest")
         .WithPassword("guest")
         .WithImage("rabbitmq:3.12-management")
-        .WithPortBinding(5672, 5672)
+        .WithPortBinding(5672)
         .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(5672))
         .WithCleanUp(true)
         .Build();
@@ -112,6 +112,7 @@ public class IntegrationTestWebAppFactory
     {
         builder.ConfigureAppConfiguration((context, configBuilder) =>
         {
+
             var overrideConfig = new Dictionary<string, string?>
             {
                 ["RabbitMqTransportOptions:Host"] = _rabbitMqContainer.Hostname,
@@ -131,8 +132,28 @@ public class IntegrationTestWebAppFactory
 
     public async Task InitializeAsync()
     {
-        await _postgreSqlContainer.StartAsync();
-        await _rabbitMqContainer.StartAsync().ConfigureAwait(false);
+        try
+        {
+            // Check if we're in GitHub Actions
+            var isGitHubActions = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("GITHUB_ACTIONS"));
+
+            if (isGitHubActions)
+            {
+                Console.WriteLine("Running in GitHub Actions environment - setting up containers with special configuration");
+                // Additional logging to help with troubleshooting in GitHub Actions
+            }
+
+            await _postgreSqlContainer.StartAsync();
+            await _rabbitMqContainer.StartAsync();
+
+            // Log important container information for debugging
+            Console.WriteLine($"RabbitMQ Container Status: Running at {_rabbitMqContainer.Hostname}:{_rabbitMqContainer.GetMappedPublicPort(5672)}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Failed to initialize containers: {ex.Message}");
+            throw;
+        }
     }
 
     public new async Task DisposeAsync()
