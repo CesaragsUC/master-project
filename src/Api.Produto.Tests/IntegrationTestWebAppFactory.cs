@@ -1,4 +1,5 @@
-﻿using Infrastructure;
+﻿using DotNet.Testcontainers.Builders;
+using Infrastructure;
 using MassTransit;
 using Message.Broker.Abstractions;
 using Message.Broker.Services;
@@ -32,7 +33,7 @@ public class IntegrationTestWebAppFactory
         .WithPassword("guest")
         .WithPortBinding(5672, 5672) // Porta padrão do RabbitMQ
         .WithImage("rabbitmq:3.12-management")
-        .WithCleanUp(true)
+        .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(5672))
         .Build();
 
 
