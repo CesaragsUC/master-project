@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Product.Infrastructure.Consumers;
+using Product.Infrastructure.RabbitMq;
 using Shared.Kernel.FluentMigrator;
 using Testcontainers.PostgreSql;
 using Testcontainers.RabbitMq;
@@ -20,6 +21,8 @@ public class IntegrationTestWebAppFactory
     : WebApplicationFactory<Program>,
       IAsyncLifetime
 {
+    private IConfiguration _configuration;
+
     private readonly PostgreSqlContainer _postgreSqlContainer = new PostgreSqlBuilder()
         .WithImage("postgres:16")
         .WithUsername("admin")
@@ -31,15 +34,15 @@ public class IntegrationTestWebAppFactory
     private readonly RabbitMqContainer _rabbitMqContainer = new RabbitMqBuilder()
         .WithUsername("guest")
         .WithPassword("guest")
-        .WithPortBinding(5672, 5672) // Porta padrão do RabbitMQ
         .WithImage("rabbitmq:3.12-management")
+        .WithPortBinding(5672, 5672)
         .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(5672))
+        .WithCleanUp(true)
         .Build();
 
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-
         SetRabbitMqConfiguration(builder);
 
         builder.ConfigureTestServices(services =>
@@ -48,6 +51,8 @@ public class IntegrationTestWebAppFactory
             RemoveOriginalRabbitMqConfiguration(services);
             AddRabbitMqFromTestcontainer(services);
         });
+
+
     }
     private void ConfigurePostegreSqlFromTestcontainer(IServiceCollection services)
     {
@@ -96,44 +101,13 @@ public class IntegrationTestWebAppFactory
 
     private void AddRabbitMqFromTestcontainer(IServiceCollection services)
     {
+
         services.AddSingleton<IRabbitMqService, RabbitMqService>();
         services.AddHostedService<RabbitMqHostedService>();
 
-        services.AddMassTransit(x =>
-        {
-            // Registra os consumers se necessário
-            x.AddConsumers(typeof(ProductAddedConsumer).Assembly);
-
-            x.UsingRabbitMq((context, cfg) =>
-            {
-                cfg.Host(_rabbitMqContainer.Hostname, _rabbitMqContainer.GetMappedPublicPort(5672), "/", host =>
-                {
-                    host.Username("guest");
-                    host.Password("guest");
-                });
-
-                // Aqui você configura as filas manualmente se necessário
-                cfg.ConfigureEndpoints(context);
-            });
-        });
+        services.AddMessageBrokerSetup(_configuration);
     }
 
-    private void SetRabbitMqEnvironmentVariables()
-    {
-        var host = _rabbitMqContainer.Hostname;
-        var port = _rabbitMqContainer.GetMappedPublicPort(5672).ToString();// Porta padrão do AMQP
-        var connectionString = $"amqp://guest:guest@{host}:{port}/";
-
-        Environment.SetEnvironmentVariable("RabbitMqTransportOptions:Host", connectionString);
-        Environment.SetEnvironmentVariable("RabbitMqTransportOptions:Port", _rabbitMqContainer.GetMappedPublicPort(5672).ToString());
-        Environment.SetEnvironmentVariable("RabbitMqTransportOptions:User", "guest");
-        Environment.SetEnvironmentVariable("RabbitMqTransportOptions:Pass", "guest");
-        Environment.SetEnvironmentVariable("RabbitMqTransportOptions:VHost", "/");
-        Environment.SetEnvironmentVariable("RabbitMqTransportOptions:UseSsl", "false");
-        Environment.SetEnvironmentVariable("RabbitMqTransportOptions:Prefix", "dev");
-    }
-
-    //alteration to use ConfigureAppConfiguration instead of SetRabbitMqEnvironmentVariables
     private void SetRabbitMqConfiguration(IWebHostBuilder builder)
     {
         builder.ConfigureAppConfiguration((context, configBuilder) =>
@@ -150,7 +124,9 @@ public class IntegrationTestWebAppFactory
             };
 
             configBuilder.AddInMemoryCollection(overrideConfig);
+            _configuration = configBuilder.Build();
         });
+
     }
 
     public async Task InitializeAsync()
