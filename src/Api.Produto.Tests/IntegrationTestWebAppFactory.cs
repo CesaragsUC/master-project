@@ -34,6 +34,8 @@ public class IntegrationTestWebAppFactory
     private readonly RabbitMqContainer _rabbitMqContainer = new RabbitMqBuilder()
         .WithImage("rabbitmq:3.12-management")
         .WithPortBinding(5672, 5672)
+        .WithUsername("admin")
+        .WithPassword("admin")
         .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(5672))
         .WithCleanUp(true)
         .Build();
