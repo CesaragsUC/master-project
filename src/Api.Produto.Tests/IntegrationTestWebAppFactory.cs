@@ -32,13 +32,14 @@ public class IntegrationTestWebAppFactory
         .WithPassword("guest")
         .WithPortBinding(5672, 5672) // Porta padrão do RabbitMQ
         .WithImage("rabbitmq:3.12-management")
+        .WithCleanUp(true)
         .Build();
 
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
 
-        SetRabbitMqEnvironmentVariables();
+        SetRabbitMqConfiguration(builder);
 
         builder.ConfigureTestServices(services =>
         {
