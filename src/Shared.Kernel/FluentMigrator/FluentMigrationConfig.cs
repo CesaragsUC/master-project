@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;
+using Serilog;
 using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
@@ -33,17 +34,25 @@ public static class FluentMigrationConfig
 
     private static void UpdateDatabase(IServiceProvider serviceProvider, string connectionString)
     {
+        try
+        {
 
-        // Garante que o banco de dados exista
-        EnsureDatabaseExists(connectionString);
+            // Garante que o banco de dados exista
+            EnsureDatabaseExists(connectionString);
 
-        // Instantiate the runner
-        var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
+            // Instantiate the runner
+            var runner = serviceProvider.GetRequiredService<IMigrationRunner>();
 
-        runner.ListMigrations();
+            runner.ListMigrations();
 
-        // Execute the migrations
-        runner.MigrateUp();
+            // Execute the migrations
+            runner.MigrateUp();
+        }
+        catch 
+        {
+            Log.Error("Error while updating database with migrations. Check your connection string and migrations assembly.");
+        }
+
 
 
     }

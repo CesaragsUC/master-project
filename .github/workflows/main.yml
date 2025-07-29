@@ -29,33 +29,9 @@ env:
     PRODUCT_CONTAINER_APP: casoft-store-product   
 
 jobs:
-
-  build:
-    if: github.event_name == 'pull_request' || github.ref_name != 'main'
-    name: Executing build
-    runs-on: ubuntu-latest
-    concurrency:
-      group: example-group
-      cancel-in-progress: true    
-    steps:
-        - name: Debug branch
-          run: |
-              echo 'Ref is: ${{ github.ref }}'
-
-        - name: Fetching project code ⏳
-          uses: actions/checkout@v4
-        - name: Setup dotnet
-          uses: actions/setup-dotnet@v4
-          with:
-              dotnet-version: 8.0.300
-        - name: Executing dotnet build
-          working-directory: .
-          run: dotnet build CasoftStore.sln
-
-
   tests:
       if: github.event_name == 'pull_request' || github.ref_name != 'main'
-      needs: build
+      #needs: build
       uses: CesaragsUC/master-project/.github/workflows/test.yml@main
       secrets: inherit
 

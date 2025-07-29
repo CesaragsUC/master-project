@@ -25,7 +25,7 @@ public static class RabbitMqServiceExtensions
         configuration.GetSection("RabbitMqTransportOptions").Bind(rabbitMqOptions);
 
         services.AddSingleton<IRabbitMqService, RabbitMqService>();
-        services.AddHostedService<RabbitMqHostedService>();
+        //services.AddHostedService<RabbitMqHostedService>();
         services.AddMassTransit(x =>
         {
             foreach (var assembly in consumerAssemblies)

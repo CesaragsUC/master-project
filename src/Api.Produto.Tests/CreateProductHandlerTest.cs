@@ -8,13 +8,13 @@ using Product.Domain.Abstractions;
 
 namespace Product.Api.Tests;
 
-public class CreateProductHandlerTest : BaseConfig
+public class CreateProductHandlerTest : BaseIntegrationTest
 {
     private readonly Mock<IProductRepository> _productRepository;
     private readonly Mock<IProductService> _productService;
     private readonly Mock<IBobStorageService> _bobStorageService;
     private readonly CreateProductHandler _handler;
-    public CreateProductHandlerTest()
+    public CreateProductHandlerTest(IntegrationTestWebAppFactory factory) : base(factory)
     {
         InitializeMediatrService();
 
@@ -32,20 +32,23 @@ public class CreateProductHandlerTest : BaseConfig
 
         var command = new CreateProductCommand
         {
-            Name = "Produtos 01",
-            Price = 10.5m,
+            Name = "AMD Ryzen 7 7700X",
+            Price = 150.5m,
             Active = true
         };
 
-        _productRepository.Setup(r => r.AddAsync(It.IsAny<Domain.Models.Product>())).Returns(Task.CompletedTask);
 
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await Sender.Send(command);
 
         // Act
-        Assert.True(result.Succeeded);
+        var product = DbContext.Products.FirstOrDefault(p => p.Name.Equals(command.Name));
 
-        _productRepository.Verify(r => r.AddAsync(It.IsAny<Domain.Models.Product>()), Times.Once);
+
+        //Assert
+
+        Assert.NotNull(product);
     }
+
 
     [Fact(DisplayName = "Teste 02 - Com Falha")]
     [Trait("Produtoservice", "ProductoCreateHandler")]
@@ -55,10 +58,11 @@ public class CreateProductHandlerTest : BaseConfig
 
         var command = new CreateProductCommand();
 
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var result = await Sender.Send(command);
 
         // Act
         Assert.False(result.Succeeded);
-        _productRepository.Verify(r => r.AddAsync(It.IsAny<Domain.Models.Product>()), Times.Never);
+
     }
+
 }
