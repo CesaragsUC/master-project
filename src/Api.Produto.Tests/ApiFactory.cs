@@ -1,6 +1,5 @@
 ﻿using DotNet.Testcontainers.Builders;
 using Infrastructure;
-using MassTransit;
 using Message.Broker.Abstractions;
 using Message.Broker.Services;
 using Microsoft.AspNetCore.Hosting;
@@ -10,18 +9,17 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Product.Infrastructure.Consumers;
 using Product.Infrastructure.RabbitMq;
 using Shared.Kernel.FluentMigrator;
 using Testcontainers.PostgreSql;
 using Testcontainers.RabbitMq;
 
 namespace Product.Api.Tests;
-public class IntegrationTestWebAppFactory
+public class ApiFactory
     : WebApplicationFactory<Program>,
       IAsyncLifetime
 {
-    private IConfiguration _configuration;
+    private IConfiguration? _configuration;
 
     private readonly PostgreSqlContainer _postgreSqlContainer = new PostgreSqlBuilder()
         .WithImage("postgres:16")
@@ -33,23 +31,21 @@ public class IntegrationTestWebAppFactory
 
     private readonly RabbitMqContainer _rabbitMqContainer = new RabbitMqBuilder()
         .WithImage("rabbitmq:3.12-management")
-        .WithPortBinding(5672, 5672)
         .WithUsername("admin")
         .WithPassword("admin")
-        .WithWaitStrategy(Wait.ForUnixContainer().UntilPortIsAvailable(5672))
+        .WithCommand("rabbitmq-server", "rabbitmq-plugins", "enable", "rabbitmq_management")
         .WithCleanUp(true)
         .Build();
 
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        SetRabbitMqConfiguration(builder);
+        SetTestsConfiguration(builder);
 
         builder.ConfigureTestServices(services =>
         {
             ConfigurePostegreSqlFromTestcontainer(services);
-            RemoveOriginalRabbitMqConfiguration(services);
-            AddRabbitMqFromTestcontainer(services);
+            ConfigureRabbitMqFromTestcontainer(services);
         });
 
 
@@ -79,6 +75,18 @@ public class IntegrationTestWebAppFactory
 
     }
 
+
+    private void ConfigureRabbitMqFromTestcontainer(IServiceCollection services)
+    {
+        //remove a configuração original do RabbitMqService
+        RemoveOriginalRabbitMqConfiguration(services);
+
+        //registra novamente o RabbitMqService
+        services.AddSingleton<IRabbitMqService, RabbitMqService>();
+
+        services.AddMessageBrokerSetup(_configuration);
+    }
+
     private void RemoveOriginalRabbitMqConfiguration(IServiceCollection services)
     {
         // Remover configuração antiga
@@ -99,23 +107,17 @@ public class IntegrationTestWebAppFactory
             services.Remove(descriptor);
     }
 
-    private void AddRabbitMqFromTestcontainer(IServiceCollection services)
-    {
-
-        services.AddSingleton<IRabbitMqService, RabbitMqService>();
-
-        services.AddMessageBrokerSetup(_configuration);
-    }
-
-    private void SetRabbitMqConfiguration(IWebHostBuilder builder)
+    private void SetTestsConfiguration(IWebHostBuilder builder)
     {
         builder.ConfigureAppConfiguration((context, configBuilder) =>
         {
-
+            var port = _rabbitMqContainer.GetMappedPublicPort(5672);
+            var hostname = _rabbitMqContainer.Hostname;
+            var connectionString = _rabbitMqContainer.GetConnectionString();
             var overrideConfig = new Dictionary<string, string?>
             {
-                ["RabbitMqTransportOptions:Host"] = _rabbitMqContainer.Hostname,
-                ["RabbitMqTransportOptions:Port"] = _rabbitMqContainer.GetMappedPublicPort(5672).ToString(),
+                ["RabbitMqTransportOptions:Host"] = connectionString,
+                ["RabbitMqTransportOptions:Port"] = port.ToString(),
                 ["RabbitMqTransportOptions:User"] = "admin",
                 ["RabbitMqTransportOptions:VHost"] = "/",
                 ["RabbitMqTransportOptions:Pass"] = "admin",
