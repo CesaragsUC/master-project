@@ -120,7 +120,9 @@ public class IntegrationTestWebAppFactory
                 ["RabbitMqTransportOptions:VHost"] = "/",
                 ["RabbitMqTransportOptions:Pass"] = "admin",
                 ["RabbitMqTransportOptions:UseSsl"] = "false",
-                ["RabbitMqTransportOptions:Prefix"] = "dev"
+                ["RabbitMqTransportOptions:Prefix"] = "dev",
+                ["BlobContainers:ConnectionStrings"] = "UseDevelopmentStorage=true",
+                ["BlobContainers:ContainerName"] = "meu-container"
             };
 
             configBuilder.AddInMemoryCollection(overrideConfig);
