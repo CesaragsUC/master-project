@@ -1,80 +1,66 @@
-﻿using HybridRepoNet.Repository;
-using Moq;
+﻿using Moq;
 using Product.Application.Comands.Product;
-using Product.Application.Handlers.Product;
-using Product.Domain.Abstractions;
-using Product.Domain.Models;
-using System.Linq.Expressions;
 
 
 namespace Product.Api.Tests;
 
-public class DeleteProductHandlerTest : BaseConfig
+public class DeleteProductHandlerTest : BaseIntegrationTest
 {
-
-    private readonly Mock<IProductRepository> _productRepository;
-    private readonly Mock<IProductService> _productService;
-    private readonly DeleteProductHandler _handler;
-    public DeleteProductHandlerTest()
+    public DeleteProductHandlerTest(ApiFactory factory) : base(factory)
     {
         InitializeMediatrService();
-
-        _productRepository = new Mock<IProductRepository>();
-        _productService = new Mock<IProductService>();
-
-        _handler = new DeleteProductHandler(_productService.Object, _productRepository.Object);
     }
 
-
     [Fact(DisplayName = "Teste 01 - Deletar com sucesso")]
-    [Trait("Produtoservice", "ProductDeleteHandler")]
+    [Trait("ProductDeleteHandler", "DeleteProductHandlerTest")]
     public async Task Test1()
     {
-        var command = new DeleteProductCommand(Guid.NewGuid());
 
-        var product = new Domain.Models.Product
+        var command = new CreateProductCommand
         {
-            Id = command.Id,
-            Name = "Produtos Teste",
-            Price = 20.00m,
-            Active = true,
-            CreatAt = DateTime.Now
+            Name = "Nissan Sentra",
+            Price = 150.5m,
+            Active = true
         };
 
-        _productRepository.Setup(r => r.FindOne(It.IsAny<Guid>())).Returns(product);
+
+        var result = await Sender.Send(command);
+
+        var productCreated = DbContext.Products.FirstOrDefault(p => p.Name.Equals(command.Name));
+
+        var deleteCommand = new DeleteProductCommand(productCreated.Id);
+
+        var deleteResult = await Sender.Send(deleteCommand);
 
 
-        _productRepository.Setup(r => r.Delete(It.IsAny<Domain.Models.Product>())).Callback<Domain.Models.Product>((product) =>
-        {
-            // Se o produto for válido, retorne o produto
-            if (product != null)
-            {
-                return;
-            }
-        });
-
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var productDeleted = DbContext.Products.FirstOrDefault(p => p.Id == productCreated.Id);
 
         // Act
-        Assert.True(result.Succeeded);
-        _productRepository.Verify(r => r.FindOne(It.IsAny<Guid>()), Times.Once);
-        _productRepository.Verify(r => r.Delete(It.IsAny<Domain.Models.Product>()), Times.Once);
+        Assert.Null(productDeleted);
+
     }
 
     [Fact(DisplayName = "Teste 02 - Deletar com erro")]
-    [Trait("Produtoservice", " ProductDeleteHandler")]
+    [Trait("ProductDeleteHandler", " DeleteProductHandlerTest")]
     public async Task Test2()
     {
-        // Arrange
+        var command = new CreateProductCommand
+        {
+            Name = "Nissan Sentra",
+            Price = 150.5m,
+            Active = true
+        };
 
-        var command = new DeleteProductCommand(Guid.Empty);
 
+        var result = await Sender.Send(command);
 
-        var result = await _handler.Handle(command, CancellationToken.None);
+        var productCreated = DbContext.Products.FirstOrDefault(p => p.Name.Equals(command.Name));
+
+        var deleteCommand = new DeleteProductCommand(Guid.NewGuid());
+
+        var deleteResult = await Sender.Send(deleteCommand);
 
         // Act
-        Assert.False(result.Succeeded);
-        _productRepository.Verify(r => r.FindOne(It.IsAny<Guid>()), Times.Never);
-        _productRepository.Verify(r => r.Delete(It.IsAny<Product.Domain.Models.Product>()), Times.Never);
+        Assert.False(deleteResult.Succeeded);
     }
 }

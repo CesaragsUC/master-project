@@ -5,15 +5,13 @@ using Product.Application.Handlers.Product;
 
 namespace Product.Api.Tests;
 
-public abstract class BaseIntegrationTest
-    : IClassFixture<IntegrationTestWebAppFactory>,
-      IDisposable
+public abstract class BaseIntegrationTest: IClassFixture<ApiFactory>,IDisposable
 {
     private readonly IServiceScope _scope;
     protected readonly ISender Sender;
     protected readonly ProductDbContext DbContext;
 
-    protected BaseIntegrationTest(IntegrationTestWebAppFactory factory)
+    protected BaseIntegrationTest(ApiFactory factory)
     {
         _scope = factory.Services.CreateScope();
 
