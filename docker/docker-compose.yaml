@@ -70,7 +70,9 @@ volumes:
     driver: local
   grafana_config_data:
     driver: local 
-
+  azurite_data:
+    driver: local   
+  
 networks:
   default:
     name: casoft-network

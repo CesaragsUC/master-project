@@ -104,13 +104,12 @@ public class UpdateProductHandler :
 
     private async Task SendMessage(Domain.Models.Product product)
     {
-        await _productService.PublishProductAddedEvent(new ProductAddedDomainEvent
+        await _productService.PublishProductUpdatedEvent(new ProductUpdatedDomainEvent
         {
             ProductId = product.Id.ToString(),
             Name = product.Name,
             Price = product.Price,
             Active = product.Active,
-            CreatAt = product.CreatAt,
             ImageUri = product.ImageUri
         });
     }
