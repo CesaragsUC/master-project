@@ -43,6 +43,11 @@ public class BobStorageService : IBobStorageService
             await blobClient.UploadAsync(stream, httpHeaders);
         }
 
+        if(blobClient.Uri.ToString().Contains("azurite"))
+        {
+            return blobClient.Uri.ToString().Replace("azurite","localhost");
+        }
+
         return blobClient.Uri.ToString();
     }
 
